@@ -42,7 +42,7 @@ namespace MiniGolf
         public override Vector2 GetGlobalCenter()
         {
             Vector2 size = GetGlobalSize();
-            return GetGlobalPosition() - (size / 2.0f - size * _sprite.Pivot).Rotate(MathHelper.ToRadians(GetGlobalRotation()));
+            return GetGlobalPosition() + (size / 2.0f - size * _sprite.Pivot).Rotate(MathHelper.ToRadians(GetGlobalRotation()));
         }
 
         public override Hitbox GetHitbox()
