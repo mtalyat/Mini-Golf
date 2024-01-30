@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MiniGolf.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,6 +78,7 @@ namespace MiniGolf
         public float Radius => GetGlobalSize().X / 2.0f; // should be square, so just use the x axis
 
         private TrailObject _trail = null;
+        private AimingObject _aiming = null;
 
         public bool Dead => _state == State.Dead;
         public bool Sunk => _state == State.Sunk;
@@ -157,10 +157,15 @@ namespace MiniGolf
                 ButtonState state = Input.GetMouseButtonState(0);
                 if (state == ButtonState.Down && Input.ContainsMouse(GetHitbox()))
                 {
+                    // spawn a trail to the mouse
                     _trail = Scene.Instantiate(new TrailObject(GetGlobalCenter(), GetGlobalSize().X, Scene));
+
+                    // if a pool ball, spawn an aiming object
+                    _aiming = Scene.Instantiate(new AimingObject(GetGlobalCenter(), Scene));
 
                     // set depth to render right under the ball
                     _trail.Depth = Depth - 0.0001f;
+                    _aiming.Depth = Depth - 0.0001f;
                 }
                 else if (_trail != null)
                 {
@@ -175,6 +180,8 @@ namespace MiniGolf
                         Hit(Vector2Helper.FromAngle(GetTrailAngle()), _trail.GetGlobalSize().Y);
                         _trail.Destroy();
                         _trail = null;
+                        _aiming?.Destroy();
+                        _aiming = null;
                     }
                 }
             }
@@ -220,10 +227,16 @@ namespace MiniGolf
             base.Draw(gameTime);
         }
 
+        #region Trail
+
         private float GetTrailAngle()
         {
             return MathHelper.ToRadians(_trail.GetGlobalRotation()) - MathF.PI / 2.0f;
         }
+
+        #endregion
+
+        #region Collisions
 
         public bool PreCollideWith(LevelObject obj)
         {
@@ -309,6 +322,8 @@ namespace MiniGolf
                     break;
             }
         }
+
+        #endregion
 
         #region Movement
 

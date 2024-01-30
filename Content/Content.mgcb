@@ -47,6 +47,18 @@
 /processorParam:TextureFormat=Color
 /build:Level/Level1/level.png
 
+#begin Texture/Aim.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Texture/Aim.png
+
 #begin Texture/BowlingBall.png
 /importer:TextureImporter
 /processor:TextureProcessor

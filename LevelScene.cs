@@ -26,9 +26,13 @@ namespace MiniGolf
         private readonly List<LevelObject> _collisionObjects = new();
 
         // player management data:
+        // holds references to player objects
         private List<Player> _alivePlayers;
-        private List<Vector2> _alivePlayerSpawns;
+        // holds position and rotation
+        private List<Vector3> _alivePlayerSpawns;
+        // current player index in _alivePlayers
         private int _activePlayerIndex = -1;
+        // active player with the active ball
         private Player ActivePlayer => _alivePlayers[_activePlayerIndex];
 
         private BallObject _activeBall = null;
@@ -82,7 +86,7 @@ namespace MiniGolf
             // find the starting spawn location
             Vector2 start = _typeObjects[ObjectType.Start].First().GetGlobalCenter();
             // populate the respawn points
-            _alivePlayerSpawns = new List<Vector2>(Enumerable.Repeat(start, _alivePlayers.Count));
+            _alivePlayerSpawns = new List<Vector3>(Enumerable.Repeat(new Vector3(start, 0.0f), _alivePlayers.Count));
 
             // start the game
             NextTurn();
@@ -149,7 +153,7 @@ namespace MiniGolf
                     case BallObject.State.Done:
                         // ball finished turn as normal, nothing crazy happened
                         // update respawn point
-                        _alivePlayerSpawns[_activePlayerIndex] = _activeBall.GetGlobalPosition();
+                        _alivePlayerSpawns[_activePlayerIndex] = new Vector3(_activeBall.GetGlobalPosition(), _activeBall.GetGlobalRotation());
                         break;
                     case BallObject.State.Dead:
                         // oops, the ball hit a hazzard, add a stroke
@@ -271,14 +275,14 @@ namespace MiniGolf
             return levelObject;
         }
 
-        private BallObject SpawnBall(Player player, Vector2? position = null)
+        private BallObject SpawnBall(Player player, Vector2? position = null, float? rotation = null)
         {
-            if (position == null)
-            {
-                position = _alivePlayerSpawns[_activePlayerIndex];
-            }
+            Vector3 spawn = _alivePlayerSpawns[_activePlayerIndex];
 
-            return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position.Value);
+            position ??= new Vector2(spawn.X, spawn.Y);
+            rotation ??= spawn.Z;
+
+            return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position.Value, rotation);
         }
 
         #endregion
@@ -402,6 +406,68 @@ namespace MiniGolf
 
             // done with colliding, now move as normal
             _activeBall?.Move(deltaTime);
+        }
+
+        public RaycastHit Raycast(Vector2 origin, Vector2 direction, float maxDistance = float.MaxValue) => Raycast(new Ray(origin, direction), maxDistance);
+
+        public RaycastHit Raycast(Ray ray, float maxDistance = float.MaxValue) => Raycast(ray, _collisionObjects, maxDistance);
+
+        public RaycastHit Raycast(Ray ray, List<LevelObject> levelObjects, float maxDistance = float.MaxValue)
+        {
+            LevelObject closest = null;
+            float closestDistance = maxDistance;
+
+            foreach (LevelObject levelObject in levelObjects)
+            {
+                // if the level object is not solid, ignore
+                if (!levelObject.Flags.HasFlag(BehaviorFlags.Solid))
+                {
+                    continue;
+                }
+
+                if (CheckIfRayIntersectsLevelObject(ray, levelObject, out float distance) && distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closest = levelObject;
+                }
+            }
+
+            if(closest != null)
+            {
+                return new RaycastHit(ray);
+            }
+            else
+            {
+                // TODO: get normal
+                return new RaycastHit(ray, closest, closestDistance, new Vector2());
+            }
+        }
+
+        private static bool CheckIfRayIntersectsLevelObject(Ray ray, LevelObject obj, out float distance)
+        {
+            distance = 0.0f;
+
+            Vector2 iDir = new Vector2(1.0f / ray.Direction.X, 1.0f / ray.Direction.Y);
+
+            Hitbox hitbox = obj.GetHitbox();
+            (Vector2 topLeft, Vector2 bottomRight) = hitbox.GetMinMax();
+
+            Vector2 min = (topLeft - ray.Origin) * iDir;
+            Vector2 max = (bottomRight - ray.Origin) * iDir;
+
+            Vector2 tMin = Vector2.Min(min, max);
+            Vector2 tMax = Vector2.Max(min, max);
+
+            float t0 = MathF.Max(tMin.X, tMin.Y);
+            float t1 = MathF.Min(tMax.X, tMax.Y);
+
+            if(t0 > t1 || t1 < 0)
+            {
+                return false;
+            }
+
+            distance = t0 >= 0 ? t0 : t1;
+            return true;
         }
 
         #endregion

@@ -39,17 +39,27 @@ namespace MiniGolf
 
             base.UnloadContent();
         }
+        
+        private void BeginDraw()
+        {
+            // draw with layers
+            _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+        }
+
+        private void EndDraw()
+        {
+            // done 
+            _spriteBatch.End();
+        }
 
         public override void Draw(GameTime gameTime)
         {
-            // draw with layers
-            SpriteBatch.Begin(SpriteSortMode.FrontToBack);
+            BeginDraw();
 
             // draw other things in the scene
             base.Draw(gameTime);
 
-            // done drawing
-            SpriteBatch.End();
+            EndDraw();
         }
 
         public T Instantiate<T>(T gameObject) where T : GameObject

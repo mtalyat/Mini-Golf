@@ -62,5 +62,36 @@ namespace MiniGolf
             // if the distance to the center is within the radius, it is contained
             return localPosition.DistanceTo(new Vector2(Size.X / 2.0f, Size.Y / 2.0f)) <= Size.X / 2.0f;
         }
+
+        public Vector2[] GetCorners()
+        {
+            return new Vector2[4]
+            {
+                Position,
+                Position + new Vector2(Size.X, 0.0f).Rotate(MathHelper.ToRadians(-Rotation)),
+                Position + new Vector2(0.0f, Size.Y).Rotate(MathHelper.ToRadians(-Rotation)),
+                Position + new Vector2(Size.X, Size.Y).Rotate(MathHelper.ToRadians(-Rotation))
+            };
+        }
+
+        public (Vector2, Vector2) GetMinMax()
+        {
+            // top left is min of X and Y
+            Vector2[] corners = GetCorners();
+
+            Vector2 topLeft = new(float.MaxValue, float.MaxValue);
+            Vector2 bottomRight = new(float.MinValue, float.MinValue);
+
+            foreach (Vector2 corner in corners)
+            {
+                if (corner.X < topLeft.X) topLeft.X = corner.X;
+                if (corner.Y < topLeft.Y) topLeft.Y = corner.Y;
+
+                if(corner.X > bottomRight.X) bottomRight.X = corner.X;
+                if(corner.Y > bottomRight.Y) bottomRight.Y = corner.Y;
+            }
+
+            return (topLeft, bottomRight);
+        }
     }
 }

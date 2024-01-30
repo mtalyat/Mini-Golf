@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniGolf.Content
+namespace MiniGolf
 {
     internal class TrailObject : SpriteObject
     {
