@@ -59,6 +59,9 @@ namespace MiniGolf
                 case ObjectType.Box:
                     _behaviorFlags = BehaviorFlags.Collidable | BehaviorFlags.Solid | BehaviorFlags.Breakable;
                     break;
+                case ObjectType.Crate:
+                    _behaviorFlags = BehaviorFlags.Collidable | BehaviorFlags.Solid;
+                    break;
                 case ObjectType.RotatingWall:
                 case ObjectType.MovingWall:
                     _behaviorFlags = BehaviorFlags.Collidable | BehaviorFlags.Solid;

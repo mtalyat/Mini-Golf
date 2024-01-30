@@ -92,6 +92,11 @@ namespace MiniGolf
         Box,
 
         /// <summary>
+        /// A solid object that cannot be broken.
+        /// </summary>
+        Crate,
+
+        /// <summary>
         /// A wall that can spin.
         /// </summary>
         RotatingWall,
