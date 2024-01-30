@@ -272,6 +272,8 @@ namespace MiniGolf
                 case ObjectType.Wall2:
                 case ObjectType.Wall3:
                 case ObjectType.Wall4:
+                case ObjectType.Box:
+                case ObjectType.Crate:
                     // spin if hit a wall
                     _shouldSpin = true;
                     break;
