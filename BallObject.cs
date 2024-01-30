@@ -81,6 +81,8 @@ namespace MiniGolf
         public bool Sunk => _state == State.Sunk;
         private float _timer;
         private float _maxTime;
+        private Vector2 _start;
+        private Vector2 _end;
 
         public BallObject(BallType type, Player owner, Scene scene) : base(ObjectType.Ball, new Sprite(scene.Content.Load<Texture2D>($"Texture/{type}"), null, new Vector2(0.5f, 0.5f)), scene)
         {
@@ -160,8 +162,15 @@ namespace MiniGolf
                 _timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 // update scale
-                float scale = MathF.Max(_timer, 0.0f) / _maxTime;
+                float percent = MathF.Max(_timer, 0.0f) / _maxTime;
+                float scale = percent;
                 LocalScale = new Vector2(scale, scale);
+
+                // update position
+                if(_state == State.Sinking)
+                {
+                    LocalPosition = Vector2Helper.Lerp(_end, _start, percent);
+                }
 
                 // if timer is done, finish
                 if(_timer <= 0.0f)
@@ -193,17 +202,10 @@ namespace MiniGolf
             return MathHelper.ToRadians(_trail.GetGlobalRotation()) - MathF.PI / 2.0f;
         }
 
-        public void CollideWith(LevelObject obj, float deltaTime)
+        public bool PreCollideWith(LevelObject obj)
         {
-            // determine what to do based on its type
-            switch (obj.Type)
+            switch(obj.Type)
             {
-                case ObjectType.Hole:
-                    if (obj.GetHitbox().ContainsRound(GetGlobalCenter()))
-                    {
-                        Sink();
-                    }
-                    break;
                 case ObjectType.WallDamaged:
                     // break if heavy or if football
                     if (_weight == Weight.Heavy || _ballType == BallType.FootballBall)
@@ -215,13 +217,37 @@ namespace MiniGolf
                         {
                             SlowDown(Constants.LEVEL_DAMAGED_WALL_SLOW_DOWN);
                         }
+
+                        return false;
                     }
                     break;
-                case ObjectType.Wall:
-                case ObjectType.Wall1:
-                case ObjectType.Wall2:
-                case ObjectType.Wall3:
-                case ObjectType.Wall4:
+                case ObjectType.Box:
+                    // kill box if heavy
+                    if (_weight == Weight.Heavy)
+                    {
+                        obj.Destroy();
+
+                        // slow down slightly
+                        SlowDown(Constants.LEVEL_BOX_SLOW_DOWN);
+
+                        return false;
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
+        public void CollideWith(LevelObject obj, float deltaTime)
+        {
+            // determine what to do based on its type
+            switch (obj.Type)
+            {
+                case ObjectType.Hole:
+                    if (obj.GetHitbox().ContainsRound(GetGlobalCenter()))
+                    {
+                        Sink(obj);
+                    }
                     break;
                 case ObjectType.Slope:
                     // get vector direction of slope from its angle, add to velocity
@@ -244,13 +270,6 @@ namespace MiniGolf
                     if (obj.GetHitbox().Contains(GetGlobalCenter()))
                     {
                         Die();
-                    }
-                    break;
-                case ObjectType.Box:
-                    // kill box if heavy
-                    if (_weight == BallObject.Weight.Heavy)
-                    {
-                        obj.Destroy();
                     }
                     break;
             }
@@ -325,11 +344,13 @@ namespace MiniGolf
 
         #region Events
 
-        public void Sink()
+        public void Sink(LevelObject hole)
         {
             if(_state == State.Moving)
             {
                 Stop();
+                _start = GetGlobalCenter();
+                _end = hole.GetGlobalCenter();
                 _state = State.Sinking;
                 _maxTime = Constants.BALL_SINK_TIME;
                 _timer = _maxTime;

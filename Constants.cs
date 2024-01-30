@@ -21,7 +21,8 @@ namespace MiniGolf
         public const float BALL_SINK_TIME = 0.5f;
         public const float BALL_DEATH_TIME = 0.5f;
 
-        public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.1f;
+        public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.2f;
+        public const float LEVEL_BOX_SLOW_DOWN = 0.1f;
         public const float LEVEL_SLOPE_FORCE = 1.0f;
         public const float LEVEL_SANDBAR_FORCE = 100.0f;
     }

@@ -57,6 +57,11 @@ namespace MiniGolf
             return FromAngle(Angle(origin, v) + radians) * Distance(v, origin);
         }
 
+        public static Vector2 Lerp(Vector2 v1, Vector2 v2, float amount)
+        {
+            return new Vector2(MathHelper.Lerp(v1.X, v2.X, amount), MathHelper.Lerp(v1.Y, v2.Y, amount));
+        }
+
         public static float Magnitude(this Vector2 v)
         {
             return MathF.Sqrt(v.X * v.X + v.Y * v.Y);

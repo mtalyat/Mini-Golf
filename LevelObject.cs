@@ -36,7 +36,7 @@ namespace MiniGolf
                 case ObjectType.Start:
                     break;
                 case ObjectType.WallDamaged:
-                    _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Solid;
+                    _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Solid | BehaviorFlags.Breakable;
                     break;
                 case ObjectType.Wall:
                 case ObjectType.Wall1:

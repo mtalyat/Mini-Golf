@@ -341,9 +341,8 @@ namespace MiniGolf
                 if (collisionData.RelativeBallPosition.DistanceTo(collisionData.ClampedBallPosition) <= ballRadius)
                 {
                     // determine what to do based on the other object's properties
-
-                    // if solid, reflect
-                    if (obj.Flags.HasFlag(BehaviorFlags.Solid))
+                    // if PreCollideWith true, the ball should reflect if solid
+                    if (_activeBall.PreCollideWith(obj) && obj.Flags.HasFlag(BehaviorFlags.Solid))
                     {
                         // TODO: account for round reflection
                         //if(obj.Flags.HasFlag(BehaviorFlags.Round))
