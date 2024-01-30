@@ -160,12 +160,15 @@ namespace MiniGolf
                     // spawn a trail to the mouse
                     _trail = Scene.Instantiate(new TrailObject(GetGlobalCenter(), GetGlobalSize().X, Scene));
 
-                    // if a pool ball, spawn an aiming object
-                    _aiming = Scene.Instantiate(new AimingObject(GetGlobalCenter(), Scene));
-
                     // set depth to render right under the ball
                     _trail.Depth = Depth - 0.0001f;
-                    _aiming.Depth = Depth - 0.0001f;
+
+                    // if a pool ball, spawn an aiming object
+                    if(_ballType == BallType.PoolBall)
+                    {
+                        _aiming = Scene.Instantiate(new AimingObject(GetGlobalCenter(), Scene));
+                        _aiming.Depth = Depth - 0.0001f;
+                    }
                 }
                 else if (_trail != null)
                 {

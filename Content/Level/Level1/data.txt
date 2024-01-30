@@ -1,5 +1,5 @@
 ﻿#Balls	GolfBall TennisBall FootballBall SoccerBall BowlingBall PongBall PoolBall HockeyPuck Mint GolfBall
-Balls	PoolBall PoolBall PoolBall PoolBall PoolBall PoolBall PoolBall
+Balls	HockeyPuck HockeyPuck HockeyPuck HockeyPuck HockeyPuck HockeyPuck HockeyPuck HockeyPuck
 Start	20 40 60 60
 	500 500/120 120
 Hole	20 0 40 40/.5 .5
