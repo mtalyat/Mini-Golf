@@ -340,7 +340,7 @@ namespace MiniGolf
                 if(obj.Flags.HasFlag(BehaviorFlags.Round))
                 {
                     // if round, just use radii
-                    collided = ballCenter.DistanceTo(obj.GetGlobalCenter()) <= ballRadius + obj.GetGlobalSize().X / 2.0f;
+                    collided = ballFutureCenterPosition.DistanceTo(obj.GetGlobalCenter()) <= ballRadius + obj.GetGlobalSize().X / 2.0f;
                 }
                 else
                 {
@@ -365,17 +365,27 @@ namespace MiniGolf
 
                             //}
 
-                            // get the positional data to do the collision
-                            BallCollisionData collisionData = GetBallRectangularCollisionData(ballCenter, obj);
-
                             // calulcate the normal for reflection
 
                             // angle from clamped to relative ball center will be the normal
                             // then also reverse the previous angle
-                            Vector2 normal = collisionData.ClampedBallPosition.DirectionTo(collisionData.RelativeBallPosition);
+                            Vector2 normal;
 
-                            // now rotate the normal back to world space instead of local space
-                            normal = Vector2Helper.FromAngle(Vector2Helper.Angle(Vector2.Zero, normal) + MathHelper.ToRadians(obj.GetGlobalRotation()));
+                            if (obj.Flags.HasFlag(BehaviorFlags.Round))
+                            {
+                                // if round, just get direction to future center
+                                normal = obj.GetGlobalCenter().DirectionTo(ballFutureCenterPosition);
+                            }
+                            else
+                            {
+                                // get the positional data to do the collision
+                                BallCollisionData collisionData = GetBallRectangularCollisionData(ballCenter, obj);
+
+                                normal = collisionData.ClampedBallPosition.DirectionTo(collisionData.RelativeBallPosition);
+
+                                // now rotate the normal back to world space instead of local space
+                                normal = Vector2Helper.FromAngle(Vector2Helper.Angle(Vector2.Zero, normal) + MathHelper.ToRadians(obj.GetGlobalRotation()));
+                            }
 
                             // reflect using the normal given from the collision data
                             _activeBall.Reflect(normal);
