@@ -104,8 +104,8 @@ namespace MiniGolf
             GraphicsDevice.SetRenderTarget(null);
 
             // render the target to the screen
-            _targetBatch.Begin();
-            //_targetBatch.Begin(samplerState: SamplerState.PointClamp);
+            //_targetBatch.Begin();
+            _targetBatch.Begin(samplerState: SamplerState.PointClamp);
             _targetBatch.Draw(_target, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
             _targetBatch.End();
         }

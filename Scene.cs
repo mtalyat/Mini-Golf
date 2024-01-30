@@ -77,8 +77,12 @@ namespace MiniGolf
             return gameObject;
         }
 
-        public void Destroy(GameObject gameObject)
+        public virtual void Clean(GameObject gameObject) { }
+
+        public virtual void Destroy(GameObject gameObject)
         {
+            Clean(gameObject);
+
             gameObject.Destroy();
         }
     }

@@ -251,15 +251,15 @@ namespace MiniGolf
                     break;
                 case ObjectType.Slope:
                     // get vector direction of slope from its angle, add to velocity
-                    Velocity += Vector2Helper.FromAngle(MathHelper.ToRadians(obj.GetGlobalRotation())) * Constants.LEVEL_SLOPE_FORCE * deltaTime;
+                    Push(Vector2Helper.FromAngle(MathHelper.ToRadians(obj.GetGlobalRotation())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
                 case ObjectType.Hill:
                     // get vector direction of slope from center of the hill, add to velocity
-                    Velocity += Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime;
+                    Push(Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
                 case ObjectType.Valley:
                     // get vector direction of slope from center of the hill, subtract from velocity
-                    Velocity -= Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime;
+                    Push(-Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
                 case ObjectType.Sandbar:
                     // slow down the ball
@@ -292,6 +292,15 @@ namespace MiniGolf
             Hit(direction * power);
         }
 
+        public void Push(Vector2 directionAndPower)
+        {
+            // soccer ball not affected by pushing
+            if(_ballType != BallType.SoccerBall)
+            {
+                Velocity += directionAndPower;
+            }
+        }
+
         public void Stop()
         {
             Velocity = Vector2.Zero;
@@ -304,6 +313,12 @@ namespace MiniGolf
 
         public void Move(float deltaTime)
         {
+            // only move if in the moving state
+            if(_state != State.Moving)
+            {
+                return;
+            }
+
             // slow from friction
             SlowDown(_objectFriction * deltaTime);
 

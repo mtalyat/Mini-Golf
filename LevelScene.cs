@@ -124,6 +124,18 @@ namespace MiniGolf
             base.Draw(gameTime);
         }
 
+        public override void Clean(GameObject gameObject)
+        {
+            // remove from lists
+            if (gameObject is LevelObject levelObject)
+            {
+                _typeObjects[levelObject.Type].Remove(levelObject);
+                _collisionObjects.Remove(levelObject);
+            }
+
+            base.Clean(gameObject);
+        }
+
         #region Game Management
 
         private bool EndOfTurn()

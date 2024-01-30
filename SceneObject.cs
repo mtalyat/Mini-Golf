@@ -23,11 +23,11 @@ namespace MiniGolf
 
         public override void Destroy()
         {
+            // have scene clean up any resources
+            _scene.Clean(this);
+
             // destroy self as normal
             base.Destroy();
-
-            // also remove self from scene
-            SetParent(null);
         }
     }
 }
