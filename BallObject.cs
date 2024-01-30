@@ -92,7 +92,7 @@ namespace MiniGolf
             _owner = owner;
             _ballType = type;
             LocalSize = new Vector2(40.0f, 40.0f);
-            Depth = 1.0f;
+            Depth = 0.5f;
 
             // set sprite color to owner color
             Color = owner.Color;
@@ -230,8 +230,8 @@ namespace MiniGolf
             switch(obj.Type)
             {
                 case ObjectType.WallDamaged:
-                    // break if heavy or if football
-                    if (_weight == Weight.Heavy || _ballType == BallType.FootballBall)
+                    // break if heavy or if a football that is not spinning
+                    if (_weight == Weight.Heavy || (_ballType == BallType.FootballBall && !_shouldSpin))
                     {
                         obj.Destroy();
 
