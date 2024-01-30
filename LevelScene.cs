@@ -285,19 +285,8 @@ namespace MiniGolf
 
         #region Physics
 
-        private static BallCollisionData GetBallCollisionData(Vector2 ballCenter, LevelObject obj)
+        private static BallCollisionData GetBallRectangularCollisionData(Vector2 ballCenter, LevelObject obj)
         {
-            // TODO: differentiate round from square
-            //if(obj.Flags.HasFlag(BehaviorFlags.Round))
-            //{
-            //    // the object is round
-
-            //}
-            //else
-            //{
-            //    // the object is a square
-            //}
-
             // get the obj orientation data
             Hitbox objHitbox = obj.GetHitbox();
             Vector2 objPosition = objHitbox.Position;
@@ -346,11 +335,23 @@ namespace MiniGolf
             // check against all other collidable objects
             foreach (LevelObject obj in _collisionObjects)
             {
-                // get collision data for new position
-                BallCollisionData collisionData = GetBallCollisionData(ballFutureCenterPosition, obj);
+                bool collided;
+
+                if(obj.Flags.HasFlag(BehaviorFlags.Round))
+                {
+                    // if round, just use radii
+                    collided = ballCenter.DistanceTo(obj.GetGlobalCenter()) <= ballRadius + obj.GetGlobalSize().X / 2.0f;
+                }
+                else
+                {
+                    // if not round, its more complicated
+                    BallCollisionData collisionData = GetBallRectangularCollisionData(ballFutureCenterPosition, obj);
+
+                    collided = collisionData.RelativeBallPosition.DistanceTo(collisionData.ClampedBallPosition) <= ballRadius;
+                }
 
                 // if within the radius of the ball, collison is going to occur
-                if (collisionData.RelativeBallPosition.DistanceTo(collisionData.ClampedBallPosition) <= ballRadius)
+                if (collided)
                 {
                     // determine what to do based on the other object's properties
                     // if PreCollideWith true, the ball should reflect if solid
@@ -365,7 +366,7 @@ namespace MiniGolf
                             //}
 
                             // get the positional data to do the collision
-                            collisionData = GetBallCollisionData(ballCenter, obj);
+                            BallCollisionData collisionData = GetBallRectangularCollisionData(ballCenter, obj);
 
                             // calulcate the normal for reflection
 
