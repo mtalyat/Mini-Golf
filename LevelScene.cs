@@ -326,11 +326,9 @@ namespace MiniGolf
             // check for future collisions
 
             // get ball data
-            Hitbox ballHitbox = _activeBall.GetHitbox();
-            Vector2 ballPosition = ballHitbox.Position;
             Vector2 ballVelocity = _activeBall.Velocity * deltaTime;
             float ballRadius = _activeBall.Radius;
-            Vector2 ballCenter = ballPosition + new Vector2(ballRadius, ballRadius);
+            Vector2 ballCenter = _activeBall.GetGlobalPosition();
             Vector2 ballFutureCenterPosition = ballCenter + ballVelocity;
 
             // check against all other collidable objects
