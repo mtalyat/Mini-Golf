@@ -137,12 +137,20 @@ namespace MiniGolf
                     // set depth to render right under the ball
                     _trail.Depth = Depth - 0.0001f;
                 }
-                else if (state == ButtonState.Up && _trail != null)
+                else if (_trail != null)
                 {
-                    // if button released, hit and destroy the trail
-                    Hit(Vector2Helper.FromAngle(MathHelper.ToRadians(_trail.GetGlobalRotation()) - MathF.PI / 2.0f), _trail.GetGlobalSize().Y);
-                    _trail.Destroy();
-                    _trail = null;
+                    if (state == ButtonState.Pressed)
+                    {
+                        // if button held, make ball face the angle of the trail
+                        LocalRotation = MathHelper.ToDegrees(GetTrailAngle());
+                    }
+                    else if(state == ButtonState.Up)
+                    {
+                        // if button released, hit and destroy the trail
+                        Hit(Vector2Helper.FromAngle(GetTrailAngle()), _trail.GetGlobalSize().Y);
+                        _trail.Destroy();
+                        _trail = null;
+                    }
                 }
             }
 
@@ -178,6 +186,11 @@ namespace MiniGolf
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+        }
+
+        private float GetTrailAngle()
+        {
+            return MathHelper.ToRadians(_trail.GetGlobalRotation()) - MathF.PI / 2.0f;
         }
 
         public void CollideWith(LevelObject obj, float deltaTime)
