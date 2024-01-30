@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace MiniGolf
+{
+    internal class ObjectTypeData
+    {
+        private readonly ObjectType _objectType;
+        public ObjectType Type => _objectType;
+
+        private readonly Rectangle? _rectangle;
+        public Rectangle? Rect => _rectangle;
+
+        private readonly Vector2? _pivot;
+        public Vector2? Pivot => _pivot;
+
+        public ObjectTypeData(ObjectType objectType, Rectangle? rectangle, Vector2? pivot)
+        {
+            _objectType = objectType;
+            _rectangle = rectangle;
+            _pivot = pivot;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ObjectTypeData data &&
+                   _objectType == data._objectType &&
+                   _rectangle.Equals(data._rectangle) &&
+                   _pivot.Equals(data._pivot);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_objectType, _rectangle, _pivot);
+        }
+
+        public static ObjectTypeData FromString(string str)
+        {
+            // split by separating tab
+            string[] parts = str.Split('\t');
+
+            string[] subParts = parts[1].Split('/');
+
+            // get data for the object
+            ObjectType type = Enum.Parse<ObjectType>(parts[0]);
+            Rectangle? rect = subParts.Length <= 0 ? null : Parse.ParseRectangle(subParts[0]);
+            Vector2? pivot = subParts.Length <= 1 ? null : Parse.ParseVector2(subParts[1]);
+
+            return new ObjectTypeData(type, rect, pivot);
+        }
+    }
+}
