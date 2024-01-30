@@ -19,17 +19,24 @@ namespace MiniGolf
         private readonly int _levelId;
         private Texture2D _levelTexture;
 
-        private readonly List<string> _ballNames = new();
+        private readonly List<BallType> _balls = new();
 
         private readonly Dictionary<ObjectType, List<GameObject>> _typeObjects = new();
 
         private readonly List<LevelObject> _collisionObjects = new();
+
+        // player management data:
+        private List<Player> _alivePlayers;
+        private List<Vector2> _alivePlayerSpawns;
+        private int _activePlayerIndex = -1;
+        private Player ActivePlayer => _alivePlayers[_activePlayerIndex];
 
         private BallObject _activeBall = null;
 
         public LevelScene(int levelId, Game game) : base(game)
         {
             _levelId = levelId;
+            _alivePlayers = new List<Player>(Session.Players);
         }
 
         public override void Initialize()
@@ -44,10 +51,10 @@ namespace MiniGolf
             // load level data from the file
             _data = new LevelData($"Content/{path}data.txt");
 
-            // get the ball names, put them in a queue so they can easily be grabbed, and load the textures while we're at it
+            // get the ball names, put them in a list so they can easily be grabbed
             foreach (string name in _data.TakeValue("Balls").Split(' '))
             {
-                _ballNames.Add(name);
+                _balls.Add(Enum.Parse<BallType>(name));
             }
 
             // load the level png
@@ -69,11 +76,141 @@ namespace MiniGolf
                 }
             }
 
+            // ensure ball is in there
             _typeObjects.TryAdd(ObjectType.Ball, new List<GameObject>());
-            _activeBall = SpawnBall(new Player("Dork", Color.White));
+
+            // find the starting spawn location
+            Vector2 start = _typeObjects[ObjectType.Start][0].GetGlobalPosition();
+            // populate the respawn points
+            _alivePlayerSpawns = new List<Vector2>(Enumerable.Repeat(start, _alivePlayers.Count));
+
+            // start the game
+            NextTurn();
 
             base.LoadContent();
         }
+
+        protected override void UnloadContent()
+        {
+            base.UnloadContent();
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            // if the ball is in the scene, simulate physics on it
+            if (_activeBall != null)
+            {
+                ConductBallPhysics(gameTime);
+            }
+
+            // if the ball is done moving, move to the next turn
+            if(_activeBall?.CurrentState >= BallObject.State.Done)
+            {
+                NextTurn();
+            }
+
+            base.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            SpriteBatch.Begin();
+
+            // draw the background
+            SpriteBatch.Draw(_levelTexture, new Vector2(0.0f, 0.0f), Color.White);
+
+            SpriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+
+        #region Game Management
+
+        private bool EndOfTurn()
+        {
+            // if there is a ball, handle it
+            if (_activeBall != null)
+            {
+                // act upon the ball
+                switch (_activeBall.CurrentState)
+                {
+                    case BallObject.State.Done:
+                        // ball finished turn as normal, nothing crazy happened
+                        // update respawn point
+                        _alivePlayerSpawns[_activePlayerIndex] = _activeBall.GetGlobalPosition();
+                        break;
+                    case BallObject.State.Dead:
+                        // oops, the ball hit a hazzard, add a stroke
+                        ActivePlayer.Stroke += 1;
+                        break;
+                    case BallObject.State.Sunk:
+                        // yippee, the ball sunk in a hole!
+                        return true;
+                    default:
+                        // the ball is not done moving: what are we doing here?
+                        return false;
+                }
+
+                // destroy old ball
+                _activeBall.Destroy();
+                _activeBall = null;
+            }
+
+            return false;
+        }
+
+        private void RemoveActivePlayerFromPlay()
+        {
+            _alivePlayers.RemoveAt(_activePlayerIndex);
+            _alivePlayerSpawns.RemoveAt(_activePlayerIndex);
+        }
+
+        /// <summary>
+        /// Moves to the player/ball
+        /// </summary>
+        private void NextTurn()
+        {
+            int move = 0;
+
+            if(_activePlayerIndex == -1) // if beginning of the game, move to first player 
+            {
+                move = 1;
+            }
+            else if(EndOfTurn()) // if the current player sunk their ball, remove them from play
+            {
+                RemoveActivePlayerFromPlay();
+            }
+            else if(ActivePlayer.Stroke >= _balls.Count) // if out of strokes, remove them from play
+            {
+                RemoveActivePlayerFromPlay();
+            }
+            else // no one was removed, so move to the next player
+            {
+                move = 1;
+            }
+
+            // if no players left, game over
+            if(_alivePlayers.Count == 0)
+            {
+                GameOver();
+                return;
+            }
+
+            // move to next player
+            _activePlayerIndex = (_activePlayerIndex + move) % _alivePlayers.Count;
+
+            // spawn their ball
+            _activeBall = SpawnBall(ActivePlayer);
+        }
+        
+        private void GameOver()
+        {
+            ((MiniGolfGame)Game).LoadScene(SceneType.MainMenu);
+        }
+
+        #endregion
+
+        #region Creating Objects
 
         private LevelObject InstantiateLevelObject(LevelObject levelObject, Vector2? position = null, float? rotation = null)
         {
@@ -91,20 +228,50 @@ namespace MiniGolf
             return levelObject;
         }
 
+        /// <summary>
+        /// Spawns a GameComponent using the given type and data.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private LevelObject CreateLevelObject(ObjectTypeData typeData, ObjectData data, Texture2D texture)
+        {
+            // create object
+            LevelObject levelObject = typeData.Type switch
+            {
+                ObjectType.Ball => new LevelObject
+                    (
+                    typeData.Type,
+                    new Sprite(Content.Load<Texture2D>("Objects/GolfBall"), null),
+                    this
+                    ),
+                _ => new LevelObject
+                    (
+                    typeData.Type,
+                    new Sprite(texture, typeData.Rect, typeData.Pivot),
+                    this
+                    ),
+            };
+
+            // set to proper location, size, rot
+            levelObject.SetOrientation(data.Position, Vector2.One, data.Size, data.Rotation);
+
+            return levelObject;
+        }
+
         private BallObject SpawnBall(Player player, Vector2? position = null)
         {
             if (position == null)
             {
-                position = _typeObjects[ObjectType.Start].First().GetGlobalPosition();
+                position = _alivePlayerSpawns[_activePlayerIndex];
             }
 
-            return (BallObject)InstantiateLevelObject(new BallObject(Enum.Parse<BallType>(_ballNames[player.Stroke]), player, this), position.Value);
+            return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position.Value);
         }
 
-        protected override void UnloadContent()
-        {
-            base.UnloadContent();
-        }
+        #endregion
+
+        #region Physics
 
         private static BallCollisionData GetBallCollisionData(Vector2 ballCenter, LevelObject obj)
         {
@@ -199,69 +366,11 @@ namespace MiniGolf
                         normal = Vector2Helper.FromAngle(Vector2Helper.Angle(Vector2.Zero, normal) + MathHelper.ToRadians(obj.GetGlobalRotation()));
 
                         // reflect using the normal given from the collision data
-                        _activeBall.Velocity = _activeBall.Velocity - 2.0f * Vector2.Dot(_activeBall.Velocity, normal) * normal;
+                        _activeBall.Reflect(normal);
                     }
 
-                    // determine what to do based on its type
-                    switch (obj.Type)
-                    {
-                        case ObjectType.Hole:
-                            // if the center of the ball is over the hole, sink the ball
-                            // TODO: sink, not destroy
-                            if (obj.GetHitbox().ContainsRound(_activeBall.GetGlobalCenter()))
-                            {
-                                _activeBall.Destroy();
-                                _activeBall = null;
-                            }
-                            break;
-                        case ObjectType.WallDamaged:
-                            // break if heavy or if football
-                            if (_activeBall.WeightClass == BallObject.Weight.Heavy || _activeBall.BallType == BallType.FootballBall)
-                            {
-                                obj.Destroy();
-
-                                // if not football, slow down slightly
-                                if (_activeBall.BallType != BallType.FootballBall)
-                                {
-                                    _activeBall.SlowDown(Constants.LEVEL_DAMAGED_WALL_SLOW_DOWN * deltaTime);
-                                }
-                            }
-                            break;
-                        case ObjectType.Wall:
-                        case ObjectType.Wall1:
-                        case ObjectType.Wall2:
-                        case ObjectType.Wall3:
-                        case ObjectType.Wall4:
-                            break;
-                        case ObjectType.Slope:
-                            // get vector direction of slope from its angle, add to velocity
-                            _activeBall.Velocity += Vector2Helper.FromAngle(MathHelper.ToRadians(obj.GetGlobalRotation())) * Constants.LEVEL_SLOPE_FORCE * deltaTime;
-                            break;
-                        case ObjectType.Hill:
-                            // get vector direction of slope from center of the hill, add to velocity
-                            _activeBall.Velocity += Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), ballCenter)) * Constants.LEVEL_SLOPE_FORCE * deltaTime;
-                            break;
-                        case ObjectType.Valley:
-                            // get vector direction of slope from center of the hill, subtract from velocity
-                            _activeBall.Velocity -= Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), ballCenter)) * Constants.LEVEL_SLOPE_FORCE * deltaTime;
-                            break;
-                        case ObjectType.Sandbar:
-                            // slow down the ball
-                            _activeBall.Velocity *= 1.0f - Math.Min(Constants.LEVEL_SANDBAR_FORCE * deltaTime, 1.0f);
-                            break;
-                        case ObjectType.Water:
-                            // kill ball
-                            _activeBall.Destroy();
-                            _activeBall = null;
-                            break;
-                        case ObjectType.Box:
-                            // kill box if heavy
-                            if (_activeBall.WeightClass == BallObject.Weight.Heavy)
-                            {
-                                obj.Destroy();
-                            }
-                            break;
-                    }
+                    // decide what to do when colliding with something
+                    _activeBall.CollideWith(obj, deltaTime);
 
                     // only one collision per frame
                     break;
@@ -272,57 +381,6 @@ namespace MiniGolf
             _activeBall?.Move(deltaTime);
         }
 
-        public override void Update(GameTime gameTime)
-        {
-            if (_activeBall != null)
-            {
-                ConductBallPhysics(gameTime);
-            }
-
-            base.Update(gameTime);
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            SpriteBatch.Begin();
-
-            // draw the background
-            SpriteBatch.Draw(_levelTexture, new Vector2(0.0f, 0.0f), Color.White);
-
-            SpriteBatch.End();
-
-            base.Draw(gameTime);
-        }
-
-        /// <summary>
-        /// Spawns a GameComponent using the given type and data.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private LevelObject CreateLevelObject(ObjectTypeData typeData, ObjectData data, Texture2D texture)
-        {
-            // create object
-            LevelObject levelObject = typeData.Type switch
-            {
-                ObjectType.Ball => new LevelObject
-                    (
-                    typeData.Type,
-                    new Sprite(Content.Load<Texture2D>("Objects/GolfBall"), null),
-                    this
-                    ),
-                _ => new LevelObject
-                    (
-                    typeData.Type,
-                    new Sprite(texture, typeData.Rect, typeData.Pivot),
-                    this
-                    ),
-            };
-
-            // set to proper location, size, rot
-            levelObject.SetOrientation(data.Position, Vector2.One, data.Size, data.Rotation);
-
-            return levelObject;
-        }
+        #endregion
     }
 }

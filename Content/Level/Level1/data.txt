@@ -1,8 +1,8 @@
-﻿Balls	GolfBall GolfBall GolfBall
+﻿Balls	GolfBall TennisBall FootballBall SoccerBall BowlingBall PongBall PoolBall HockeyPuck Mint GolfBall
 Start	20 20 60 40
 	500 500/60 40
-Hole	20 0 20 20/.5 .5
-	986 986/20 20
+Hole	20 0 30 20/.5 .5
+	966 966/40 40
 Wall2	0 80 20 20/0.5 0.5
 	10 10/20 20/90
 	1014 10/20 20/180

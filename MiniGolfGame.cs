@@ -110,9 +110,24 @@ namespace MiniGolf
             _targetBatch.End();
         }
 
-        internal void LoadScene(Scene scene)
+        private void LoadScene(Scene scene)
         {
             _nextScene = scene;
+        }
+
+        internal void LoadScene(SceneType sceneType, int data = 0)
+        {
+            switch(sceneType)
+            {
+                case SceneType.MainMenu:
+                    LoadScene(new MainMenuScene(this));
+                    break;
+                case SceneType.Level:
+                    LoadScene(new LevelScene(data, this));
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace MiniGolf
 
             Instantiate(new ButtonObject("Start", new Sprite(Content.Load<Texture2D>("Texture/UI"), new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
             {
-                MiniGolfGame.Instance.LoadScene(new LevelScene(1, Game));
+                Play();
             }), new Vector2(400, 400), 0.0f);
 
             base.LoadContent();
@@ -35,6 +35,17 @@ namespace MiniGolf
         protected override void UnloadContent()
         {
             base.UnloadContent();
+        }
+
+        private void Play()
+        {
+            // TODO: load players
+            Session.Players = new List<Player>()
+            {
+                new Player("Player", Color.White),
+            };
+
+            MiniGolfGame.Instance.LoadScene(SceneType.Level, 1);
         }
     }
 }

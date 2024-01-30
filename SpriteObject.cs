@@ -64,7 +64,7 @@ namespace MiniGolf
                 _sprite.Slice, 
                 Color, 
                 MathHelper.ToRadians(rotation),
-                size * _sprite.Pivot,
+                _sprite.Size * _sprite.Pivot,
                 SpriteEffects.None, 
                 _depth);
 
