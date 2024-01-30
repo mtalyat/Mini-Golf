@@ -354,32 +354,35 @@ namespace MiniGolf
                 {
                     // determine what to do based on the other object's properties
                     // if PreCollideWith true, the ball should reflect if solid
-                    if (_activeBall.PreCollideWith(obj) && obj.Flags.HasFlag(BehaviorFlags.Solid))
+                    if (_activeBall.PreCollideWith(obj))
                     {
-                        // TODO: account for round reflection
-                        //if(obj.Flags.HasFlag(BehaviorFlags.Round))
-                        //{
+                        if(obj.Flags.HasFlag(BehaviorFlags.Solid))
+                        {
+                            // TODO: account for round reflection
+                            //if(obj.Flags.HasFlag(BehaviorFlags.Round))
+                            //{
 
-                        //}
+                            //}
 
-                        // get the positional data to do the collision
-                        collisionData = GetBallCollisionData(ballCenter, obj);
+                            // get the positional data to do the collision
+                            collisionData = GetBallCollisionData(ballCenter, obj);
 
-                        // calulcate the normal for reflection
+                            // calulcate the normal for reflection
 
-                        // angle from clamped to relative ball center will be the normal
-                        // then also reverse the previous angle
-                        Vector2 normal = collisionData.ClampedBallPosition.DirectionTo(collisionData.RelativeBallPosition);
+                            // angle from clamped to relative ball center will be the normal
+                            // then also reverse the previous angle
+                            Vector2 normal = collisionData.ClampedBallPosition.DirectionTo(collisionData.RelativeBallPosition);
 
-                        // now rotate the normal back to world space instead of local space
-                        normal = Vector2Helper.FromAngle(Vector2Helper.Angle(Vector2.Zero, normal) + MathHelper.ToRadians(obj.GetGlobalRotation()));
+                            // now rotate the normal back to world space instead of local space
+                            normal = Vector2Helper.FromAngle(Vector2Helper.Angle(Vector2.Zero, normal) + MathHelper.ToRadians(obj.GetGlobalRotation()));
 
-                        // reflect using the normal given from the collision data
-                        _activeBall.Reflect(normal);
+                            // reflect using the normal given from the collision data
+                            _activeBall.Reflect(normal);
+                        }
+
+                        // decide what to do when colliding with something
+                        _activeBall.CollideWith(obj, deltaTime);
                     }
-
-                    // decide what to do when colliding with something
-                    _activeBall.CollideWith(obj, deltaTime);
 
                     // only one collision per frame
                     break;

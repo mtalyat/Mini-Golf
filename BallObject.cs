@@ -73,6 +73,9 @@ namespace MiniGolf
         public Vector2 Velocity { get; set; } = Vector2.Zero;
         public bool IsMoving => Velocity.X != 0.0f && Velocity.Y != 0.0f;
 
+        private float _angularVelocity = 0.0f;
+        private bool _shouldSpin = false;
+
         public float Radius => GetGlobalSize().X / 2.0f; // should be square, so just use the x axis
 
         private TrailObject _trail = null;
@@ -123,9 +126,29 @@ namespace MiniGolf
         public override void Update(GameTime gameTime)
         {
             // if no longer moving and was moving, mark as done
-            if(!IsMoving && _state == State.Moving)
+            if(_state == State.Moving)
             {
-                _state = State.Done;
+                if(IsMoving)
+                {
+                    if(_shouldSpin)
+                    {
+                        // spin the ball, based on X velocity
+                        float spin = _angularVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        if (Velocity.X >= 0.0f)
+                        {
+                            LocalRotation += spin;
+                        }
+                        else
+                        {
+                            LocalRotation -= spin;
+                        }
+                    }
+                }
+                else
+                {
+                    // no longer moving
+                    _state = State.Done;
+                }
             }
 
             // if not moving and self was clicked, spawn a trail
@@ -243,7 +266,17 @@ namespace MiniGolf
             // determine what to do based on its type
             switch (obj.Type)
             {
+                case ObjectType.Wall:
+                case ObjectType.WallDamaged:
+                case ObjectType.Wall1:
+                case ObjectType.Wall2:
+                case ObjectType.Wall3:
+                case ObjectType.Wall4:
+                    // spin if hit a wall
+                    _shouldSpin = true;
+                    break;
                 case ObjectType.Hole:
+                    // if the ball is over the hole, sink into it
                     if (obj.GetHitbox().ContainsRound(GetGlobalCenter()))
                     {
                         Sink(obj);
@@ -283,6 +316,8 @@ namespace MiniGolf
             Velocity = Constants.BALL_HIT_POWER * (2.0f - (float)_weight / 2.0f) * directionAndPower;
             // mark as moving
             _state = State.Moving;
+            // mark as spinning if not a football
+            _shouldSpin = _ballType != BallType.FootballBall;
             // add a stroke
             _owner.Stroke++;
         }
@@ -331,6 +366,9 @@ namespace MiniGolf
 
             // move
             LocalPosition += Velocity * deltaTime;
+
+            // spin
+            _angularVelocity = MathHelper.ToDegrees(Velocity.Magnitude() * Radius * deltaTime) * Constants.BALL_SPIN_SCALE;
         }
 
         public void Reflect(Vector2 normal)
