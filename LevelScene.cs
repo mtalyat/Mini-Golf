@@ -104,7 +104,7 @@ namespace MiniGolf
             // if the ball is in the scene, simulate physics on it
             if (_activeBall != null)
             {
-                ConductBallPhysics(gameTime);
+                ConductBallPhysics(_activeBall, (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
 
             // if the ball is done moving, move to the next turn
@@ -323,24 +323,23 @@ namespace MiniGolf
             };
         }
 
-        private void ConductBallPhysics(GameTime gameTime)
+        // return true if collided with a solid object
+        private bool ConductBallPhysics(BallObject ball, float deltaTime, bool triggerEvents = true)
         {
-            // get elapsed time as a float
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             // check for future collisions
 
             // get ball data
-            Vector2 ballVelocity = _activeBall.Velocity * deltaTime;
-            float ballRadius = _activeBall.Radius;
-            Vector2 ballCenter = _activeBall.GetGlobalPosition();
+            Vector2 ballVelocity = ball.Velocity * deltaTime;
+            float ballRadius = ball.Radius;
+            Vector2 ballCenter = ball.GetGlobalPosition();
             Vector2 ballFutureCenterPosition = ballCenter + ballVelocity;
+
+            bool collided = false;
+            bool solidCollision = false;
 
             // check against all other collidable objects
             foreach (LevelObject obj in _collisionObjects)
             {
-                bool collided;
-
                 if(obj.Flags.HasFlag(BehaviorFlags.Round))
                 {
                     // if round, just use radii
@@ -359,9 +358,10 @@ namespace MiniGolf
                 {
                     // determine what to do based on the other object's properties
                     // if PreCollideWith true, the ball should reflect if solid
-                    if (_activeBall.PreCollideWith(obj))
+                    if (ball.PreCollideWith(obj))
                     {
-                        if(obj.Flags.HasFlag(BehaviorFlags.Solid))
+                        solidCollision = obj.Flags.HasFlag(BehaviorFlags.Solid);
+                        if (solidCollision)
                         {
                             // TODO: account for round reflection
                             //if(obj.Flags.HasFlag(BehaviorFlags.Round))
@@ -392,11 +392,14 @@ namespace MiniGolf
                             }
 
                             // reflect using the normal given from the collision data
-                            _activeBall.Reflect(normal);
+                            ball.Reflect(normal);
                         }
 
-                        // decide what to do when colliding with something
-                        _activeBall.CollideWith(obj, deltaTime);
+                        if(triggerEvents)
+                        {
+                            // decide what to do when colliding with something
+                            ball.CollideWith(obj, deltaTime);
+                        }
                     }
 
                     // only one collision per frame
@@ -405,7 +408,37 @@ namespace MiniGolf
             }
 
             // done with colliding, now move as normal
-            _activeBall?.Move(deltaTime);
+            ball.Move(deltaTime);
+
+            return solidCollision;
+        }
+
+        public void ThwackBall(BallObject ball)
+        {
+            // do nothing if no ball or if ball is not moving
+            if (ball == null || !ball.IsMoving) return;
+
+            // get ideal deltaTime so ball moves incrementally (not too fast or slow)
+            float gameTime = ball.Radius * 2.0f / ball.Velocity.Magnitude();
+
+            Vector2 initialPosition = ball.LocalPosition;
+            Vector2 initialVelocity = ball.Velocity;
+
+            // simulate for a long time, or until a collision
+            for (int i = 0; i < 1000; i++)
+            {
+                if(ConductBallPhysics(ball, gameTime, false))
+                {
+                    return;
+                }
+
+                // might have slown down from friction, etc. so reset velocity
+                ball.Velocity = initialVelocity;
+            }
+
+            // if nothing was hit, move back and hit as normal. That was a pathetic hit.
+            ball.LocalPosition = initialPosition;
+            ball.Velocity = initialVelocity;
         }
 
         public RaycastHit Raycast(Vector2 origin, Vector2 direction, float maxDistance = float.MaxValue) => Raycast(new Ray(origin, direction), maxDistance);

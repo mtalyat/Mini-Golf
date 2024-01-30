@@ -180,7 +180,7 @@ namespace MiniGolf
                     else if(state == ButtonState.Up)
                     {
                         // if button released, hit and destroy the trail
-                        Hit(Vector2Helper.FromAngle(GetTrailAngle()), _trail.GetGlobalSize().Y);
+                        Hit(Vector2Helper.FromAngle(GetTrailAngle()) * _trail.GetGlobalSize().Y);
                         _trail.Destroy();
                         _trail = null;
                         _aiming?.Destroy();
@@ -340,11 +340,12 @@ namespace MiniGolf
             _shouldSpin = _ballType != BallType.FootballBall;
             // add a stroke
             _owner.Stroke++;
-        }
 
-        public void Hit(Vector2 direction, float power)
-        {
-            Hit(direction * power);
+            // if hockey puck, thwack it
+            if(_ballType == BallType.HockeyPuck)
+            {
+                ((LevelScene)Scene).ThwackBall(this);
+            }
         }
 
         public void Push(Vector2 directionAndPower)
