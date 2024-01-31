@@ -50,7 +50,7 @@ namespace MiniGolf
                     break;
                 case ObjectType.Hill:
                 case ObjectType.Valley:
-                case ObjectType.Sandbar:
+                case ObjectType.Sand:
                     _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Round;
                     break;
                 case ObjectType.Water:

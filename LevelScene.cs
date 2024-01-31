@@ -156,8 +156,7 @@ namespace MiniGolf
                         _alivePlayerSpawns[_activePlayerIndex] = new Vector3(_activeBall.GetGlobalPosition(), _activeBall.GetGlobalRotation());
                         break;
                     case BallObject.State.Dead:
-                        // oops, the ball hit a hazzard, add a stroke
-                        ActivePlayer.Stroke += 1;
+                        // oops, the ball hit a hazzard
                         break;
                     case BallObject.State.Sunk:
                         // yippee, the ball sunk in a hole!
@@ -425,10 +424,15 @@ namespace MiniGolf
             Vector2 initialVelocity = ball.Velocity;
 
             // simulate for a long time, or until a collision
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < Constants.BALL_THWACK_ITERATIONS; i++)
             {
                 if(ConductBallPhysics(ball, gameTime, false))
                 {
+                    // ball collided
+
+                    // spawn a visual
+                    Instantiate(new ThwackObject(initialPosition, ball.GetGlobalCenter(), ball.Radius * 1.8f, this));
+
                     return;
                 }
 

@@ -79,7 +79,7 @@ namespace MiniGolf
         /// <summary>
         /// A space that will slow the ball.
         /// </summary>
-        Sandbar,
+        Sand,
 
         /// <summary>
         /// A space that will kill the ball.
@@ -96,14 +96,14 @@ namespace MiniGolf
         /// </summary>
         Crate,
 
-        /// <summary>
-        /// A wall that can spin.
-        /// </summary>
-        RotatingWall,
+        ///// <summary>
+        ///// A wall that can spin.
+        ///// </summary>
+        //RotatingWall,
 
-        /// <summary>
-        /// A wall that can move.
-        /// </summary>
-        MovingWall,
+        ///// <summary>
+        ///// A wall that can move.
+        ///// </summary>
+        //MovingWall,
     }
 }

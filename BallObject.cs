@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -112,7 +113,7 @@ namespace MiniGolf
             }
 
             // set friction based on ball type
-            switch(type)
+            switch (type)
             {
                 case BallType.SoccerBall:
                     _objectFriction = Constants.BALL_FRICTION * 2.0f;
@@ -126,28 +127,39 @@ namespace MiniGolf
         public override void Update(GameTime gameTime)
         {
             // if no longer moving and was moving, mark as done
-            if(_state == State.Moving)
+            if (_state == State.Moving)
             {
-                if(IsMoving)
+                // if velocity is > threshold, reset timer
+                if (Velocity.Magnitude() > Constants.BALL_STOP_THRESHOLD)
                 {
-                    if(_shouldSpin)
-                    {
-                        // spin the ball, based on X velocity
-                        float spin = _angularVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        if (Velocity.X >= 0.0f)
-                        {
-                            LocalRotation += spin;
-                        }
-                        else
-                        {
-                            LocalRotation -= spin;
-                        }
-                    }
+                    _timer = Constants.BALL_STOP_TIME;
+                }
+                else if (_timer <= 0.0f)
+                {
+                    // ball has stopped
+                    _timer = 0.0f;
+                    Stop();
+
+                    // no longer moving
+                    _state = State.Done;
                 }
                 else
                 {
-                    // no longer moving
-                    _state = State.Done;
+                    _timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+
+                if (_shouldSpin && IsMoving)
+                {
+                    // spin the ball, based on X velocity
+                    float spin = _angularVelocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (Velocity.X >= 0.0f)
+                    {
+                        LocalRotation += spin;
+                    }
+                    else
+                    {
+                        LocalRotation -= spin;
+                    }
                 }
             }
 
@@ -164,7 +176,7 @@ namespace MiniGolf
                     _trail.Depth = Depth - 0.0001f;
 
                     // if a pool ball, spawn an aiming object
-                    if(_ballType == BallType.PoolBall)
+                    if (_ballType == BallType.PoolBall)
                     {
                         _aiming = Scene.Instantiate(new AimingObject(GetGlobalCenter(), Scene));
                         _aiming.Depth = Depth - 0.0001f;
@@ -177,7 +189,7 @@ namespace MiniGolf
                         // if button held, make ball face the angle of the trail
                         LocalRotation = MathHelper.ToDegrees(GetTrailAngle());
                     }
-                    else if(state == ButtonState.Up)
+                    else if (state == ButtonState.Up)
                     {
                         // if button released, hit and destroy the trail
                         Hit(Vector2Helper.FromAngle(GetTrailAngle()) * _trail.GetGlobalSize().Y);
@@ -189,7 +201,7 @@ namespace MiniGolf
                 }
             }
 
-            if(_state == State.Sinking || _state == State.Dying)
+            if (_state == State.Sinking || _state == State.Dying)
             {
                 // shrinking
                 _timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -200,18 +212,19 @@ namespace MiniGolf
                 LocalScale = new Vector2(scale, scale);
 
                 // update position
-                if(_state == State.Sinking)
+                if (_state == State.Sinking)
                 {
                     LocalPosition = Vector2Helper.Lerp(_end, _start, percent);
                 }
 
                 // if timer is done, finish
-                if(_timer <= 0.0f)
+                if (_timer <= 0.0f)
                 {
-                    if(_state == State.Sinking)
+                    if (_state == State.Sinking)
                     {
                         _state = State.Sunk;
-                    } else if (_state == State.Dying)
+                    }
+                    else if (_state == State.Dying)
                     {
                         _state = State.Dead;
                     }
@@ -230,6 +243,12 @@ namespace MiniGolf
             base.Draw(gameTime);
         }
 
+        public override Vector2 GetGlobalCenter()
+        {
+            Vector2 size = GetGlobalSize();
+            return GetGlobalPosition() + (size / 2.0f - size * Sprite.Pivot);
+        }
+
         #region Trail
 
         private float GetTrailAngle()
@@ -243,7 +262,7 @@ namespace MiniGolf
 
         public bool PreCollideWith(LevelObject obj)
         {
-            switch(obj.Type)
+            switch (obj.Type)
             {
                 case ObjectType.WallDamaged:
                     // break if heavy or if a football that is not spinning
@@ -279,6 +298,8 @@ namespace MiniGolf
 
         public void CollideWith(LevelObject obj, float deltaTime)
         {
+            bool contains = obj.Flags.HasFlag(BehaviorFlags.Round) ? obj.GetHitbox().ContainsRound(GetGlobalCenter()) : obj.GetHitbox().Contains(GetGlobalCenter());
+
             // determine what to do based on its type
             switch (obj.Type)
             {
@@ -292,36 +313,38 @@ namespace MiniGolf
                 case ObjectType.Crate:
                     // spin if hit a wall
                     _shouldSpin = true;
-                    break;
+                    return;
                 case ObjectType.Hole:
                     // if the ball is over the hole, sink into it
-                    if (obj.GetHitbox().ContainsRound(GetGlobalCenter()))
-                    {
+                    if (contains)
                         Sink(obj);
-                    }
                     break;
                 case ObjectType.Slope:
                     // get vector direction of slope from its angle, add to velocity
-                    Push(Vector2Helper.FromAngle(MathHelper.ToRadians(obj.GetGlobalRotation())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
+                    if (contains)
+                        Push(Vector2Helper.FromAngle(MathHelper.ToRadians(obj.GetGlobalRotation())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
                 case ObjectType.Hill:
                     // get vector direction of slope from center of the hill, add to velocity
-                    Push(Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
+                    if (contains)
+                        Push(Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
                 case ObjectType.Valley:
                     // get vector direction of slope from center of the hill, subtract from velocity
-                    Push(-Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
+                    if (contains)
+                        Push(-Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
-                case ObjectType.Sandbar:
-                    // slow down the ball
-                    Velocity *= 1.0f - Math.Min(Constants.LEVEL_SANDBAR_FORCE * deltaTime, 1.0f);
+                case ObjectType.Sand:
+                    // slow down the ball, if not a light ball
+                    if (_weight != Weight.Light && contains)
+                    {
+                        Velocity *= 1.0f - Math.Min(Constants.LEVEL_SANDBAR_FORCE * deltaTime, 1.0f);
+                    }
                     break;
                 case ObjectType.Water:
                     // kill ball if center is in the hazard
-                    if (obj.GetHitbox().Contains(GetGlobalCenter()))
-                    {
+                    if (contains)
                         Die();
-                    }
                     break;
             }
         }
@@ -342,7 +365,7 @@ namespace MiniGolf
             _owner.Stroke++;
 
             // if hockey puck, thwack it
-            if(_ballType == BallType.HockeyPuck)
+            if (_ballType == BallType.HockeyPuck)
             {
                 ((LevelScene)Scene).ThwackBall(this);
             }
@@ -351,7 +374,7 @@ namespace MiniGolf
         public void Push(Vector2 directionAndPower)
         {
             // soccer ball not affected by pushing
-            if(_ballType != BallType.SoccerBall)
+            if (_ballType != BallType.SoccerBall)
             {
                 Velocity += directionAndPower;
             }
@@ -370,20 +393,13 @@ namespace MiniGolf
         public void Move(float deltaTime)
         {
             // only move if in the moving state
-            if(_state != State.Moving)
+            if (_state != State.Moving)
             {
                 return;
             }
 
             // slow from friction
             SlowDown(_objectFriction * deltaTime);
-
-            // if velocity is < 1, stop
-            // < 1 indicates that it is moving less than one pixel a second
-            if (Velocity.Magnitude() < Constants.BALL_STOP_THRESHOLD)
-            {
-                Stop();
-            }
 
             // move
             LocalPosition += Velocity * deltaTime;
@@ -420,7 +436,7 @@ namespace MiniGolf
 
         public void Sink(LevelObject hole)
         {
-            if(_state == State.Moving)
+            if (_state == State.Moving)
             {
                 Stop();
                 _start = GetGlobalCenter();

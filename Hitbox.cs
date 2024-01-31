@@ -59,8 +59,15 @@ namespace MiniGolf
             // rotate the point to be in the same local space as this object
             Vector2 localPosition = (position - Position).Rotate(MathHelper.ToRadians(-Rotation));
 
+            // offset by center
+            localPosition -= Size / 2.0f;
+
             // if the distance to the center is within the radius, it is contained
-            return localPosition.DistanceTo(new Vector2(Size.X / 2.0f, Size.Y / 2.0f)) <= Size.X / 2.0f;
+            //return localPosition.DistanceTo(new Vector2(Size.X / 2.0f, Size.Y / 2.0f)) <= Size.X / 2.0f;
+            // https://math.stackexchange.com/questions/76457/check-if-a-point-is-within-an-ellipse#:~:text=The%20region%20(disk)%20bounded%20by,it%20is%20outside%20the%20ellipse
+            // assume h and k are 0 and 0, since the position is localized
+            return (localPosition.X * localPosition.X) / MathF.Pow(Size.X / 2.0f, 2.0f) +
+                (localPosition.Y * localPosition.Y) / MathF.Pow(Size.Y / 2.0f, 2.0f) <= 1.0f;
         }
 
         public Vector2[] GetCorners()
