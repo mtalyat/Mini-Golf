@@ -106,4 +106,9 @@ namespace MiniGolf
         ///// </summary>
         //MovingWall,
     }
+
+    internal static class ObjectTypeExtensions
+    {
+        public const int OBJECT_TYPE_COUNT = 16;
+    }
 }

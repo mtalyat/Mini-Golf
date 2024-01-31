@@ -17,11 +17,19 @@ namespace MiniGolf
         private static MouseState _currentMouseState;
         public static MouseState CurrentMouseState => _currentMouseState;
 
+        private static KeyboardState _lastKeyboardState;
+        public static KeyboardState LastKeyboardState => _lastKeyboardState;
+        private static KeyboardState _currentKeyboardState;
+        public static KeyboardState CurrentKeyboardState => _currentKeyboardState;
+
         public static void Update(Game game)
         {
             // move current state to last state, get the new state
             _lastMouseState = _currentMouseState;
             _currentMouseState = Mouse.GetState();
+
+            _lastKeyboardState = _currentKeyboardState;
+            _currentKeyboardState = Keyboard.GetState();
 
             // scale the new state to adjust for the resolution size
             _currentMouseState = new MouseState(
@@ -37,7 +45,7 @@ namespace MiniGolf
                 );
         }
 
-        private static XnaButtonState GetButtonState(int button, MouseState state)
+        private static XnaButtonState GetMouseButtonButtonState(int button, MouseState state)
         {
             switch(button)
             {
@@ -52,8 +60,8 @@ namespace MiniGolf
 
         public static ButtonState GetMouseButtonState(int button)
         {
-            XnaButtonState currentButtonState = GetButtonState(button, _currentMouseState);
-            XnaButtonState lastButtonState = GetButtonState(button, _lastMouseState);
+            XnaButtonState currentButtonState = GetMouseButtonButtonState(button, _currentMouseState);
+            XnaButtonState lastButtonState = GetMouseButtonButtonState(button, _lastMouseState);
 
             if(currentButtonState == XnaButtonState.Pressed)
             {
@@ -70,6 +78,36 @@ namespace MiniGolf
             } else
             {
                 if(lastButtonState == XnaButtonState.Pressed)
+                {
+                    // starting to be released
+                    return ButtonState.Up;
+                }
+                else
+                {
+                    // still not held
+                    return ButtonState.Released;
+                }
+            }
+        }
+
+        public static ButtonState GetKeyboardButtonState(Keys key)
+        {
+            if(_currentKeyboardState.IsKeyDown(key))
+            {
+                if(_lastKeyboardState.IsKeyDown(key))
+                {
+                    // still held
+                    return ButtonState.Pressed;
+                }
+                else
+                {
+                    // starting to be held
+                    return ButtonState.Down;
+                }
+            }
+            else
+            {
+                if(_lastKeyboardState.IsKeyDown(key))
                 {
                     // starting to be released
                     return ButtonState.Up;

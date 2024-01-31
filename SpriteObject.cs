@@ -13,8 +13,12 @@ namespace MiniGolf
     /// </summary>
     internal class SpriteObject : SceneObject
     {
-        private readonly Sprite _sprite;
-        public Sprite Sprite => _sprite;
+        private Sprite _sprite;
+        public Sprite Sprite
+        {
+            get => _sprite;
+            set => _sprite = value;
+        }
 
         public Color Color { get; set; } = Color.White;
 
@@ -30,7 +34,7 @@ namespace MiniGolf
         public SpriteObject(Sprite sprite, Scene scene) : base(scene)
         {
             _sprite = sprite;
-            LocalSize = sprite.Size;
+            LocalSize = sprite?.Size ?? Vector2.Zero;
         }
 
         public SpriteObject(Sprite sprite, Vector2 size, Scene scene) : base(scene)
@@ -54,7 +58,7 @@ namespace MiniGolf
 
         public override void Draw(GameTime gameTime)
         {
-            if(Visible)
+            if(Visible && _sprite != null)
             {
                 Vector2 position = GetGlobalPosition();
                 Vector2 size = GetGlobalSize();

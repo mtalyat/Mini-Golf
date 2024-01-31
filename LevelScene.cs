@@ -59,7 +59,7 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
-            string fullPath = Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, _path);
+            string fullPath = _path;
             string folderPath = Path.GetDirectoryName(_path);
             string fullFolderPath = Path.GetDirectoryName(fullPath);
 
@@ -74,10 +74,10 @@ namespace MiniGolf
             }
 
             // load the level png
-            _backgroundTexture = Game.Content.Load<Texture2D>(Path.Combine(folderPath, "background"));
+            _backgroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension(fullPath, "png"));
 
             // load the level components png
-            Texture2D levelComponentsTexture = Game.Content.Load<Texture2D>(Path.Combine(folderPath, "components"));
+            Texture2D levelComponentsTexture = ExternalContent.LoadTexture2D(Path.Combine(folderPath, "components.png"));
 
             // create each object
             foreach (var pair in _data.ObjectDatas)

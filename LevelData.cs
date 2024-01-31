@@ -28,9 +28,6 @@ namespace MiniGolf
         {
             string[] lines = System.IO.File.ReadAllLines(path);
 
-            // get ObjectType names
-            HashSet<string> objectTypeNames = new(Enum.GetNames<ObjectType>());
-
             // add those to a dictionary for quick lookup
             ObjectType type = ObjectType.Generic;
 

@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -211,10 +210,13 @@ namespace MiniGolf
                 float scale = percent;
                 LocalScale = new Vector2(scale, scale);
 
-                // update position
-                if (_state == State.Sinking)
+                // update color and position
+                switch(_state)
                 {
-                    LocalPosition = Vector2Helper.Lerp(_end, _start, percent);
+                    case State.Sinking:
+                        LocalPosition = Vector2Helper.Lerp(_end, _start, percent);
+                        Color = new Color(percent, percent, percent, 1.0f);
+                        break;
                 }
 
                 // if timer is done, finish

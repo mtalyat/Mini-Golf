@@ -50,7 +50,7 @@ namespace MiniGolf
                 new Player("Player", Color.White),
             };
 
-            ((MiniGolfGame)Game).LoadLevel(1, 1);
+            ((MiniGolfGame)Game).LoadLevel(Constants.BUILTIN_WORLD_NAME, 1);
         }
 
         private void LoadEditor()

@@ -15,6 +15,9 @@ namespace MiniGolf
         private readonly ContentManager _contentManager;
         public ContentManager Content => _contentManager;
 
+        private readonly ExternalContentManager _externalContentManager;
+        public ExternalContentManager ExternalContent => _externalContentManager;
+
         private readonly SpriteBatch _spriteBatch;
         public SpriteBatch SpriteBatch => _spriteBatch;
 
@@ -23,10 +26,8 @@ namespace MiniGolf
         public Scene(Game game) : base(game)
         {
             // initialize this class
-            _contentManager = new ContentManager(game.Content.ServiceProvider)
-            {
-                RootDirectory = Constants.CONTENT_ROOT_DIRECTORY
-            };
+            _contentManager = new ContentManager(game.Services, Constants.CONTENT_ROOT_DIRECTORY);
+            _externalContentManager = new ExternalContentManager(game);
             _spriteBatch = new SpriteBatch(game.GraphicsDevice);
 
             // set size to 1 for normal rendering
@@ -36,6 +37,7 @@ namespace MiniGolf
         protected override void UnloadContent()
         {
             Content.Unload();
+            ExternalContent.Unload();
 
             base.UnloadContent();
         }

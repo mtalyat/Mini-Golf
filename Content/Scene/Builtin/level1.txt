@@ -1,0 +1,36 @@
+﻿Balls	GolfBall TennisBall FootballBall SoccerBall BowlingBall PongBall PoolBall HockeyPuck Mint GolfBall
+Start
+	500 500/120 120
+Hole
+	966 966/40 40
+Wall2
+	10 10/20 20/90
+	1014 10/20 20/180
+	10 1014/20 20
+	1014 1014/20 20/270
+Wall
+	20 10/20 984/270
+	20 1014/20 984/270
+	10 20/20 984
+	1014 20/20 984
+	20 800/20 400/315
+WallDamaged
+	950 480/20 80
+Hill
+	160 160/240 240
+Valley
+	864 160/240 240
+Slope
+	20 460/240 240
+Box
+	460 70/60 60
+	460 150/40 40
+	460 210/20 20
+Crate
+	540 70/60 60
+	540 150/40 40
+	540 210/20 20
+Water
+	312 700/400 200
+Sand
+	712 700/292 200

@@ -107,9 +107,9 @@ namespace MiniGolf
             _nextScene = scene;
         }
 
-        internal void LoadLevel(int worldNumber, int levelNumber)
+        internal void LoadLevel(string worldName, int levelNumber)
         {
-            LoadScene(SceneType.Level, $"Scene/World{worldNumber}/level{levelNumber}");
+            LoadScene(SceneType.Level, $"{Constants.CONTENT_ROOT_DIRECTORY}/Scene/{worldName}/level{levelNumber}");
         }
 
         internal void LoadScene(SceneType sceneType, params dynamic[] args)

@@ -8,6 +8,10 @@ namespace MiniGolf
 {
     internal static class Constants
     {
+        public const string APPLICATION_NAME = "Mini Golf";
+
+        public const string BUILTIN_WORLD_NAME = "Builtin";
+
         public const int RESOLUTION_WIDTH = 1920;
         public const int RESOLUTION_HEIGHT = 1080;
 
