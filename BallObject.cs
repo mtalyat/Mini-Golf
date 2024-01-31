@@ -316,7 +316,7 @@ namespace MiniGolf
                     return;
                 case ObjectType.Hole:
                     // if the ball is over the hole, sink into it
-                    if (contains)
+                    if (contains && Velocity.Magnitude() <= Constants.BALL_SINK_THRESHOLD)
                         Sink(obj);
                     break;
                 case ObjectType.Slope:

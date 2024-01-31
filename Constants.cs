@@ -19,6 +19,7 @@ namespace MiniGolf
         public const float BALL_BOUNCE_PENALTY_PERCENT = 0.25f;
         public const float BALL_STOP_THRESHOLD = 14.0f;
         public const float BALL_STOP_TIME = 0.1f;
+        public const float BALL_SINK_THRESHOLD = 400.0f;
         public const float BALL_SINK_TIME = 0.5f;
         public const float BALL_DEATH_TIME = 0.5f;
         public const float BALL_SPIN_SCALE = 0.1f;
