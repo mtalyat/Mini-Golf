@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using static System.Formats.Asn1.AsnWriter;
 using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
@@ -15,20 +16,11 @@ namespace MiniGolf
         private Scene _currentScene;
         private Scene _nextScene;
 
-        private static MiniGolfGame _instance;
-        public static MiniGolfGame Instance => _instance;
-
         public MiniGolfGame()
         {
-            _instance = this;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = Constants.CONTENT_ROOT_DIRECTORY;
             IsMouseVisible = true;
-        }
-
-        ~MiniGolfGame()
-        {
-            _instance = null;
         }
 
         protected override void Initialize()
@@ -43,7 +35,7 @@ namespace MiniGolf
             _target = new RenderTarget2D(GraphicsDevice, Constants.RESOLUTION_WIDTH, Constants.RESOLUTION_HEIGHT);
 
             // create the level, the scene does the rest
-            LoadScene(new MainMenuScene(this));
+            LoadScene(SceneType.MainMenu);
 
             base.Initialize();
         }
@@ -115,7 +107,12 @@ namespace MiniGolf
             _nextScene = scene;
         }
 
-        internal void LoadScene(SceneType sceneType, int data = 0)
+        internal void LoadLevel(int worldNumber, int levelNumber)
+        {
+            LoadScene(SceneType.Level, $"Scene/World{worldNumber}/level{levelNumber}");
+        }
+
+        internal void LoadScene(SceneType sceneType, params dynamic[] args)
         {
             switch(sceneType)
             {
@@ -123,7 +120,10 @@ namespace MiniGolf
                     LoadScene(new MainMenuScene(this));
                     break;
                 case SceneType.Level:
-                    LoadScene(new LevelScene(data, this));
+                    LoadScene(new LevelScene(args[0], this));
+                    break;
+                case SceneType.Editor:
+                    LoadScene(new EditorScene(this));
                     break;
                 default:
                     throw new NotImplementedException();

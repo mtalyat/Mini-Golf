@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Path = System.IO.Path;
 
 namespace MiniGolf
 {
@@ -15,8 +16,9 @@ namespace MiniGolf
     /// </summary>
     internal class LevelScene : Scene
     {
+        private readonly string _path;
         private LevelData _data;
-        private readonly int _levelId;
+        private LevelInfo _info;
         private Texture2D _backgroundTexture;
 
         private readonly List<BallType> _balls = new();
@@ -38,9 +40,15 @@ namespace MiniGolf
 
         private BallObject _activeBall = null;
 
-        public LevelScene(int levelId, Game game) : base(game)
+        /// <summary>
+        /// Runs a level at the given path.
+        /// </summary>
+        /// <param name="path">The path to the level.png in the Content folder.</param>
+        /// <param name="game"></param>
+        public LevelScene(string path, Game game) : base(game)
         {
-            _levelId = levelId;
+            _path = path;
+
             _alivePlayers = new List<Player>(Session.Players);
         }
 
@@ -51,10 +59,13 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
-            string path = $"Scene/World1/";
+            string fullPath = Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, _path);
+            string folderPath = Path.GetDirectoryName(_path);
+            string fullFolderPath = Path.GetDirectoryName(fullPath);
 
             // load level data from the file
-            _data = new LevelData($"Content/{path}level{_levelId}.txt");
+            _info = new LevelInfo(Path.Combine(fullFolderPath, "info.txt"));
+            _data = new LevelData($"{Path.Combine(Path.ChangeExtension(fullPath, null))}scene.txt");
 
             // get the ball names, put them in a list so they can easily be grabbed
             foreach (string name in _data.TakeValue("Balls").Split(' '))
@@ -63,21 +74,21 @@ namespace MiniGolf
             }
 
             // load the level png
-            _backgroundTexture = Game.Content.Load<Texture2D>($"{path}background");
+            _backgroundTexture = Game.Content.Load<Texture2D>(Path.Combine(folderPath, "background"));
 
             // load the level components png
-            Texture2D levelComponentsTexture = Game.Content.Load<Texture2D>($"{path}components");
+            Texture2D levelComponentsTexture = Game.Content.Load<Texture2D>(Path.Combine(folderPath, "components"));
 
             // create each object
             foreach (var pair in _data.ObjectDatas)
             {
                 // add a new list for the type
-                _typeObjects.Add(pair.Key.Type, new List<GameObject>());
+                _typeObjects.Add(pair.Key, new List<GameObject>());
 
                 foreach (var data in pair.Value)
                 {
                     // create object using type and other data
-                    InstantiateLevelObject(CreateLevelObject(pair.Key, data, levelComponentsTexture));
+                    InstantiateLevelObject(CreateLevelObject(_info.ObjectTypeDatas[pair.Key], data, levelComponentsTexture));
                 }
             }
 

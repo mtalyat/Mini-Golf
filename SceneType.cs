@@ -10,5 +10,6 @@ namespace MiniGolf
     {
         MainMenu,
         Level,
+        Editor,
     }
 }

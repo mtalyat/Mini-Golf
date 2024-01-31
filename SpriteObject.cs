@@ -24,7 +24,7 @@ namespace MiniGolf
         public float Depth
         {
             get => _depth;
-            set => _depth = Math.Clamp(value, 0.0f, 1.0f);
+            set => SetDepth(value);
         }
 
         public SpriteObject(Sprite sprite, Scene scene) : base(scene)
@@ -54,21 +54,29 @@ namespace MiniGolf
 
         public override void Draw(GameTime gameTime)
         {
-            Vector2 position = GetGlobalPosition();
-            Vector2 size = GetGlobalSize();
-            float rotation = GetGlobalRotation();
+            if(Visible)
+            {
+                Vector2 position = GetGlobalPosition();
+                Vector2 size = GetGlobalSize();
+                float rotation = GetGlobalRotation();
 
-            SpriteBatch.Draw(
-                _sprite.Texture, 
-                new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
-                _sprite.Slice, 
-                Color, 
-                MathHelper.ToRadians(rotation),
-                _sprite.Size * _sprite.Pivot,
-                SpriteEffects.None, 
-                _depth);
+                SpriteBatch.Draw(
+                    _sprite.Texture,
+                    new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
+                    _sprite.Slice,
+                    Color,
+                    MathHelper.ToRadians(rotation),
+                    _sprite.Size * _sprite.Pivot,
+                    SpriteEffects.None,
+                    _depth);
+            }            
 
             base.Draw(gameTime);
+        }
+
+        protected virtual void SetDepth(float value)
+        {
+            _depth = Math.Clamp(value, 0.0f, 1.0f);
         }
     }
 }

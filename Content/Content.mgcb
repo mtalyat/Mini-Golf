@@ -20,18 +20,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Font/rocks-serif.spritefont
 
-#begin Scene/World1/background.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Scene/World1/background.png
-
 #begin Scene/World1/components.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -44,8 +32,23 @@
 /processorParam:TextureFormat=Color
 /build:Scene/World1/components.png
 
-#begin Scene/World1/level1.txt
-/copy:Scene/World1/level1.txt
+#begin Scene/World1/info.txt
+/copy:Scene/World1/info.txt
+
+#begin Scene/World1/level1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Scene/World1/level1.png
+
+#begin Scene/World1/level1scene.txt
+/copy:Scene/World1/level1scene.txt
 
 #begin Texture/Aim.png
 /importer:TextureImporter

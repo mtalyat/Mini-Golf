@@ -66,6 +66,7 @@ namespace MiniGolf
             OnClick = onClick;
 
             SetMargin(margin);
+            SetDepth(0.9f);
         }
 
         public override void Initialize()
@@ -100,6 +101,15 @@ namespace MiniGolf
                 _textObject.LocalPosition = new Vector2(_margin, _margin) + offset;
                 _textObject.LocalSize = adjustedSize;
             }
+        }
+
+        protected override void SetDepth(float value)
+        {
+            // set new depth
+            base.SetDepth(MathF.Min(value, 0.9999f));
+
+            // update text to be in front
+            _textObject.Depth = Depth + 0.0001f;
         }
 
         private void SetMargin(float margin)

@@ -16,13 +16,12 @@ namespace MiniGolf
     internal class LevelData
     {
         private readonly Dictionary<string, string> _values = new();
-        public Dictionary<string, string> Values => _values;
 
-        private readonly Dictionary<ObjectTypeData, List<ObjectData>> _objectDatas = new();
-        public Dictionary<ObjectTypeData, List<ObjectData>> ObjectDatas => _objectDatas;
+        private readonly Dictionary<ObjectType, List<ObjectData>> _objectDatas = new();
+        public Dictionary<ObjectType, List<ObjectData>> ObjectDatas => _objectDatas;
 
         /// <summary>
-        /// Creates a new SceneData by parsing the given text.
+        /// Creates a new LevelData by loading the info as well as the level data.
         /// </summary>
         /// <param name="text"></param>
         public LevelData(string path)
@@ -33,23 +32,23 @@ namespace MiniGolf
             HashSet<string> objectTypeNames = new(Enum.GetNames<ObjectType>());
 
             // add those to a dictionary for quick lookup
-            ObjectTypeData typeData = null;
+            ObjectType type = ObjectType.Generic;
 
             foreach (string line in lines)
             {
                 // ignore empty lines or lines starting with a comment (#)
-                if(string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) continue;
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) continue;
 
                 // if starts with a tab, it is some data, not a header
-                if(line.StartsWith('\t'))
+                if (line.StartsWith('\t'))
                 {
                     // parse data
 
                     // create a list if no list yet for this type
-                    if (!_objectDatas.TryGetValue(typeData, out List<ObjectData> datas))
+                    if (!_objectDatas.TryGetValue(type, out List<ObjectData> datas))
                     {
                         datas = new List<ObjectData>();
-                        _objectDatas.Add(typeData, datas);
+                        _objectDatas.Add(type, datas);
                     }
 
                     // add to that list, but remove the '\t' first
@@ -61,14 +60,12 @@ namespace MiniGolf
                 // no starting tab means header data
                 string[] parts = line.Split('\t');
 
-                if (objectTypeNames.Contains(parts[0]))
+                if (!Enum.TryParse(parts[0], out type))
                 {
-                    typeData = ObjectTypeData.FromString(line);
-                }
-                else
-                {
-                    typeData = new ObjectTypeData(ObjectType.Generic, new Rectangle(), new Vector2());
+                    // not an ObjectType, so add to values
                     _values.Add(parts[0], parts[1]);
+
+                    type = ObjectType.Generic;
                 }
             }
         }
