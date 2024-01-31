@@ -20,7 +20,7 @@
 /processorParam:TextureFormat=Compressed
 /build:Font/rocks-serif.spritefont
 
-#begin Level/Level1/components.png
+#begin Scene/World1/background.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -30,12 +30,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Level/Level1/components.png
+/build:Scene/World1/background.png
 
-#begin Level/Level1/data.txt
-/copy:Level/Level1/data.txt
-
-#begin Level/Level1/level.png
+#begin Scene/World1/components.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -45,7 +42,10 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Level/Level1/level.png
+/build:Scene/World1/components.png
+
+#begin Scene/World1/level1.txt
+/copy:Scene/World1/level1.txt
 
 #begin Texture/Aim.png
 /importer:TextureImporter

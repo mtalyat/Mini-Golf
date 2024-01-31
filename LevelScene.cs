@@ -17,7 +17,7 @@ namespace MiniGolf
     {
         private LevelData _data;
         private readonly int _levelId;
-        private Texture2D _levelTexture;
+        private Texture2D _backgroundTexture;
 
         private readonly List<BallType> _balls = new();
 
@@ -50,10 +50,10 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
-            string path = $"Level/Level{_levelId}/";
+            string path = $"Scene/World1/";
 
             // load level data from the file
-            _data = new LevelData($"Content/{path}data.txt");
+            _data = new LevelData($"Content/{path}level{_levelId}.txt");
 
             // get the ball names, put them in a list so they can easily be grabbed
             foreach (string name in _data.TakeValue("Balls").Split(' '))
@@ -62,7 +62,7 @@ namespace MiniGolf
             }
 
             // load the level png
-            _levelTexture = Game.Content.Load<Texture2D>($"{path}level");
+            _backgroundTexture = Game.Content.Load<Texture2D>($"{path}background");
 
             // load the level components png
             Texture2D levelComponentsTexture = Game.Content.Load<Texture2D>($"{path}components");
@@ -121,7 +121,7 @@ namespace MiniGolf
             SpriteBatch.Begin();
 
             // draw the background
-            SpriteBatch.Draw(_levelTexture, new Vector2(0.0f, 0.0f), Color.White);
+            SpriteBatch.Draw(_backgroundTexture, new Vector2(0.0f, 0.0f), Color.White);
 
             SpriteBatch.End();
 
