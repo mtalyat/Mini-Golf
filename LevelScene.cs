@@ -20,6 +20,7 @@ namespace MiniGolf
         private Texture2D _backgroundTexture;
 
         private readonly List<BallType> _balls = new();
+        private readonly List<SpriteObject> _ballPreviews = new();
 
         private readonly Dictionary<ObjectType, List<GameObject>> _typeObjects = new();
 
@@ -216,6 +217,34 @@ namespace MiniGolf
 
             // spawn their ball
             _activeBall = SpawnBall(ActivePlayer);
+
+            // reload previews
+            RefreshPreviews();
+        }
+
+        private void RefreshPreviews()
+        {
+            // destroy old previews
+            for(int i = _ballPreviews.Count - 1; i >= 0; i--)
+            {
+                _ballPreviews[i].Destroy();
+            }
+            _ballPreviews.Clear();
+
+            // create new ones based on the stroke
+            int offset = ActivePlayer.Stroke;
+            int count = _balls.Count - offset;
+
+            for(int i = 0; i < count; i++)
+            {
+                SpriteObject preview = new(new Sprite(Content.Load<Texture2D>($"Texture/{_balls[i + offset]}")), this)
+                {
+                    Depth = 1.0f, // render on top
+                    LocalPosition = new Vector2(20 + i * 40, 20),
+                    LocalSize = new Vector2(20, 20),
+                };
+                _ballPreviews.Add(preview);
+            }
         }
         
         private void GameOver()
