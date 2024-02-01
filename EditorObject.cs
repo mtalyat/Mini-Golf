@@ -226,12 +226,12 @@ namespace MiniGolf
                 if (CheckKey(Keys.I, snap))
                 {
                     moved = true;
-                    LocalSize += new Vector2(0.0f, -move);
+                    LocalSize += new Vector2(0.0f, move);
                 }
                 if (CheckKey(Keys.K, snap))
                 {
                     moved = true;
-                    LocalSize += new Vector2(0.0f, move);
+                    LocalSize += new Vector2(0.0f, -move);
                 }
                 if (CheckKey(Keys.J, snap))
                 {
