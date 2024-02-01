@@ -23,6 +23,14 @@ namespace MiniGolf
 
         public Color BackgroundColor { get; set; } = Color.CornflowerBlue;
 
+        public Vector2 CameraPosition
+        {
+            get => GetCameraPosition();
+            set => SetCameraPosition(value);
+        }
+
+        public Vector2 CameraPivot { get; set; } = Vector2.Zero;
+
         public Scene(Game game) : base(game)
         {
             // initialize this class
@@ -30,8 +38,7 @@ namespace MiniGolf
             _externalContentManager = new ExternalContentManager(game);
             _spriteBatch = new SpriteBatch(game.GraphicsDevice);
 
-            // set size to 1 for normal rendering
-            LocalSize = new Vector2(1.0f, 1.0f);
+            SetCameraPosition(Vector2.Zero);
         }
 
         protected override void UnloadContent()
@@ -96,6 +103,16 @@ namespace MiniGolf
             Clean(gameObject);
 
             gameObject.Destroy();
+        }
+
+        private void SetCameraPosition(Vector2 position)
+        {
+            LocalPosition = new Vector2(position.X + Constants.RESOLUTION_WIDTH * CameraPivot.X, position.Y + Constants.RESOLUTION_HEIGHT * CameraPivot.Y);
+        }
+
+        private Vector2 GetCameraPosition()
+        {
+            return LocalPosition - new Vector2(Constants.RESOLUTION_WIDTH * CameraPivot.X, Constants.RESOLUTION_HEIGHT * CameraPivot.Y);
         }
     }
 }

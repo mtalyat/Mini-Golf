@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
+using System.Reflection;
 
 namespace MiniGolf
 {
@@ -23,14 +24,26 @@ namespace MiniGolf
         private int _selectedTypeIndex = 0;
         private ObjectType SelectedType => (ObjectType)_selectedTypeIndex;
 
+        private bool _movingCamera = false;
+        private Vector2 _movingCameraOffset;
+
         private SpriteObject _preview;
         private SelectionObject _selectionObject;
+
+        private CanvasObject _canvas;
 
         private readonly Dictionary<ObjectType, List<EditorObject>> _editorObjects = new();
 
         public EditorScene(Game game) : base(game)
         {
 
+        }
+
+        public override void Initialize()
+        {
+            _canvas = Instantiate(new CanvasObject(this));
+
+            base.Initialize();
         }
 
         protected override void LoadContent()
@@ -56,7 +69,7 @@ namespace MiniGolf
             _preview = Instantiate(new SpriteObject(null, new Vector2(100, 100), this)
             {
                 Depth = 0.9f
-            }, new Vector2(10.0f, 10.0f), 0.0f);
+            }, new Vector2(10.0f, 10.0f), 0.0f, _canvas);
 
             _componentsTexture = ExternalContent.LoadTexture2D(Path.Combine(path, "components.png"));
             _levelInfo = new LevelInfo(Path.Combine(path, "info.txt"));
@@ -103,6 +116,7 @@ namespace MiniGolf
                 ReloadPreview();
             }
 
+            // place new items
             if(Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
             {
                 if(Input.GetKeyboardButtonState(Keys.LeftControl) <= ButtonState.Down)
@@ -131,6 +145,25 @@ namespace MiniGolf
                 }
             }
 
+            // drag camera around
+            ButtonState middleMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Middle);
+            if (middleMouseButtonState == ButtonState.Down)
+            {
+                _movingCamera = true;
+                _movingCameraOffset = CameraPosition - Input.MousePosition;
+            }
+
+            if(_movingCamera)
+            {
+                CameraPosition = Input.MousePosition + _movingCameraOffset;
+            }
+
+            // stop dragging camera around
+            if(middleMouseButtonState == ButtonState.Up)
+            {
+                _movingCamera = false;
+            }
+
             ButtonState leftMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
 
             _shouldDragSelect = leftMouseButtonState == ButtonState.Down;
@@ -141,7 +174,7 @@ namespace MiniGolf
             if (_shouldDragSelect)
             {
                 _universalDrag = false;
-                _selectionObject = Instantiate(new SelectionObject(Input.GetMousePosition(), this));
+                _selectionObject = Instantiate(new SelectionObject(Input.MousePosition, this));
             }
             else if (leftMouseButtonState == ButtonState.Down)
             {
@@ -325,7 +358,7 @@ namespace MiniGolf
                 EditorObject editorObject = SpawnTypeObject(data);
 
                 // move to mouse position
-                editorObject.LocalPosition = Input.GetMousePosition();
+                editorObject.LocalPosition = Input.MousePosition;
 
                 return editorObject;
             }

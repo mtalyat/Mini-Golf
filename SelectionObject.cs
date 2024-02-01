@@ -17,7 +17,7 @@ namespace MiniGolf
         {
             _start = start;
             Color = Color.Blue;
-            Depth = 1.0f;
+            Depth = 0.5f;
 
             UpdateOrientation();
         }
@@ -31,7 +31,7 @@ namespace MiniGolf
 
         private void UpdateOrientation()
         {
-            _end = Input.GetMousePosition();
+            _end = Input.MousePosition;
 
             LocalPosition = Vector2.Min(_start, _end);
             LocalSize = Vector2.Max(_start, _end) - LocalPosition;

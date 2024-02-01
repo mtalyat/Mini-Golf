@@ -132,7 +132,7 @@ namespace MiniGolf
                         _isDragging = true;
                         _movedWhileDragging = false;
                     }
-                    _offset = LocalPosition - Input.GetMousePosition();
+                    _offset = LocalPosition - Input.MousePosition;
                 }
             }
 
@@ -150,7 +150,7 @@ namespace MiniGolf
                 }                
 
                 // move to mouse + offset
-                Vector2 newPosition = Input.GetMousePosition() + _offset;
+                Vector2 newPosition = Input.MousePosition + _offset;
                 if(LocalPosition !=  newPosition)
                 {
                     _movedWhileDragging = true;

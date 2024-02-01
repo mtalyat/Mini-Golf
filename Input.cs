@@ -26,6 +26,8 @@ namespace MiniGolf
         private static MouseState _currentMouseState;
         public static MouseState CurrentMouseState => _currentMouseState;
 
+        public static Vector2 MousePosition => new Vector2(_currentMouseState.X, _currentMouseState.Y);
+
         private static KeyboardState _lastKeyboardState;
         public static KeyboardState LastKeyboardState => _lastKeyboardState;
         private static KeyboardState _currentKeyboardState;
@@ -135,11 +137,6 @@ namespace MiniGolf
                     return ButtonState.Released;
                 }
             }
-        }
-
-        public static Vector2 GetMousePosition()
-        {
-            return new Vector2(_currentMouseState.X, _currentMouseState.Y);
         }
 
         public static bool ContainsMouse(Hitbox hitbox)

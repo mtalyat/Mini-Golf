@@ -25,7 +25,7 @@ namespace MiniGolf
         private void UpdateOrientation()
         {
             // update end to mouse position
-            _end = Input.GetMousePosition();
+            _end = Input.MousePosition;
 
             // set rotation to match the line between start and end
             float angle = _start.AngleTo(_end) + MathF.PI * 1.5f;
