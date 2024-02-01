@@ -17,6 +17,12 @@ namespace MiniGolf
 
         public override void Initialize()
         {
+            // TODO: load multiple players
+            Session.Players = new List<Player>()
+            {
+                new Player("Player", Color.White),
+            };
+
             base.Initialize();
         }
 
@@ -44,12 +50,6 @@ namespace MiniGolf
 
         private void LoadFirstLevel()
         {
-            // TODO: load players
-            Session.Players = new List<Player>()
-            {
-                new Player("Player", Color.White),
-            };
-
             ((MiniGolfGame)Game).LoadLevel(Constants.BUILTIN_WORLD_NAME, 1);
         }
 

@@ -16,6 +16,8 @@ namespace MiniGolf
         public SelectionObject(Vector2 start, Scene scene) : base(new Sprite(scene.Content.Load<Texture2D>("Texture/Selection")), scene)
         {
             _start = start;
+            Color = Color.Blue;
+            Depth = 1.0f;
 
             UpdateOrientation();
         }
@@ -30,7 +32,8 @@ namespace MiniGolf
         private void UpdateOrientation()
         {
             _end = Input.GetMousePosition();
-
+            
+            // TODO: fix for when negative
             LocalPosition = _start;
             LocalSize = _end - _start;
         }

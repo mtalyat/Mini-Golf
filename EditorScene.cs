@@ -46,7 +46,7 @@ namespace MiniGolf
             string customPath = Path.Combine(path, CUSTOM_NAME);
 
             // TODO: load texture
-            string texturePath = Path.ChangeExtension(customPath, "png");
+            //string texturePath = Path.ChangeExtension(customPath, "png");
             string scenePath = Path.ChangeExtension(customPath, "txt");
 
             // create scene file if necessary
@@ -75,6 +75,13 @@ namespace MiniGolf
             if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
             {
                 SaveAndExit();
+                return;
+            }
+            
+            // test
+            if(Input.GetKeyboardButtonState(Keys.Enter) == ButtonState.Down)
+            {
+                SaveAndTest();
                 return;
             }
 
@@ -264,6 +271,15 @@ namespace MiniGolf
             }
         }
 
+        private void Test()
+        {
+            ((MiniGolfGame)Game).LoadScene(SceneType.Level, Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
+                "My Games",
+                Constants.APPLICATION_NAME,
+                CUSTOM_NAME));
+        }
+
         private void Exit()
         {
             ((MiniGolfGame)Game).LoadScene(SceneType.MainMenu);
@@ -275,23 +291,19 @@ namespace MiniGolf
             Exit();
         }
 
+        private void SaveAndTest()
+        {
+            Save();
+            Test();
+        }
+
         #endregion
 
         #region Objects
 
-        private Sprite GetSelectedTypeSprite()
-        {
-            if(_levelInfo.ObjectTypeDatas.TryGetValue(SelectedType, out ObjectTypeData data))
-            {
-                return GetObjectTypeSprite(data);
-            }
-
-            return null;
-        }
-
         private Sprite GetObjectTypeSprite(ObjectTypeData data)
         {
-            return new Sprite(_componentsTexture, data.Rect, Vector2.Zero);
+            return new Sprite(_componentsTexture, data.Rect, data.Pivot);
         }
 
         // spawns the selected type

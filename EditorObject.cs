@@ -32,10 +32,23 @@ namespace MiniGolf
 
         private readonly EditorScene _editorScene;
 
+        private readonly SpriteObject _cover;
+
         public EditorObject(ObjectType type, Sprite sprite, Scene scene) : base(sprite, scene)
         {
             _type = type;
             _editorScene = (EditorScene)scene;
+            _cover = new SpriteObject(new Sprite(scene.Content.Load<Texture2D>("Texture/Selection"), null, Sprite.Pivot), scene);
+        }
+
+        public override void Initialize()
+        {
+            Scene.Instantiate(_cover, Vector2.Zero, 0.0f, this);
+            _cover.Color = SELECTED_COLOR;
+            _cover.Depth = Depth + 0.0001f;
+            _cover.Visible = false;
+
+            base.Initialize();
         }
 
         public override void Update(GameTime gameTime)
@@ -55,10 +68,12 @@ namespace MiniGolf
             UpdateSize(snap, scale);
             UpdateRotation(snap, scale);
 
-            // if selected, use selected color instead
-            if (Selected)
+            // if selected, show the cover with the selected color
+            _cover.Visible = Selected;
+            if(Selected)
             {
-                Color = SELECTED_COLOR;
+                // match size, position and rotation are automatic since this is a child
+                _cover.LocalSize = GetGlobalSize();
             }
 
             base.Update(gameTime);
@@ -73,6 +88,14 @@ namespace MiniGolf
             }
 
             return false;
+        }
+
+        private bool CheckKey(Keys key, bool snap)
+        {
+            ButtonState state = Input.GetKeyboardButtonState(key);
+
+            // true when down or pressed, not pressed and snap
+            return state == ButtonState.Down || (state == ButtonState.Pressed && !snap);
         }
 
         private void UpdatePosition(bool snap, bool scale)
@@ -133,25 +156,25 @@ namespace MiniGolf
 
             if (!_isDragging && Selected)
             {
-                float move = scale ? SNAP_SIZE : 1;
+                float move = (scale || snap) ? SNAP_SIZE : 1;
 
                 // if not dragging, we can move with WASD if selected
-                if (Input.GetKeyboardButtonState(Keys.W) <= ButtonState.Down)
+                if (CheckKey(Keys.W, snap))
                 {
                     moved = true;
                     LocalPosition += new Vector2(0.0f, -move);
                 }
-                if (Input.GetKeyboardButtonState(Keys.S) <= ButtonState.Down)
+                if (CheckKey(Keys.S, snap))
                 {
                     moved = true;
                     LocalPosition += new Vector2(0.0f, move);
                 }
-                if (Input.GetKeyboardButtonState(Keys.A) <= ButtonState.Down)
+                if (CheckKey(Keys.A, snap))
                 {
                     moved = true;
                     LocalPosition += new Vector2(-move, 0.0f);
                 }
-                if (Input.GetKeyboardButtonState(Keys.D) <= ButtonState.Down)
+                if (CheckKey(Keys.D, snap))
                 {
                     moved = true;
                     LocalPosition += new Vector2(move, 0.0f);
@@ -191,27 +214,27 @@ namespace MiniGolf
         {
             if (Selected)
             {
-                float move = scale ? SNAP_SIZE : 1.0f;
+                float move = (scale || snap) ? SNAP_SIZE : 1.0f;
 
                 bool moved = false;
 
                 // we can move with IK if selected
-                if (Input.GetKeyboardButtonState(Keys.I) <= ButtonState.Down)
-                {
-                    moved = true;
-                    LocalSize += new Vector2(0.0f, move);
-                }
-                if (Input.GetKeyboardButtonState(Keys.K) <= ButtonState.Down)
+                if (CheckKey(Keys.I, snap))
                 {
                     moved = true;
                     LocalSize += new Vector2(0.0f, -move);
                 }
-                if (Input.GetKeyboardButtonState(Keys.J) <= ButtonState.Down)
+                if (CheckKey(Keys.K, snap))
+                {
+                    moved = true;
+                    LocalSize += new Vector2(0.0f, move);
+                }
+                if (CheckKey(Keys.J, snap))
                 {
                     moved = true;
                     LocalSize += new Vector2(-move, 0.0f);
                 }
-                if (Input.GetKeyboardButtonState(Keys.L) <= ButtonState.Down)
+                if (CheckKey(Keys.L, snap))
                 {
                     moved = true;
                     LocalSize += new Vector2(move, 0.0f);
@@ -228,25 +251,30 @@ namespace MiniGolf
         {
             if (Selected)
             {
-                float move = scale ? SNAP_ROTATE : 1.0f;
+                float move = (scale || snap) ? SNAP_ROTATE : 1.0f;
 
                 bool moved = false;
 
                 // we can move with IK if selected
-                if (Input.GetKeyboardButtonState(Keys.Q) <= ButtonState.Down)
+                if (CheckKey(Keys.Q, snap))
                 {
                     moved = true;
-                    LocalSize += new Vector2(0.0f, move);
+                    LocalRotation += -move;
                 }
-                if (Input.GetKeyboardButtonState(Keys.E) <= ButtonState.Down)
+                if (CheckKey(Keys.E, snap))
                 {
                     moved = true;
-                    LocalSize += new Vector2(0.0f, -move);
+                    LocalRotation += move;
+                }
+                if(Input.GetKeyboardButtonState(Keys.R) == ButtonState.Down)
+                {
+                    moved = true;
+                    LocalRotation = 0.0f;
                 }
 
                 if (moved && snap)
                 {
-                    LocalSize = LocalSize.Snap(SNAP_SIZE);
+                    LocalRotation = (MathF.Floor(LocalRotation / SNAP_ROTATE) * SNAP_ROTATE) % 360.0f;
                 }
             }
         }
