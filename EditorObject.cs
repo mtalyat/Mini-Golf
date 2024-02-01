@@ -199,7 +199,7 @@ namespace MiniGolf
                 if (Input.GetKeyboardButtonState(Keys.I) <= ButtonState.Down)
                 {
                     moved = true;
-                    LocalSize = new Vector2(0.0f, move);
+                    LocalSize += new Vector2(0.0f, move);
                 }
                 if (Input.GetKeyboardButtonState(Keys.K) <= ButtonState.Down)
                 {
@@ -236,7 +236,7 @@ namespace MiniGolf
                 if (Input.GetKeyboardButtonState(Keys.Q) <= ButtonState.Down)
                 {
                     moved = true;
-                    LocalSize = new Vector2(0.0f, move);
+                    LocalSize += new Vector2(0.0f, move);
                 }
                 if (Input.GetKeyboardButtonState(Keys.E) <= ButtonState.Down)
                 {
