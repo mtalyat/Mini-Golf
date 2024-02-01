@@ -33,6 +33,12 @@ namespace MiniGolf
             set => SetSize(value);
         }
 
+        public Vector2 LocalCenter
+        {
+            get => GetCenter();
+            set => SetCenter(value);
+        }
+
         private float _localRotation = 0.0f;
         public float LocalRotation
         {
@@ -101,6 +107,11 @@ namespace MiniGolf
         protected virtual void SetPosition(Vector2 position)
         {
             _localPosition = position;
+        }
+
+        protected virtual void SetCenter(Vector2 center)
+        {
+            SetPosition(center - (_localSize * _localScale * 0.5f).Rotate(MathHelper.ToRadians(LocalRotation)));
         }
 
         protected virtual void SetScale(Vector2 scale)
@@ -174,7 +185,12 @@ namespace MiniGolf
 
         public virtual Vector2 GetGlobalCenter()
         {
-            return GetGlobalPosition() + GetGlobalSize() / 2.0f;
+            return GetGlobalPosition() + GetGlobalSize() * 0.5f;
+        }
+
+        protected virtual Vector2 GetCenter()
+        {
+            return _localPosition + (_localSize * _localScale * 0.5f).Rotate(MathHelper.ToRadians(LocalRotation));
         }
 
         public virtual Hitbox GetHitbox()

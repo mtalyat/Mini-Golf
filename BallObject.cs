@@ -169,7 +169,7 @@ namespace MiniGolf
                 if (state == ButtonState.Down && Input.ContainsMouse(GetHitbox()))
                 {
                     // spawn a trail to the mouse
-                    _trail = Scene.Instantiate(new TrailObject(GetGlobalCenter(), GetGlobalSize().X, Scene));
+                    _trail = Scene.Instantiate(new TrailObject(LocalPosition, Radius * 2.0f, Scene));
 
                     // set depth to render right under the ball
                     _trail.Depth = Depth - 0.0001f;
@@ -177,7 +177,7 @@ namespace MiniGolf
                     // if a pool ball, spawn an aiming object
                     if (_ballType == BallType.PoolBall)
                     {
-                        _aiming = Scene.Instantiate(new AimingObject(GetGlobalCenter(), Scene));
+                        _aiming = Scene.Instantiate(new AimingObject(LocalPosition, Scene));
                         _aiming.Depth = Depth - 0.0001f;
                     }
                 }
@@ -214,7 +214,7 @@ namespace MiniGolf
                 switch(_state)
                 {
                     case State.Sinking:
-                        LocalPosition = Vector2Helper.Lerp(_end, _start, percent);
+                        LocalPosition = Vector2.Lerp(_end, _start, percent);
                         Color = new Color(percent, percent, percent, 1.0f);
                         break;
                 }
@@ -248,7 +248,12 @@ namespace MiniGolf
         public override Vector2 GetGlobalCenter()
         {
             Vector2 size = GetGlobalSize();
-            return GetGlobalPosition() + (size / 2.0f - size * Sprite.Pivot);
+            return GetGlobalPosition() + (size * 0.5f - size * Sprite.Pivot);
+        }
+
+        protected override Vector2 GetCenter()
+        {
+            return LocalPosition + (LocalSize * LocalScale * 0.5f);
         }
 
         #region Trail
@@ -366,10 +371,14 @@ namespace MiniGolf
             // add a stroke
             _owner.Stroke++;
 
+            LevelScene levelScene = (LevelScene)Scene;
+
+            levelScene.FollowBall();
+
             // if hockey puck, thwack it
             if (_ballType == BallType.HockeyPuck)
             {
-                ((LevelScene)Scene).ThwackBall(this);
+                levelScene.ThwackBall(this);
             }
         }
 
@@ -441,8 +450,8 @@ namespace MiniGolf
             if (_state == State.Moving)
             {
                 Stop();
-                _start = GetGlobalCenter();
-                _end = hole.GetGlobalCenter();
+                _start = LocalPosition;
+                _end = hole.LocalPosition;
                 _state = State.Sinking;
                 _maxTime = Constants.BALL_SINK_TIME;
                 _timer = _maxTime;

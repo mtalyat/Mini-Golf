@@ -88,7 +88,6 @@ namespace MiniGolf
             ButtonState leftShiftButtonState = Input.GetKeyboardButtonState(Keys.LeftShift);
             int scroll = Input.GetMouseDeltaScrollY();
             Vector2 mousePosition = Input.MousePosition;
-            Vector2 globalMousePosition = Input.GetMouseGlobalPosition(this);
 
             // exit
             if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
@@ -183,13 +182,13 @@ namespace MiniGolf
                 if (scroll > 0)
                 {
                     // zoom in
-                    LocalScale = new Vector2(LocalScale.X * Constants.ZOOM_FACTOR);
+                    LocalScale = new Vector2(LocalScale.X * Constants.CAMERA_ZOOM_FACTOR);
                 }
 
                 if (scroll < 0)
                 {
                     // zoom out
-                    LocalScale = new Vector2(LocalScale.X / Constants.ZOOM_FACTOR);
+                    LocalScale = new Vector2(LocalScale.X / Constants.CAMERA_ZOOM_FACTOR);
                 }
             }
 

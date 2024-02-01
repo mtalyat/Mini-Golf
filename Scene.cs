@@ -30,6 +30,8 @@ namespace MiniGolf
         }
 
         public Vector2 CameraPivot { get; set; } = Vector2.Zero;
+        public Vector2 CameraSize => new(Constants.RESOLUTION_WIDTH, Constants.RESOLUTION_HEIGHT);
+        public Vector2 CameraOffset => CameraSize * CameraPivot;
 
         public Scene(Game game) : base(game)
         {
@@ -107,12 +109,12 @@ namespace MiniGolf
 
         private void SetCameraPosition(Vector2 position)
         {
-            LocalPosition = new Vector2(position.X + Constants.RESOLUTION_WIDTH * CameraPivot.X, position.Y + Constants.RESOLUTION_HEIGHT * CameraPivot.Y);
+            LocalPosition = position + CameraOffset;
         }
 
         private Vector2 GetCameraPosition()
         {
-            return LocalPosition - new Vector2(Constants.RESOLUTION_WIDTH * CameraPivot.X, Constants.RESOLUTION_HEIGHT * CameraPivot.Y);
+            return LocalPosition - CameraOffset;
         }
     }
 }

@@ -42,6 +42,11 @@ namespace MiniGolf
 
         private readonly CanvasObject _canvas;
 
+        private bool _movingCamera;
+        private Vector2 _movingCameraOffset;
+
+        private bool _isFollowingBall = false;
+
         /// <summary>
         /// Runs a level at the given path.
         /// </summary>
@@ -108,6 +113,7 @@ namespace MiniGolf
 
             // start the game
             NextTurn();
+            SnapCameraToBall();
 
             base.LoadContent();
         }
@@ -119,8 +125,8 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
-            // if the ball is in the scene, simulate physics on it
-            if (_activeBall != null)
+            // if the ball is in the scene and moving, simulate physics on it
+            if (_activeBall != null && _activeBall.IsMoving)
             {
                 ConductBallPhysics(_activeBall, (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
@@ -130,6 +136,8 @@ namespace MiniGolf
             {
                 NextTurn();
             }
+
+            UpdateCamera(gameTime);
 
             base.Update(gameTime);
         }
@@ -158,6 +166,72 @@ namespace MiniGolf
             base.Clean(gameObject);
         }
 
+        #region Camera
+
+        public void FollowBall()
+        {
+            _isFollowingBall = true;
+        }
+
+        private Vector2 GetCameraTargetPosition()
+        {
+            if (_activeBall == null) return LocalPosition;
+
+            return -_activeBall.LocalCenter + CameraOffset + CameraSize * 0.5f;
+        }
+
+        private void SnapCameraToBall()
+        {
+            LocalPosition = GetCameraTargetPosition();
+        }
+
+        private void UpdateCamera(GameTime gameTime)
+        {
+            // get the lower mouse button state
+            ButtonState rightMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Right);
+            ButtonState middleMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Middle);
+            ButtonState buttonState = rightMouseButtonState < middleMouseButtonState ? rightMouseButtonState : middleMouseButtonState;
+
+            // stop following if we try to move
+            // stop following if 
+            if(buttonState == ButtonState.Down)
+            {
+                _isFollowingBall = false;
+            }
+
+            // cannot drag if following the ball
+            if (_isFollowingBall)
+            {
+                // lerp to ball
+                LocalPosition = Vector2.Lerp(LocalPosition, GetCameraTargetPosition(), Constants.CAMERA_LERP_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            else
+            {
+                Vector2 mousePosition = Input.MousePosition;
+
+                // drag camera around
+                
+                if (!_movingCamera && buttonState == ButtonState.Down)
+                {
+                    _movingCamera = true;
+                    _movingCameraOffset = CameraPosition - mousePosition;
+                }
+
+                if (_movingCamera)
+                {
+                    CameraPosition = (mousePosition + _movingCameraOffset) / LocalScale;
+                }
+
+                // stop dragging camera around
+                if (buttonState == ButtonState.Up)
+                {
+                    _movingCamera = false;
+                }
+            }
+        }
+
+        #endregion
+
         #region Game Management
 
         private bool EndOfTurn()
@@ -171,7 +245,7 @@ namespace MiniGolf
                     case BallObject.State.Done:
                         // ball finished turn as normal, nothing crazy happened
                         // update respawn point
-                        _alivePlayerSpawns[_activePlayerIndex] = new Vector3(_activeBall.GetGlobalPosition(), _activeBall.GetGlobalRotation());
+                        _alivePlayerSpawns[_activePlayerIndex] = new Vector3(_activeBall.LocalPosition, _activeBall.LocalRotation);
                         break;
                     case BallObject.State.Dead:
                         // oops, the ball hit a hazzard
@@ -234,6 +308,7 @@ namespace MiniGolf
 
             // spawn their ball
             _activeBall = SpawnBall(ActivePlayer);
+            _isFollowingBall = true;
 
             // reload previews
             RefreshPreviews();
@@ -328,7 +403,7 @@ namespace MiniGolf
             position ??= new Vector2(spawn.X, spawn.Y);
             rotation ??= spawn.Z;
 
-            return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position.Value, rotation);
+            return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position, rotation);
         }
 
         #endregion
@@ -478,7 +553,7 @@ namespace MiniGolf
                     // ball collided
 
                     // spawn a visual
-                    Instantiate(new ThwackObject(initialPosition, ball.GetGlobalCenter(), ball.Radius * 1.8f, this));
+                    Instantiate(new ThwackObject(initialPosition, ball.LocalPosition, ball.Radius * 1.8f, this));
 
                     return;
                 }
