@@ -120,7 +120,8 @@ namespace MiniGolf
             }
 
             // place new items
-            if(Input.GetMouseButtonState(Input.MouseButton.Right) == ButtonState.Down)
+            if(Input.GetMouseButtonState(Input.MouseButton.Right) == ButtonState.Down ||
+                Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
             {
                 if(leftControlButtonState <= ButtonState.Down)
                 {
