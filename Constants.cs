@@ -15,6 +15,8 @@ namespace MiniGolf
         public const int RESOLUTION_WIDTH = 1920;
         public const int RESOLUTION_HEIGHT = 1080;
 
+        public const float ZOOM_FACTOR = 2.0f;
+
         public const string CONTENT_ROOT_DIRECTORY = "Content";
 
         public const float BALL_HIT_POWER = 2.0f;

@@ -17,7 +17,15 @@ namespace MiniGolf
         public override void Update(GameTime gameTime)
         {
             // always match inverse camera position to give the illusion that the children are sticking with the camera
-            LocalPosition = -Scene.LocalPosition;
+            LocalPosition = -Scene.LocalPosition / Scene.LocalScale;
+            if(Scene.LocalScale.X == 0.0f || Scene.LocalScale.Y == 0.0f)
+            {
+                LocalScale = Vector2.Zero;
+            }
+            else
+            {
+                LocalScale = Vector2.One / Scene.LocalScale;
+            }
 
             base.Update(gameTime);
         }

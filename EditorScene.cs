@@ -84,6 +84,12 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
+            ButtonState leftControlButtonState = Input.GetKeyboardButtonState(Keys.LeftControl);
+            ButtonState leftShiftButtonState = Input.GetKeyboardButtonState(Keys.LeftShift);
+            int scroll = Input.GetMouseDeltaScrollY();
+            Vector2 mousePosition = Input.MousePosition;
+            Vector2 globalMousePosition = Input.GetMouseGlobalPosition(this);
+
             // exit
             if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
             {
@@ -99,16 +105,14 @@ namespace MiniGolf
             }
 
             // change selected type
-            int scroll = Input.GetMouseDeltaScrollY();
-
-            if (Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down || scroll > 0)
+            if (Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll > 0))
             {
                 // move to next object
                 _selectedTypeIndex = (_selectedTypeIndex + 1) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
 
                 ReloadPreview();
             }
-            else if (Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down || scroll < 0)
+            else if (Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll < 0))
             {
                 // move to previous object
                 _selectedTypeIndex = (_selectedTypeIndex - 1 + ObjectTypeExtensions.OBJECT_TYPE_COUNT) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
@@ -117,9 +121,9 @@ namespace MiniGolf
             }
 
             // place new items
-            if(Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
+            if(Input.GetMouseButtonState(Input.MouseButton.Right) == ButtonState.Down)
             {
-                if(Input.GetKeyboardButtonState(Keys.LeftControl) <= ButtonState.Down)
+                if(leftControlButtonState <= ButtonState.Down)
                 {
                     // duplicate selected if any
                     // unselect old, select new
@@ -141,7 +145,16 @@ namespace MiniGolf
                 }
                 else
                 {
-                    SpawnSelectedTypeObject();
+                    // spawn new object
+                    if(leftShiftButtonState >= ButtonState.Up)
+                    {
+                        SetAllSelected(false);
+                    }
+                    EditorObject obj = SpawnSelectedTypeObject();
+                    if(obj != null)
+                    {
+                        obj.Selected = true;
+                    }
                 }
             }
 
@@ -150,18 +163,34 @@ namespace MiniGolf
             if (middleMouseButtonState == ButtonState.Down)
             {
                 _movingCamera = true;
-                _movingCameraOffset = CameraPosition - Input.MousePosition;
+                _movingCameraOffset = CameraPosition - mousePosition;
             }
 
             if(_movingCamera)
             {
-                CameraPosition = Input.MousePosition + _movingCameraOffset;
+                CameraPosition = (mousePosition + _movingCameraOffset) / LocalScale;
             }
 
             // stop dragging camera around
             if(middleMouseButtonState == ButtonState.Up)
             {
                 _movingCamera = false;
+            }
+
+            // scroll/zoom in and out
+            if(leftControlButtonState >= ButtonState.Up)
+            {
+                if (scroll > 0)
+                {
+                    // zoom in
+                    LocalScale = new Vector2(LocalScale.X * Constants.ZOOM_FACTOR);
+                }
+
+                if (scroll < 0)
+                {
+                    // zoom out
+                    LocalScale = new Vector2(LocalScale.X / Constants.ZOOM_FACTOR);
+                }
             }
 
             ButtonState leftMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
@@ -174,7 +203,7 @@ namespace MiniGolf
             if (_shouldDragSelect)
             {
                 _universalDrag = false;
-                _selectionObject = Instantiate(new SelectionObject(Input.MousePosition, this));
+                _selectionObject = Instantiate(new SelectionObject(mousePosition, this));
             }
             else if (leftMouseButtonState == ButtonState.Down)
             {
@@ -225,7 +254,7 @@ namespace MiniGolf
                         }
                     }
 
-                    if (Input.GetKeyboardButtonState(Keys.LeftControl) <= ButtonState.Down)
+                    if (leftControlButtonState <= ButtonState.Down)
                     {
                         // select the selected list only
                         foreach (var obj in selectedObjects)
@@ -242,7 +271,7 @@ namespace MiniGolf
                         }
 
                         // if holding left shift, do not unselected non-included objects
-                        if (Input.GetKeyboardButtonState(Keys.LeftShift) > ButtonState.Down)
+                        if (leftShiftButtonState >= ButtonState.Up)
                         {
                             foreach (var obj in unselectedObjects)
                             {
@@ -358,7 +387,7 @@ namespace MiniGolf
                 EditorObject editorObject = SpawnTypeObject(data);
 
                 // move to mouse position
-                editorObject.LocalPosition = Input.MousePosition;
+                editorObject.LocalPosition = Input.GetMouseGlobalPosition(this);
 
                 return editorObject;
             }

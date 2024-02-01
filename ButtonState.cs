@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MiniGolf
 {
+    // TODO: make this a struct
     internal enum ButtonState
     {
         /// <summary>

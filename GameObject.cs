@@ -154,7 +154,7 @@ namespace MiniGolf
 
         public Vector2 GetGlobalPosition()
         {
-            return (_parent?.GetGlobalPosition() ?? Vector2.Zero) + LocalPosition;
+            return ((_parent?.GetGlobalPosition() ?? Vector2.Zero) + LocalPosition * (_parent?.GetGlobalScale() ?? Vector2.One));
         }
 
         public Vector2 GetGlobalScale()
@@ -164,7 +164,7 @@ namespace MiniGolf
 
         public Vector2 GetGlobalSize()
         {
-            return GetGlobalScale() * LocalSize;
+            return LocalSize * GetGlobalScale();
         }
 
         public float GetGlobalRotation()

@@ -64,6 +64,11 @@ namespace MiniGolf
 
         public static int GetMouseDeltaScrollX() => _currentMouseState.HorizontalScrollWheelValue - _lastMouseState.HorizontalScrollWheelValue;
 
+        public static Vector2 GetMouseGlobalPosition(Scene scene)
+        {
+            return MousePosition / scene.LocalScale - scene.LocalPosition;
+        }
+
         private static XnaButtonState GetMouseButtonButtonState(MouseButton button, MouseState state)
         {
             switch(button)

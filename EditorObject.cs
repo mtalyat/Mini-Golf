@@ -73,7 +73,7 @@ namespace MiniGolf
             if(Selected)
             {
                 // match size, position and rotation are automatic since this is a child
-                _cover.LocalSize = GetGlobalSize();
+                _cover.LocalSize = LocalSize;
             }
 
             base.Update(gameTime);
@@ -285,7 +285,7 @@ namespace MiniGolf
 
         public ObjectData ToObjectData()
         {
-            return new ObjectData(GetGlobalPosition(), GetGlobalSize(), GetGlobalRotation());
+            return new ObjectData(LocalPosition, LocalSize, LocalRotation);
         }
     }
 }
