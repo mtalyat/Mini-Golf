@@ -338,7 +338,7 @@ namespace MiniGolf
                     break;
                 case ObjectType.Valley:
                     // get vector direction of slope from center of the hill, subtract from velocity
-                    if (contains)
+                    if (contains && GetGlobalCenter().DistanceTo(obj.GetGlobalCenter()) > 4.0f) // give a small center of no force so balls can settle
                         Push(-Vector2Helper.FromAngle(Vector2Helper.Angle(obj.GetGlobalCenter(), GetGlobalCenter())) * Constants.LEVEL_SLOPE_FORCE * deltaTime);
                     break;
                 case ObjectType.Sand:
