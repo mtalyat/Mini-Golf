@@ -34,7 +34,7 @@ namespace MiniGolf
         /// </summary>
         public string Data { get; private set; }
 
-        public ObjectData(Vector2 position, Vector2 size, float rotation, string data)
+        public ObjectData(Vector2 position, Vector2 size, float rotation, string data = "")
         {
             Position = position;
             Size = size;

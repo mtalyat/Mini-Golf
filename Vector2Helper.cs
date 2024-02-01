@@ -62,6 +62,11 @@ namespace MiniGolf
             return new Vector2(MathHelper.Lerp(v1.X, v2.X, amount), MathHelper.Lerp(v1.Y, v2.Y, amount));
         }
 
+        public static Vector2 Snap(this Vector2 v, float snap)
+        {
+            return new Vector2(MathF.Floor(v.X / snap) * snap, MathF.Floor(v.Y / snap) * snap);
+        }
+
         public static float Magnitude(this Vector2 v)
         {
             return MathF.Sqrt(v.X * v.X + v.Y * v.Y);

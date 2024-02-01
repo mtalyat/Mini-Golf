@@ -12,6 +12,15 @@ namespace MiniGolf
 {
     internal static class Input
     {
+        public enum MouseButton
+        {
+            Left,
+            Right,
+            Middle,
+            XButton1,
+            XButton2,
+        }
+
         private static MouseState _lastMouseState;
         public static MouseState LastMouseState => _lastMouseState;
         private static MouseState _currentMouseState;
@@ -45,20 +54,28 @@ namespace MiniGolf
                 );
         }
 
-        private static XnaButtonState GetMouseButtonButtonState(int button, MouseState state)
+        public static int GetMouseScrollY() => _currentMouseState.ScrollWheelValue;
+
+        public static int GetMouseScrollX() => _currentMouseState.HorizontalScrollWheelValue;
+
+        public static int GetMouseDeltaScrollY() => _currentMouseState.ScrollWheelValue - _lastMouseState.ScrollWheelValue;
+
+        public static int GetMouseDeltaScrollX() => _currentMouseState.HorizontalScrollWheelValue - _lastMouseState.HorizontalScrollWheelValue;
+
+        private static XnaButtonState GetMouseButtonButtonState(MouseButton button, MouseState state)
         {
             switch(button)
             {
-                case 0: return state.LeftButton;
-                case 1: return state.RightButton;
-                case 2: return state.MiddleButton;
-                case 3: return state.XButton1;
-                case 4: return state.XButton2;
+                case MouseButton.Left: return state.LeftButton;
+                case MouseButton.Right: return state.RightButton;
+                case MouseButton.Middle: return state.MiddleButton;
+                case MouseButton.XButton1: return state.XButton1;
+                case MouseButton.XButton2: return state.XButton2;
                 default: return XnaButtonState.Released;
             }
         }
 
-        public static ButtonState GetMouseButtonState(int button)
+        public static ButtonState GetMouseButtonState(MouseButton button)
         {
             XnaButtonState currentButtonState = GetMouseButtonButtonState(button, _currentMouseState);
             XnaButtonState lastButtonState = GetMouseButtonButtonState(button, _lastMouseState);

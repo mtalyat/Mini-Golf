@@ -126,6 +126,8 @@ namespace MiniGolf
             SetRotation(rotation);
         }
 
+        public void SetOrientation(GameObject other) => SetOrientation(other.GetGlobalPosition(), other.GetGlobalScale(), other.GetGlobalSize(), other.GetGlobalRotation());
+
         public void SetParent(GameObject parent)
         {
             // cannot set parent to self

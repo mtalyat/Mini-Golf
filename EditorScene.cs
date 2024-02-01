@@ -16,9 +16,17 @@ namespace MiniGolf
 
         private Texture2D _componentsTexture;
         private LevelInfo _levelInfo;
-        private int _objectIndex = 0;
+        private LevelData _levelData;
+        private bool _shouldDragSelect = false;
+        private bool _universalDrag = false;
+        public bool UniversalDrag => _universalDrag;
+        private int _selectedTypeIndex = 0;
+        private ObjectType SelectedType => (ObjectType)_selectedTypeIndex;
 
         private SpriteObject _preview;
+        private SelectionObject _selectionObject;
+
+        private readonly Dictionary<ObjectType, List<EditorObject>> _editorObjects = new();
 
         public EditorScene(Game game) : base(game)
         {
@@ -42,7 +50,7 @@ namespace MiniGolf
             string scenePath = Path.ChangeExtension(customPath, "txt");
 
             // create scene file if necessary
-            if(!File.Exists(scenePath)) File.Create(scenePath).Close();
+            if (!File.Exists(scenePath)) File.Create(scenePath).Close();
 
             // create empty preview
             _preview = Instantiate(new SpriteObject(null, new Vector2(100, 100), this)
@@ -52,6 +60,7 @@ namespace MiniGolf
 
             _componentsTexture = ExternalContent.LoadTexture2D(Path.Combine(path, "components.png"));
             _levelInfo = new LevelInfo(Path.Combine(path, "info.txt"));
+            _levelData = new LevelData(scenePath);
 
             ReloadPreview();
 
@@ -60,29 +69,241 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
-            // check for inputs
-            if(Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down)
+            // change selected type
+            int scroll = Input.GetMouseDeltaScrollY();
+
+            if (Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down || scroll > 0)
             {
                 // move to next object
-                _objectIndex = (_objectIndex + 1) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
+                _selectedTypeIndex = (_selectedTypeIndex + 1) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
 
                 ReloadPreview();
             }
-            else if(Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down)
+            else if (Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down || scroll < 0)
             {
                 // move to previous object
-                _objectIndex = (_objectIndex - 1 + ObjectTypeExtensions.OBJECT_TYPE_COUNT) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
+                _selectedTypeIndex = (_selectedTypeIndex - 1 + ObjectTypeExtensions.OBJECT_TYPE_COUNT) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
 
                 ReloadPreview();
             }
 
+            if(Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
+            {
+                if(Input.GetKeyboardButtonState(Keys.LeftControl) <= ButtonState.Down)
+                {
+                    // duplicate selected if any
+                    // unselect old, select new
+                    foreach(var pair in _editorObjects)
+                    {
+                        // iterate backwards in case a new object is added to this list
+                        for(int i = pair.Value.Count - 1; i >= 0; i--)
+                        {
+                            EditorObject obj = pair.Value[i];
+                            if (!obj.Selected) continue;
+                            obj.Selected = false;
+
+                            EditorObject newObj = SpawnTypeObject(_levelInfo.ObjectTypeDatas[obj.Type]);
+                            newObj.SetOrientation(obj);
+                            newObj.LocalPosition += new Vector2(20.0f, -20.0f); // offset a little so its not stuck behind it
+                            newObj.Selected = true;
+                        }
+                    }
+                }
+                else
+                {
+                    SpawnSelectedTypeObject();
+                }
+            }
+
+            ButtonState leftMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
+
+            _shouldDragSelect = leftMouseButtonState == ButtonState.Down;
+
             base.Update(gameTime);
+
+            // nothing was selected, but the mouse was clicked down
+            if (_shouldDragSelect)
+            {
+                _universalDrag = false;
+                _selectionObject = Instantiate(new SelectionObject(Input.GetMousePosition(), this));
+            }
+            else if (leftMouseButtonState == ButtonState.Down)
+            {
+                // something was selected
+                _universalDrag = true;
+            }
+
+            // if released mouse, unselect
+            if (leftMouseButtonState == ButtonState.Up)
+            {
+                _universalDrag = false;
+
+                if (_selectionObject != null)
+                {
+                    // check each object: if all 4 corners are within the selection, we are good
+                    Hitbox selectionHitbox = _selectionObject.GetHitbox();
+
+                    List<EditorObject> selectedObjects = new();
+                    List<EditorObject> unselectedObjects = new();
+
+                    foreach (var pair in _editorObjects)
+                    {
+                        foreach (EditorObject editorObject in pair.Value)
+                        {
+                            Vector2[] corners = editorObject.GetHitbox().GetCorners();
+
+                            bool selected = false;
+
+                            foreach (Vector2 corner in corners)
+                            {
+                                if (
+                                    corner.X >= selectionHitbox.Position.X &&
+                                    corner.X <= selectionHitbox.Position.X + selectionHitbox.Size.X &&
+                                    corner.Y >= selectionHitbox.Position.Y &&
+                                    corner.Y <= selectionHitbox.Position.Y + selectionHitbox.Size.Y)
+                                {
+                                    // any corner is inside of this selection box
+                                    selected = true;
+                                    selectedObjects.Add(editorObject);
+                                    break;
+                                }
+                            }
+
+                            if (!selected)
+                            {
+                                unselectedObjects.Add(editorObject);
+                            }
+                        }
+                    }
+
+                    // select the selected list only
+                    foreach (var obj in selectedObjects)
+                    {
+                        obj.Selected = true;
+                    }
+
+                    // if holding left shift, do not unselected non-included objects
+                    if (Input.GetKeyboardButtonState(Keys.LeftShift) > ButtonState.Down)
+                    {
+                        foreach (var obj in unselectedObjects)
+                        {
+                            obj.Selected = false;
+                        }
+                    }
+
+                    // clean up
+                    _selectionObject.Destroy();
+                    _selectionObject = null;
+                }
+            }
         }
+
+        public override void Clean(GameObject gameObject)
+        {
+            if(gameObject is EditorObject editorObject)
+            {
+                _editorObjects[editorObject.Type].Remove(editorObject);
+            }
+
+            base.Clean(gameObject);
+        }
+
+        #region Objects
+
+        private Sprite GetSelectedTypeSprite()
+        {
+            if(_levelInfo.ObjectTypeDatas.TryGetValue(SelectedType, out ObjectTypeData data))
+            {
+                return GetObjectSprite(data);
+            }
+
+            return null;
+        }
+
+        private Sprite GetObjectSprite(ObjectTypeData data)
+        {
+            return new Sprite(_componentsTexture, data.Rect, Vector2.Zero);
+        }
+
+        // spawns the selected type
+        private EditorObject SpawnSelectedTypeObject()
+        {
+            if(_levelInfo.ObjectTypeDatas.TryGetValue(SelectedType, out ObjectTypeData data))
+            {
+                EditorObject editorObject = SpawnTypeObject(data);
+
+                // move to mouse position
+                editorObject.LocalPosition = Input.GetMousePosition();
+
+                return editorObject;
+            }
+
+            return null;
+        }
+
+        private EditorObject SpawnTypeObject(ObjectTypeData typeData, ObjectData data = null)
+        {
+            Sprite sprite = GetSelectedTypeSprite();
+
+            // cannot spawn if null
+            if (sprite == null) return null;
+
+            EditorObject editorObject = InstantiateEditorObject(new EditorObject(typeData.Type, sprite, this));
+
+            if(data != null)
+            {
+                editorObject.SetOrientation(data.Position, Vector2.One, data.Size, data.Rotation);
+            }
+
+            return editorObject;
+        }
+
+        private EditorObject InstantiateEditorObject(EditorObject editorObject)
+        {
+            // spawn in center by default
+            Instantiate(editorObject, new Vector2(Constants.RESOLUTION_WIDTH / 2.0f, Constants.RESOLUTION_HEIGHT / 2.0f), 0.0f);
+
+            // create list for type if it does not exist
+            if(!_editorObjects.TryGetValue(editorObject.Type, out List<EditorObject> editorObjects))
+            {
+                editorObjects = new List<EditorObject>();
+                _editorObjects.Add(editorObject.Type, editorObjects);
+            }
+
+            // add to that list
+            editorObjects.Add(editorObject);
+
+            return editorObject;
+        }
+
+        #endregion
+
+        #region Selecting
+
+        public void DoNotDragSelect()
+        {
+            _shouldDragSelect = false;
+        }
+
+        public void SetAllSelected(bool selected)
+        {
+            foreach(var pair in _editorObjects)
+            {
+                foreach(EditorObject editorObject in pair.Value)
+                {
+                    editorObject.Selected = selected;
+                }
+            }
+        }
+
+        #endregion
+
+        #region UI
 
         private void ReloadPreview()
         {
             // get the type
-            ObjectType type = (ObjectType)_objectIndex;
+            ObjectType type = (ObjectType)_selectedTypeIndex;
 
             // get the type data, create sprite from that if able
             if(_levelInfo.ObjectTypeDatas.TryGetValue(type, out ObjectTypeData value))
@@ -94,5 +315,7 @@ namespace MiniGolf
                 _preview.Sprite = null;
             }
         }
+
+        #endregion
     }
 }
