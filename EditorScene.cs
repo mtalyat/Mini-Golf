@@ -64,11 +64,20 @@ namespace MiniGolf
 
             ReloadPreview();
 
+            Load();
+
             base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
+            // exit
+            if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
+            {
+                SaveAndExit();
+                return;
+            }
+
             // change selected type
             int scroll = Input.GetMouseDeltaScrollY();
 
@@ -208,19 +217,79 @@ namespace MiniGolf
             base.Clean(gameObject);
         }
 
+        #region Saving and Loading
+
+        private void Save()
+        {
+            // compile level data
+            _levelData.ObjectDatas.Clear();
+
+            foreach(var pair in _editorObjects)
+            {
+                List<ObjectData> datas = new();
+                _levelData.ObjectDatas.Add(pair.Key, datas);
+
+                foreach(EditorObject editorObject in pair.Value)
+                {
+                    datas.Add(editorObject.ToObjectData());
+                }
+            }
+
+            // save
+            _levelData.Save();
+        }
+
+        private void Load()
+        {
+            // destroy existing
+            foreach(var pair in _editorObjects)
+            {
+                for(int i = pair.Value.Count - 1;  i >= 0; i--)
+                {
+                    Destroy(pair.Value[i]);
+                }
+            }
+            _editorObjects.Clear();
+
+            // load new ones
+            foreach(var pair in _levelData.ObjectDatas)
+            {
+                if(_levelInfo.ObjectTypeDatas.TryGetValue(pair.Key, out var typeData))
+                {
+                    foreach(ObjectData data in pair.Value)
+                    {
+                        SpawnTypeObject(typeData, data);
+                    }
+                }
+            }
+        }
+
+        private void Exit()
+        {
+            ((MiniGolfGame)Game).LoadScene(SceneType.MainMenu);
+        }
+
+        private void SaveAndExit()
+        {
+            Save();
+            Exit();
+        }
+
+        #endregion
+
         #region Objects
 
         private Sprite GetSelectedTypeSprite()
         {
             if(_levelInfo.ObjectTypeDatas.TryGetValue(SelectedType, out ObjectTypeData data))
             {
-                return GetObjectSprite(data);
+                return GetObjectTypeSprite(data);
             }
 
             return null;
         }
 
-        private Sprite GetObjectSprite(ObjectTypeData data)
+        private Sprite GetObjectTypeSprite(ObjectTypeData data)
         {
             return new Sprite(_componentsTexture, data.Rect, Vector2.Zero);
         }
@@ -243,7 +312,7 @@ namespace MiniGolf
 
         private EditorObject SpawnTypeObject(ObjectTypeData typeData, ObjectData data = null)
         {
-            Sprite sprite = GetSelectedTypeSprite();
+            Sprite sprite = GetObjectTypeSprite(typeData);
 
             // cannot spawn if null
             if (sprite == null) return null;

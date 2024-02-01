@@ -53,5 +53,13 @@ namespace MiniGolf
 
             return new ObjectTypeData(type, rect, pivot);
         }
+
+        public override string ToString()
+        {
+            Rectangle rect = Rect ?? Rectangle.Empty;
+            Vector2 pivot = Pivot ?? Vector2.Zero;
+
+            return $"{Type}\t{rect.X} {rect.Y} {rect.Width} {rect.Height}/{pivot.X} {pivot.Y}";
+        }
     }
 }

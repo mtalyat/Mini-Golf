@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,13 +21,33 @@ namespace MiniGolf
         private readonly Dictionary<ObjectType, List<ObjectData>> _objectDatas = new();
         public Dictionary<ObjectType, List<ObjectData>> ObjectDatas => _objectDatas;
 
+        private string _path = null;
+
         /// <summary>
         /// Creates a new LevelData by loading the info as well as the level data.
         /// </summary>
         /// <param name="text"></param>
         public LevelData(string path)
         {
-            string[] lines = System.IO.File.ReadAllLines(path);
+            Load(path);
+        }
+
+        public void Load(string path)
+        {
+            _path = path;
+
+            if(string.IsNullOrEmpty(_path))
+            {
+                return;
+            }
+
+            if(!File.Exists(_path))
+            {
+                // file does not exist: it is empty
+                return;
+            }
+
+            string[] lines = File.ReadAllLines(_path);
 
             // add those to a dictionary for quick lookup
             ObjectType type = ObjectType.Generic;
@@ -67,6 +88,44 @@ namespace MiniGolf
             }
         }
 
+        public void Save()
+        {
+            if(string.IsNullOrEmpty(_path))
+            {
+                return;
+            }
+
+            List<string> lines = new();
+
+            // add values
+            foreach(var pair in _values)
+            {
+                lines.Add($"{pair.Key}\t{pair.Value}");
+            }
+
+            // add the empty line for spacing
+            lines.Add(string.Empty);
+
+            // write the data from the scene
+            foreach(var pair in _objectDatas)
+            {
+                // ignore if no items
+                if (!pair.Value.Any()) continue;
+
+                // add object type header
+                lines.Add(pair.Key.ToString());
+
+                foreach(ObjectData data in pair.Value)
+                {
+                    // add each data for that type
+                    lines.Add($"\t{data}");
+                }
+            }
+
+            // all done, save the file
+            File.WriteAllLines(_path, lines.ToArray());
+        }
+
         public string TakeValue(string name)
         {
             // remove the value and return it if found
@@ -78,6 +137,12 @@ namespace MiniGolf
 
             // no value found
             return null;
+        }
+
+        public void Clear()
+        {
+            _values.Clear();
+            _objectDatas.Clear();
         }
     }
 }

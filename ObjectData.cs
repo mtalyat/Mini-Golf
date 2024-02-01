@@ -54,5 +54,10 @@ namespace MiniGolf
 
             return new ObjectData(position, size, rotation, data);
         }
+
+        public override string ToString()
+        {
+            return $"{Position.X} {Position.Y}/{Size.X} {Size.Y}/{Rotation}/{Data}";
+        }
     }
 }
