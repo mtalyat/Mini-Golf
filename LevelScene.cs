@@ -14,7 +14,7 @@ namespace MiniGolf
     /// <summary>
     /// The scene for running a level.
     /// </summary>
-    internal class LevelScene : Scene
+    internal class LevelScene : NavigatableScene
     {
         private readonly string _path;
         private LevelData _data;
@@ -41,9 +41,6 @@ namespace MiniGolf
         private BallObject _activeBall = null;
 
         private readonly CanvasObject _canvas;
-
-        private bool _movingCamera;
-        private Vector2 _movingCameraOffset;
 
         private bool _isFollowingBall = false;
 
@@ -169,15 +166,16 @@ namespace MiniGolf
 
         public void OnBallHit()
         {
-            FollowBall();
+            SetBallFollow(true);
             TrimPreviews();
         }
 
         #region Camera
 
-        private void FollowBall()
+        private void SetBallFollow(bool follow)
         {
-            _isFollowingBall = true;
+            _isFollowingBall = follow;
+            CanMoveCamera = !follow;
         }
 
         private Vector2 GetCameraTargetPosition()
@@ -203,7 +201,7 @@ namespace MiniGolf
             // stop following if 
             if(buttonState == ButtonState.Down)
             {
-                _isFollowingBall = false;
+                SetBallFollow(false);
             }
 
             // cannot drag if following the ball
@@ -211,29 +209,6 @@ namespace MiniGolf
             {
                 // lerp to ball
                 LocalPosition = Vector2.Lerp(LocalPosition, GetCameraTargetPosition(), Constants.CAMERA_LERP_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds);
-            }
-            else
-            {
-                Vector2 mousePosition = Input.MousePosition;
-
-                // drag camera around
-                
-                if (!_movingCamera && buttonState == ButtonState.Down)
-                {
-                    _movingCamera = true;
-                    _movingCameraOffset = CameraPosition - mousePosition;
-                }
-
-                if (_movingCamera)
-                {
-                    CameraPosition = (mousePosition + _movingCameraOffset) / LocalScale;
-                }
-
-                // stop dragging camera around
-                if (buttonState == ButtonState.Up)
-                {
-                    _movingCamera = false;
-                }
             }
         }
 
@@ -323,7 +298,7 @@ namespace MiniGolf
 
             // spawn their ball
             _activeBall = SpawnBall(ActivePlayer);
-            _isFollowingBall = true;
+            SetBallFollow(true);
         }
 
         private void GameOver()

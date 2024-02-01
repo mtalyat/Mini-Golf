@@ -66,7 +66,7 @@ namespace MiniGolf
 
         public static Vector2 GetMouseGlobalPosition(Scene scene)
         {
-            return MousePosition / scene.LocalScale - scene.LocalPosition;
+            return (MousePosition - scene.LocalPosition) / scene.LocalScale;
         }
 
         private static XnaButtonState GetMouseButtonButtonState(MouseButton button, MouseState state)
@@ -142,6 +142,32 @@ namespace MiniGolf
                     return ButtonState.Released;
                 }
             }
+        }
+
+        public static bool GetKeyboardAny(params Keys[] keys)
+        {
+            foreach(Keys key in keys)
+            {
+                if(GetKeyboardButtonState(key) <= ButtonState.Down)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool GetKeyboardAll(params Keys[] keys)
+        {
+            foreach (Keys key in keys)
+            {
+                if (GetKeyboardButtonState(key) >= ButtonState.Up)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static bool ContainsMouse(Hitbox hitbox)

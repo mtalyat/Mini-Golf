@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace MiniGolf
 {
-    internal class EditorScene : Scene
+    internal class EditorScene : NavigatableScene
     {
         private const string CUSTOM_NAME = "custom";
 
@@ -23,9 +23,6 @@ namespace MiniGolf
         public bool UniversalDrag => _universalDrag;
         private int _selectedTypeIndex = 0;
         private ObjectType SelectedType => (ObjectType)_selectedTypeIndex;
-
-        private bool _movingCamera = false;
-        private Vector2 _movingCameraOffset;
 
         private SpriteObject _preview;
         private SelectionObject _selectionObject;
@@ -99,6 +96,7 @@ namespace MiniGolf
             ButtonState leftShiftButtonState = Input.GetKeyboardButtonState(Keys.LeftShift);
             int scroll = Input.GetMouseDeltaScrollY();
             Vector2 mousePosition = Input.MousePosition;
+            Vector2 globalMousePosition = Input.GetMouseGlobalPosition(this);
 
             // exit
             if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
@@ -169,41 +167,6 @@ namespace MiniGolf
                 }
             }
 
-            // drag camera around
-            ButtonState middleMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Middle);
-            if (middleMouseButtonState == ButtonState.Down)
-            {
-                _movingCamera = true;
-                _movingCameraOffset = CameraPosition - mousePosition;
-            }
-
-            if(_movingCamera)
-            {
-                CameraPosition = (mousePosition + _movingCameraOffset) / LocalScale;
-            }
-
-            // stop dragging camera around
-            if(middleMouseButtonState == ButtonState.Up)
-            {
-                _movingCamera = false;
-            }
-
-            // scroll/zoom in and out
-            if(leftControlButtonState >= ButtonState.Up)
-            {
-                if (scroll > 0)
-                {
-                    // zoom in
-                    LocalScale = new Vector2(LocalScale.X * Constants.CAMERA_ZOOM_FACTOR);
-                }
-
-                if (scroll < 0)
-                {
-                    // zoom out
-                    LocalScale = new Vector2(LocalScale.X / Constants.CAMERA_ZOOM_FACTOR);
-                }
-            }
-
             UpdateBallPreviews(gameTime);
 
             ButtonState leftMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
@@ -216,7 +179,7 @@ namespace MiniGolf
             if (_shouldDragSelect)
             {
                 _universalDrag = false;
-                _selectionObject = Instantiate(new SelectionObject(mousePosition, this));
+                _selectionObject = Instantiate(new SelectionObject(globalMousePosition, this));
             }
             else if (leftMouseButtonState == ButtonState.Down)
             {
