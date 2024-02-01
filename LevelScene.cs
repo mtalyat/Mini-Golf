@@ -40,6 +40,8 @@ namespace MiniGolf
 
         private BallObject _activeBall = null;
 
+        private readonly CanvasObject _canvas;
+
         /// <summary>
         /// Runs a level at the given path.
         /// </summary>
@@ -50,10 +52,14 @@ namespace MiniGolf
             _path = path;
 
             _alivePlayers = new List<Player>(Session.Players);
+
+            _canvas = new CanvasObject(this);
         }
 
         public override void Initialize()
         {
+            Instantiate(_canvas);
+
             base.Initialize();
         }
 
@@ -254,6 +260,7 @@ namespace MiniGolf
                     LocalPosition = new Vector2(20 + i * 40, 20),
                     LocalSize = new Vector2(20, 20),
                 };
+                Instantiate(preview, _canvas);
                 _ballPreviews.Add(preview);
             }
         }
