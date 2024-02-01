@@ -138,6 +138,7 @@ namespace MiniGolf
             }
 
             UpdateCamera(gameTime);
+            AnimatePreviews(gameTime);
 
             base.Update(gameTime);
         }
@@ -166,9 +167,15 @@ namespace MiniGolf
             base.Clean(gameObject);
         }
 
+        public void OnBallHit()
+        {
+            FollowBall();
+            TrimPreviews();
+        }
+
         #region Camera
 
-        public void FollowBall()
+        private void FollowBall()
         {
             _isFollowingBall = true;
         }
@@ -304,42 +311,21 @@ namespace MiniGolf
             }
 
             // move to next player
-            _activePlayerIndex = (_activePlayerIndex + move) % _alivePlayers.Count;
+            int newPlayerIndex = (_activePlayerIndex + move) % _alivePlayers.Count;
+
+            if(_activePlayerIndex != newPlayerIndex)
+            {
+                _activePlayerIndex = newPlayerIndex;
+
+                // only need to refresh if new, otherwise TrimPreviews takes care of removing balls
+                RefreshPreviews();
+            }
 
             // spawn their ball
             _activeBall = SpawnBall(ActivePlayer);
             _isFollowingBall = true;
-
-            // reload previews
-            RefreshPreviews();
         }
 
-        private void RefreshPreviews()
-        {
-            // destroy old previews
-            for(int i = _ballPreviews.Count - 1; i >= 0; i--)
-            {
-                _ballPreviews[i].Destroy();
-            }
-            _ballPreviews.Clear();
-
-            // create new ones based on the stroke
-            int offset = ActivePlayer.Stroke;
-            int count = _balls.Count - offset;
-
-            for(int i = 0; i < count; i++)
-            {
-                SpriteObject preview = new(new Sprite(Content.Load<Texture2D>($"Texture/{_balls[i + offset]}")), this)
-                {
-                    Depth = 1.0f, // render on top
-                    LocalPosition = new Vector2(20 + i * 40, 20),
-                    LocalSize = new Vector2(20, 20),
-                };
-                Instantiate(preview, _canvas);
-                _ballPreviews.Add(preview);
-            }
-        }
-        
         private void GameOver()
         {
             ((MiniGolfGame)Game).LoadScene(SceneType.MainMenu);
@@ -627,6 +613,81 @@ namespace MiniGolf
 
             distance = t0 >= 0 ? t0 : t1;
             return true;
+        }
+
+        #endregion
+
+        #region Previews
+
+        private void TrimPreviews()
+        {
+            int offset = ActivePlayer.Stroke;
+            int count = _balls.Count - offset;
+
+            for (int i = 0; i < _ballPreviews.Count - count; i++)
+            {
+                _ballPreviews[0].Destroy();
+                _ballPreviews.RemoveAt(0);
+            }
+        }
+
+        private const float PREVIEW_OFFSET = 45.0f;
+
+        private void RefreshPreviews()
+        {
+            // destroy old previews
+            for (int i = _ballPreviews.Count - 1; i >= 0; i--)
+            {
+                _ballPreviews[i].Destroy();
+            }
+            _ballPreviews.Clear();
+
+            // create new ones based on the stroke
+            int offset = ActivePlayer.Stroke;
+            int count = _balls.Count - offset;
+
+            for (int i = 0; i < count; i++)
+            {
+                SpriteObject preview = new(new Sprite(Content.Load<Texture2D>($"Texture/{_balls[i + offset]}"), null, new Vector2(0.5f, 0.5f)), this)
+                {
+                    Depth = 1.0f, // render on top
+                    LocalPosition = new Vector2(PREVIEW_OFFSET + i * 40.0f, PREVIEW_OFFSET),
+                    LocalSize = new Vector2(50.0f),
+                };
+                Instantiate(preview, _canvas);
+                _ballPreviews.Add(preview);
+            }
+        }
+
+        private void AnimatePreviews(GameTime gameTime)
+        {
+            // skip if no balls
+            if (!_ballPreviews.Any()) return;
+
+            // only care about first ball since they move in unison
+            SpriteObject firstBall = _ballPreviews[0];
+
+            if (firstBall.LocalPosition.X > PREVIEW_OFFSET)
+            {
+                // move all balls
+                Vector2 move = new(Constants.PREVIEW_ANIMATION_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds, 0.0f);
+                float rotation = move.X * firstBall.LocalSize.X * 0.5f * Constants.BALL_SPIN_SCALE;
+
+                foreach (SpriteObject preview in _ballPreviews)
+                {
+                    preview.LocalPosition -= move;
+                    preview.LocalRotation -= rotation;
+                }
+
+                // if first is done, they all are
+                if (firstBall.LocalPosition.X < PREVIEW_OFFSET)
+                {
+                    for (int i = 0; i < _ballPreviews.Count; i++)
+                    {
+                        _ballPreviews[i].LocalPosition = new Vector2(PREVIEW_OFFSET + i * 40.0f, PREVIEW_OFFSET);
+                    }
+                }
+            }
         }
 
         #endregion

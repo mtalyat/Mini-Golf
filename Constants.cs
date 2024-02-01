@@ -38,5 +38,7 @@ namespace MiniGolf
         public const float LEVEL_BOX_SLOW_DOWN = 0.1f;
         public const float LEVEL_SLOPE_FORCE = 400.0f;
         public const float LEVEL_SANDBAR_FORCE = 6.0f;
+
+        public const float PREVIEW_ANIMATION_SPEED = 50.0f;
     }
 }

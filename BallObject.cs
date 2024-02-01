@@ -373,7 +373,7 @@ namespace MiniGolf
 
             LevelScene levelScene = (LevelScene)Scene;
 
-            levelScene.FollowBall();
+            levelScene.OnBallHit();
 
             // if hockey puck, thwack it
             if (_ballType == BallType.HockeyPuck)
