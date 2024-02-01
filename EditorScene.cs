@@ -69,7 +69,7 @@ namespace MiniGolf
             _preview = Instantiate(new SpriteObject(null, new Vector2(100, 100), this)
             {
                 Depth = 0.9f
-            }, new Vector2(10.0f, 10.0f), 0.0f, _canvas);
+            }, new Vector2(10.0f, Constants.RESOLUTION_HEIGHT - 110.0f), 0.0f, _canvas);
 
             _componentsTexture = ExternalContent.LoadTexture2D(Path.Combine(path, "components.png"));
             _levelInfo = new LevelInfo(Path.Combine(path, "info.txt"));
