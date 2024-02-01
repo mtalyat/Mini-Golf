@@ -148,5 +148,7 @@ namespace MiniGolf
         {
             return hitbox.Contains(new Vector2(_currentMouseState.X, _currentMouseState.Y));
         }
+
+        public static bool ContainsMouse(GameObject gameObject) => ContainsMouse(gameObject.GetHitbox());
     }
 }

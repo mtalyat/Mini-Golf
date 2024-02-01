@@ -30,6 +30,10 @@ namespace MiniGolf
         private SpriteObject _preview;
         private SelectionObject _selectionObject;
 
+        private readonly List<BallType> _balls = new();
+        private readonly List<SpriteObject> _ballPreviews = new();
+        private SpriteObject _plus;
+
         private CanvasObject _canvas;
 
         private readonly Dictionary<ObjectType, List<EditorObject>> _editorObjects = new();
@@ -76,6 +80,13 @@ namespace MiniGolf
             _levelData = new LevelData(scenePath);
 
             ReloadPreview();
+
+            _plus = Instantiate(new SpriteObject(new Sprite(Content.Load<Texture2D>("Texture/Plus"), null, new Vector2(0.5f)), this)
+            {
+                Depth = 0.9f
+            }, _canvas);
+            _balls.AddRange(_levelData.TakeBalls());
+            ReloadBallPreviews();
 
             Load();
 
@@ -193,6 +204,8 @@ namespace MiniGolf
                 }
             }
 
+            UpdateBallPreviews(gameTime);
+
             ButtonState leftMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
 
             _shouldDragSelect = leftMouseButtonState == ButtonState.Down;
@@ -301,6 +314,9 @@ namespace MiniGolf
 
         private void Save()
         {
+            // compile values
+            _levelData.AddValue("Balls", _balls);
+
             // compile level data
             _levelData.ObjectDatas.Clear();
 
@@ -468,6 +484,99 @@ namespace MiniGolf
             {
                 _preview.Sprite = null;
             }
+        }
+
+        private const float PREVIEW_OFFSET = 45.0f;
+        private const float PREVIEW_SIZE = 50.0f;
+        private const float PREVIEW_SPACING = 70.0f;
+
+        private Sprite CreateBallPreviewSprite(BallType type)
+        {
+            return new Sprite(Content.Load<Texture2D>($"Texture/{type}"), null, new Vector2(0.5f, 0.5f));
+        }
+
+        private void UpdateBallPreviews(GameTime gameTime)
+        {
+            for (int i = _ballPreviews.Count - 1; i >= 0; i--)
+            {
+                SpriteObject spriteObject = _ballPreviews[i];
+
+                if (Input.ContainsMouse(spriteObject.GetHitbox()))
+                {
+                    // if left, add
+                    if (Input.GetMouseButtonState(Input.MouseButton.Left) == ButtonState.Down)
+                    {
+                        _balls[i] = (BallType)(((int)_balls[i] + 1) % BallTypeExtensions.BALL_TYPE_COUNT);
+                        spriteObject.Sprite = CreateBallPreviewSprite(_balls[i]);
+                    }
+
+                    // if right, subtract
+                    if (Input.GetMouseButtonState(Input.MouseButton.Right) == ButtonState.Down)
+                    {
+                        _balls[i] = (BallType)(((int)_balls[i] - 1 + BallTypeExtensions.BALL_TYPE_COUNT) % BallTypeExtensions.BALL_TYPE_COUNT);
+                        spriteObject.Sprite = CreateBallPreviewSprite(_balls[i]);
+                    }
+
+                    // if middle click, delete
+                    if (Input.GetMouseButtonState(Input.MouseButton.Middle) == ButtonState.Down)
+                    {
+                        _balls.RemoveAt(i);
+                        ReloadBallPreviews();
+
+                        // mouse can only be over one at a time, so stop iterating
+                        return;
+                    }
+
+                    // spin when mouse is hovering and not clicking
+                    const float SPIN_SPEED = -60.0f; // degree/s
+                    spriteObject.LocalRotation += SPIN_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                    // mouse can only be over one at a time, so stop iterating
+                    return;
+                }
+                else
+                {
+                    spriteObject.LocalRotation = 0.0f;
+                }
+            }
+
+            // if plus clicked, add to it
+            if(Input.ContainsMouse(_plus) && Input.GetMouseButtonState(Input.MouseButton.Left) == ButtonState.Down)
+            {
+                _balls.Add(BallType.GolfBall);
+                ReloadBallPreviews();
+                return;
+            }
+        }
+
+        private Vector2 GetBallPreviewPosition(int i)
+        {
+            return new Vector2(PREVIEW_OFFSET + PREVIEW_SPACING * i, PREVIEW_OFFSET);
+        }
+
+        private void ReloadBallPreviews()
+        {
+            // destroy old balls
+            for(int i = _ballPreviews.Count - 1; i >= 0; i--)
+            {
+                _ballPreviews[i].Destroy();
+            }
+            _ballPreviews.Clear();
+
+            // create new balls
+            for (int i = 0; i < _balls.Count; i++)
+            {
+                SpriteObject preview = Instantiate(new SpriteObject(CreateBallPreviewSprite(_balls[i]), this)
+                {
+                    Depth = 0.9f,
+                    LocalPosition = GetBallPreviewPosition(i),
+                    LocalSize = new Vector2(PREVIEW_SIZE),
+                }, _canvas);
+                _ballPreviews.Add(preview);
+            }
+
+            // place the plus on the right
+            _plus.SetOrientation(GetBallPreviewPosition(_balls.Count), Vector2.One, new Vector2(PREVIEW_SIZE), 0.0f);
         }
 
         #endregion

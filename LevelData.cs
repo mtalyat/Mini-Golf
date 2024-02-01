@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -126,6 +127,16 @@ namespace MiniGolf
             File.WriteAllLines(_path, lines.ToArray());
         }
 
+        public void AddValue(string name, string value)
+        {
+            _values[name] = value;
+        }
+
+        public void AddValue<T>(string name, IEnumerable<T> values)
+        {
+            _values[name] = string.Join(' ', values.ToArray());
+        }
+
         public string TakeValue(string name)
         {
             // remove the value and return it if found
@@ -137,6 +148,24 @@ namespace MiniGolf
 
             // no value found
             return null;
+        }
+
+        public BallType[] TakeBalls()
+        {
+            List<BallType> result = new();
+
+            if (_values.ContainsKey("Balls"))
+            {
+                // get the ball names, put them in a list so they can easily be grabbed
+                foreach (string name in TakeValue("Balls").Split(' '))
+                {
+                    if(string.IsNullOrEmpty(name)) continue;
+
+                    result.Add(Enum.Parse<BallType>(name));
+                }
+            }
+
+            return result.ToArray();
         }
 
         public void Clear()

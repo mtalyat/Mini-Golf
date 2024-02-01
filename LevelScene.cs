@@ -77,11 +77,11 @@ namespace MiniGolf
             // load level data from the file
             _info = new LevelInfo(Path.Combine(fullFolderPath, "info.txt"));
             _data = new LevelData(Path.ChangeExtension(fullPath, "txt"));
-
-            // get the ball names, put them in a list so they can easily be grabbed
-            foreach (string name in _data.TakeValue("Balls").Split(' '))
+            _balls.AddRange(_data.TakeBalls());
+            // if no balls loaded, add one golf ball
+            if(!_balls.Any())
             {
-                _balls.Add(Enum.Parse<BallType>(name));
+                _balls.Add(BallType.GolfBall);
             }
 
             // load the level png
