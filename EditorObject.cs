@@ -143,7 +143,11 @@ namespace MiniGolf
             {
                 moved = true;
 
-                Color = CLICK_COLOR;
+                // only do color if clicking on this specific object
+                if(_isDragging)
+                {
+                    Color = CLICK_COLOR;
+                }                
 
                 // move to mouse + offset
                 Vector2 newPosition = Input.GetMousePosition() + _offset;
