@@ -192,18 +192,29 @@ namespace MiniGolf
                         }
                     }
 
-                    // select the selected list only
-                    foreach (var obj in selectedObjects)
+                    if (Input.GetKeyboardButtonState(Keys.LeftControl) <= ButtonState.Down)
                     {
-                        obj.Selected = true;
-                    }
-
-                    // if holding left shift, do not unselected non-included objects
-                    if (Input.GetKeyboardButtonState(Keys.LeftShift) > ButtonState.Down)
-                    {
-                        foreach (var obj in unselectedObjects)
+                        // select the selected list only
+                        foreach (var obj in selectedObjects)
                         {
-                            obj.Selected = false;
+                            obj.Selected = !obj.Selected;
+                        }
+                    }
+                    else
+                    {
+                        // select the selected list only
+                        foreach (var obj in selectedObjects)
+                        {
+                            obj.Selected = true;
+                        }
+
+                        // if holding left shift, do not unselected non-included objects
+                        if (Input.GetKeyboardButtonState(Keys.LeftShift) > ButtonState.Down)
+                        {
+                            foreach (var obj in unselectedObjects)
+                            {
+                                obj.Selected = false;
+                            }
                         }
                     }
 
