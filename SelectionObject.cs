@@ -32,10 +32,9 @@ namespace MiniGolf
         private void UpdateOrientation()
         {
             _end = Input.GetMousePosition();
-            
-            // TODO: fix for when negative
-            LocalPosition = _start;
-            LocalSize = _end - _start;
+
+            LocalPosition = Vector2.Min(_start, _end);
+            LocalSize = Vector2.Max(_start, _end) - LocalPosition;
         }
     }
 }
