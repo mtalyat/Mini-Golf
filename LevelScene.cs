@@ -507,10 +507,13 @@ namespace MiniGolf
                             // decide what to do when colliding with something
                             ball.CollideWith(obj, deltaTime);
                         }
-                    }
 
-                    // only one collision per frame
-                    break;
+                        // only one solid collision per frame
+                        if (solidCollision)
+                        {
+                            break;
+                        }
+                    }
                 }
             }
 
