@@ -9,12 +9,17 @@ using System.Threading.Tasks;
 namespace MiniGolf
 {
     // a scene that can be navigated using the middle mouse button/scroll
-    internal class NavigatableScene : Scene
+    internal abstract class NavigatableScene : Scene
     {
         private bool _move = false;
         private Vector2 _moveOffset;
         private float _targetZoomScale = 1.0f;
         protected bool CanMoveCamera { get; set; } = true;
+
+        protected virtual ButtonState CameraMoveButtonState
+        {
+            get => Input.GetMouseButtonState(Input.MouseButton.Middle);
+        }
 
         public NavigatableScene(Game game) : base(game)
         {
@@ -23,8 +28,8 @@ namespace MiniGolf
         public override void Update(GameTime gameTime)
         {
             // drag camera around
-            ButtonState middleMouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Middle);
-            if (middleMouseButtonState == ButtonState.Down)
+            ButtonState buttonState = CameraMoveButtonState;
+            if (buttonState == ButtonState.Down)
             {
                 _move = true;
                 _moveOffset = LocalPosition - Input.MousePosition;
@@ -36,7 +41,7 @@ namespace MiniGolf
             }
 
             // stop dragging camera around
-            if (middleMouseButtonState == ButtonState.Up)
+            if (buttonState == ButtonState.Up)
             {
                 _move = false;
             }

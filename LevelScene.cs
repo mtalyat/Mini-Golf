@@ -44,6 +44,11 @@ namespace MiniGolf
 
         private bool _isFollowingBall = false;
 
+        protected override ButtonState CameraMoveButtonState
+        {
+            get => base.CameraMoveButtonState.Combine(Input.GetMouseButtonState(Input.MouseButton.Right));
+        }
+
         /// <summary>
         /// Runs a level at the given path.
         /// </summary>

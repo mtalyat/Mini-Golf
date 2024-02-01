@@ -29,4 +29,12 @@ namespace MiniGolf
         /// </summary>
         Released
     }
+
+    internal static class ButtonStateExtensions
+    {
+        public static ButtonState Combine(this ButtonState state1, ButtonState state2)
+        {
+            return state1 < state2 ? state1 : state2;
+        }
+    }
 }
