@@ -28,7 +28,7 @@ namespace MiniGolf
         private readonly string _path;
         private readonly string _worldName;
         private readonly int _levelNumber;
-        private readonly bool _oneOff;
+        private readonly bool _testing;
         private LevelData _data;
         private LevelInfo _info;
         private Texture2D _backgroundTexture;
@@ -71,10 +71,10 @@ namespace MiniGolf
         /// </summary>
         /// <param name="path">The path to the level.png in the Content folder.</param>
         /// <param name="game"></param>
-        public LevelScene(string path, bool oneOff, Game game) : base(game)
+        public LevelScene(string path, bool testing, Game game) : base(game)
         {
             _path = path;
-            _oneOff = oneOff;
+            _testing = testing;
             _alivePlayers = new List<Player>(Session.Players);
             _canvas = new CanvasObject(this);
 
@@ -175,6 +175,13 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
+            // if press escape, exit
+            if(Input.GetKeyboardAny(Keys.Escape))
+            {
+                Exit();
+                return;
+            }
+
             // move timer if waiting to move to another scene
             if (_state != State.Play)
             {
@@ -381,7 +388,7 @@ namespace MiniGolf
 
         private void GameOver()
         {
-            if (_oneOff)
+            if (_testing)
             {
                 ReloadLevel();
             }
@@ -393,7 +400,7 @@ namespace MiniGolf
 
         private void ReloadLevel()
         {
-            MiniGolfGame.LoadScene(SceneType.Level, _path, _oneOff);
+            MiniGolfGame.LoadScene(SceneType.Level, _path, _testing);
         }
 
         private void NextLevel()
@@ -402,13 +409,21 @@ namespace MiniGolf
             {
                 // if could not load the next level, go to the main menu
                 // TODO: go to game over scene
-                MainMenu();
+                Exit();
             }
         }
 
-        private void MainMenu()
+        private void Exit()
         {
-            MiniGolfGame.LoadScene(SceneType.MainMenu);
+            if(_testing)
+            {
+                MiniGolfGame.LoadScene(SceneType.Editor);
+            }
+            else
+            {
+                MiniGolfGame.LoadScene(SceneType.MainMenu);
+            }
+            
         }
 
         #endregion
