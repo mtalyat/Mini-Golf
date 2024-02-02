@@ -35,8 +35,8 @@ namespace MiniGolf
         public const float BALL_THWACK_TIME = 0.2f;
         public const float BALL_MAX_POWER = RESOLUTION_WIDTH;
 
-        public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.2f;
-        public const float LEVEL_BOX_SLOW_DOWN = 0.1f;
+        public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.25f;
+        public const float LEVEL_BOX_SLOW_DOWN = 0.33f;
         public const float LEVEL_SLOPE_FORCE = 400.0f;
         public const float LEVEL_SANDBAR_FORCE = 6.0f;
         public const float LEVEL_PAUSE_TIME = 2.0f;
