@@ -33,6 +33,7 @@ namespace MiniGolf
         public const float BALL_SPIN_SCALE = 0.1f;
         public const int BALL_THWACK_ITERATIONS = 1000;
         public const float BALL_THWACK_TIME = 0.2f;
+        public const float BALL_MAX_POWER = RESOLUTION_WIDTH;
 
         public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.2f;
         public const float LEVEL_BOX_SLOW_DOWN = 0.1f;

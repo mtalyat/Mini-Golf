@@ -75,8 +75,6 @@ namespace MiniGolf
         private float _angularVelocity = 0.0f;
         private bool _shouldSpin = false;
 
-        public float Radius => GetGlobalSize().X / 2.0f; // should be square, so just use the x axis
-
         private TrailObject _trail = null;
         private AimingObject _aiming = null;
 
@@ -169,7 +167,7 @@ namespace MiniGolf
                 if (state == ButtonState.Down && Input.ContainsMouse(GetHitbox()))
                 {
                     // spawn a trail to the mouse
-                    _trail = Scene.Instantiate(new TrailObject(LocalPosition, Radius * 2.0f, Scene));
+                    _trail = Scene.Instantiate(new TrailObject(LocalPosition, LocalSize.X, Scene));
 
                     // set depth to render right under the ball
                     _trail.Depth = Depth - 0.0001f;
@@ -191,7 +189,7 @@ namespace MiniGolf
                     else if (state == ButtonState.Up)
                     {
                         // if button released, hit and destroy the trail
-                        Hit(Vector2Helper.FromAngle(GetTrailAngle()) * _trail.GetGlobalSize().Y);
+                        Hit(Vector2Helper.FromAngle(GetTrailAngle()) * _trail.LocalSize.Y);
                         _trail.Destroy();
                         _trail = null;
                         _aiming?.Destroy();
@@ -416,7 +414,7 @@ namespace MiniGolf
             LocalPosition += Velocity * deltaTime;
 
             // spin
-            _angularVelocity = MathHelper.ToDegrees(Velocity.Magnitude() * Radius * deltaTime) * Constants.BALL_SPIN_SCALE;
+            _angularVelocity = MathHelper.ToDegrees(Velocity.Magnitude() * LocalSize.X * 0.5f * deltaTime) * Constants.BALL_SPIN_SCALE;
         }
 
         public void Reflect(Vector2 normal)

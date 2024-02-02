@@ -35,7 +35,7 @@ namespace MiniGolf
             LocalPosition = new Vector2(_width / -2.0f, 0.0f).Rotate(angle) + _start;
 
             // set the size to be the same width as normal, but the height to match the distance between start and end
-            LocalSize = new Vector2(_width, _start.DistanceTo(_end));
+            LocalSize = new Vector2(_width, MathF.Min(Constants.BALL_MAX_POWER, _start.DistanceTo(_end)));
         }
 
         public override void Update(GameTime gameTime)

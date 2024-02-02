@@ -160,7 +160,7 @@ namespace MiniGolf
 
             if (!_isDragging && Selected)
             {
-                float move = (scale || snap) ? SNAP_SIZE : 1;
+                float move = (scale || snap) ? SNAP_MOVE : 1;
 
                 // if not dragging, we can move with WASD if selected
                 if (CheckKey(Keys.W, snap))

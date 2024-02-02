@@ -187,7 +187,7 @@ namespace MiniGolf
         {
             if (_activeBall == null) return LocalPosition;
 
-            return -_activeBall.LocalCenter + CameraOffset + CameraSize * 0.5f;
+            return -_activeBall.LocalPosition * LocalScale + CameraOffset + CameraSize * 0.5f;
         }
 
         private void SnapCameraToBall()
@@ -417,17 +417,19 @@ namespace MiniGolf
 
             // get ball data
             Vector2 ballVelocity = ball.Velocity * deltaTime;
-            float ballRadius = ball.Radius;
+            float ballRadius = ball.GetGlobalSize().X * 0.5f;
             Vector2 ballCenter = ball.GetGlobalPosition();
             Vector2 ballFutureCenterPosition = ballCenter + ballVelocity;
 
-            bool collided = false;
+            bool collided;
             bool solidCollision = false;
 
             // check against all other collidable objects
-            foreach (LevelObject obj in _collisionObjects)
+            for(int i = _collisionObjects.Count - 1; i >= 0; i--)
             {
-                if(obj.Flags.HasFlag(BehaviorFlags.Round))
+                LevelObject obj = _collisionObjects[i];
+
+                if (obj.Flags.HasFlag(BehaviorFlags.Round))
                 {
                     // if round, just use radii
                     collided = ballFutureCenterPosition.DistanceTo(obj.GetGlobalCenter()) <= ballRadius + obj.GetGlobalSize().X / 2.0f;
@@ -482,7 +484,7 @@ namespace MiniGolf
                             ball.Reflect(normal);
                         }
 
-                        if(triggerEvents)
+                        if (triggerEvents)
                         {
                             // decide what to do when colliding with something
                             ball.CollideWith(obj, deltaTime);
@@ -509,7 +511,7 @@ namespace MiniGolf
             if (ball == null || !ball.IsMoving) return;
 
             // get ideal deltaTime so ball moves incrementally (not too fast or slow)
-            float gameTime = ball.Radius * 2.0f / ball.Velocity.Magnitude();
+            float gameTime = ball.LocalSize.X / ball.Velocity.Magnitude();
 
             Vector2 initialPosition = ball.LocalPosition;
             Vector2 initialVelocity = ball.Velocity;
@@ -522,7 +524,7 @@ namespace MiniGolf
                     // ball collided
 
                     // spawn a visual
-                    Instantiate(new ThwackObject(initialPosition, ball.LocalPosition, ball.Radius * 1.8f, this));
+                    Instantiate(new ThwackObject(initialPosition, ball.LocalPosition, ball.LocalSize.X * 0.9f, this));
 
                     return;
                 }
