@@ -1,0 +1,10 @@
+﻿
+[4] GolfBall: https://freesound.org/people/craigsmith/sounds/675327/
+[0] TennisBall: https://freesound.org/people/rvdw2004/sounds/709678/
+[0] SoccerBall: https://freesound.org/people/Khanyisile56/sounds/707487/
+[0] BowlingBall: https://freesound.org/people/Rinaldobowles56/sounds/708103/
+https://freesound.org/people/drewsimko/sounds/682867/
+[0] PongBall: https://freesound.org/people/el_boss/sounds/628637/
+[3] Hockey: https://freesound.org/people/pthj412/sounds/224004/
+
+[0] Collision: https://freesound.org/people/221098HariPotter/sounds/655635/
