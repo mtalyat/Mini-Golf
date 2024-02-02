@@ -203,7 +203,15 @@ namespace MiniGolf
                     else if (state == ButtonState.Up)
                     {
                         // if button released, hit and destroy the trail
-                        Hit(Vector2Helper.FromAngle(GetTrailAngle()) * _trail.LocalSize.Y);
+                        Vector2 direction = Vector2Helper.FromAngle(GetTrailAngle());
+                        // only hit if strong enough
+                        float power = _trail.LocalSize.Y;
+                        if(power > LocalSize.X * 0.5f)
+                        {
+                            Hit(direction * power);
+                        }
+
+                        // destroy trail and aiming regardless
                         _trail.Destroy();
                         _trail = null;
                         _aiming?.Destroy();
