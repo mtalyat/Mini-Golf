@@ -31,7 +31,6 @@ namespace MiniGolf
         private readonly bool _testing;
         private LevelData _data;
         private LevelInfo _info;
-        private Texture2D _backgroundTexture;
 
         private MiniGolfGame MiniGolfGame => (MiniGolfGame)Game;
 
@@ -135,7 +134,12 @@ namespace MiniGolf
             }
 
             // load the level png
-            _backgroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension(fullPath, "png"));
+            Texture2D backgroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension(fullPath, "png"));
+            if(backgroundTexture != null)
+            {
+                BackgroundSprite = new Sprite(backgroundTexture);
+                LocalSize = BackgroundSprite.Size;
+            }
 
             // load the level components png
             Texture2D levelComponentsTexture = ExternalContent.LoadTexture2D(Path.Combine(folderPath, "components.png"));
@@ -214,18 +218,6 @@ namespace MiniGolf
             AnimatePreviews(gameTime);
 
             base.Update(gameTime);
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            SpriteBatch.Begin();
-
-            // draw the background
-            SpriteBatch.Draw(_backgroundTexture, new Vector2(0.0f, 0.0f), Color.White);
-
-            SpriteBatch.End();
-
-            base.Draw(gameTime);
         }
 
         public override void Clean(GameObject gameObject)

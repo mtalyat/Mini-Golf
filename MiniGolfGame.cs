@@ -98,9 +98,6 @@ namespace MiniGolf
             // render everything to the target
             GraphicsDevice.SetRenderTarget(_target);
 
-            // use the scene background color to clear
-            GraphicsDevice.Clear(_currentScene.BackgroundColor);
-
             // draw the scene
             base.Draw(gameTime);
 

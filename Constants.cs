@@ -18,6 +18,8 @@ namespace MiniGolf
         public const float CAMERA_ZOOM_FACTOR = 2.0f;
         public const float CAMERA_ZOOM_SPEED = 10.0f;
         public const float CAMERA_LERP_SPEED = 5.0f;
+        public const float CAMERA_SPACING_X = RESOLUTION_WIDTH * 0.5f;
+        public const float CAMERA_SPACING_Y = RESOLUTION_HEIGHT* 0.5f;
 
         public const string CONTENT_ROOT_DIRECTORY = "Content";
 
