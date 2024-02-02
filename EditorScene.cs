@@ -13,7 +13,7 @@ namespace MiniGolf
 {
     internal class EditorScene : NavigatableScene
     {
-        private const string CUSTOM_NAME = "custom";
+        private const string CUSTOM_NAME = "Custom";
 
         private Texture2D _componentsTexture;
         private LevelInfo _levelInfo;
@@ -57,11 +57,15 @@ namespace MiniGolf
             path = Path.Combine(path, Constants.APPLICATION_NAME);
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
-            string customPath = Path.Combine(path, CUSTOM_NAME);
+            // make sure the custom world folder exists
+            path = Path.Combine(path, CUSTOM_NAME);
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+            string levelPath = Path.Combine(path, "level1");
 
             // TODO: load texture
-            //string texturePath = Path.ChangeExtension(customPath, "png");
-            string scenePath = Path.ChangeExtension(customPath, "txt");
+            //string texturePath = Path.ChangeExtension(levelPath, "png");
+            string scenePath = Path.ChangeExtension(levelPath, "txt");
 
             // create scene file if necessary
             if (!File.Exists(scenePath)) File.Create(scenePath).Close();
@@ -329,7 +333,8 @@ namespace MiniGolf
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
                 "My Games",
                 Constants.APPLICATION_NAME,
-                CUSTOM_NAME));
+                CUSTOM_NAME,
+                "level1"), true);
         }
 
         private void Exit()

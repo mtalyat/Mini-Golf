@@ -19,11 +19,15 @@ namespace MiniGolf
         private readonly Vector2? _pivot;
         public Vector2? Pivot => _pivot;
 
-        public ObjectTypeData(ObjectType objectType, Rectangle? rectangle, Vector2? pivot)
+        private readonly string _soundEffect;
+        public string SoundEffect => _soundEffect;
+
+        public ObjectTypeData(ObjectType objectType, Rectangle? rectangle, Vector2? pivot, string soundEffect)
         {
             _objectType = objectType;
             _rectangle = rectangle;
             _pivot = pivot;
+            _soundEffect = soundEffect;
         }
 
         public override bool Equals(object obj)
@@ -31,12 +35,13 @@ namespace MiniGolf
             return obj is ObjectTypeData data &&
                    _objectType == data._objectType &&
                    _rectangle.Equals(data._rectangle) &&
-                   _pivot.Equals(data._pivot);
+                   _pivot.Equals(data._pivot) &&
+                   _soundEffect.Equals(data._soundEffect);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(_objectType, _rectangle, _pivot);
+            return HashCode.Combine(_objectType, _rectangle, _pivot, _soundEffect);
         }
 
         public static ObjectTypeData FromString(string str)
@@ -50,8 +55,9 @@ namespace MiniGolf
             ObjectType type = Enum.Parse<ObjectType>(parts[0]);
             Rectangle? rect = subParts.Length <= 0 ? null : Parse.ParseRectangle(subParts[0]);
             Vector2? pivot = subParts.Length <= 1 ? null : Parse.ParseVector2(subParts[1]);
+            string soundEffect = subParts.Length <= 2 || subParts.Length == 0 ? null : subParts[2];
 
-            return new ObjectTypeData(type, rect, pivot);
+            return new ObjectTypeData(type, rect, pivot, soundEffect);
         }
 
         public override string ToString()

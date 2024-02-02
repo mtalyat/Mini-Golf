@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -85,6 +86,10 @@ namespace MiniGolf
         private Vector2 _start;
         private Vector2 _end;
 
+        private SoundEffect _hitSfx;
+        private SoundEffect _thwackSfx;
+        private SoundEffect _collisionSfx;
+
         public BallObject(BallType type, Player owner, Scene scene) : base(ObjectType.Ball, new Sprite(scene.Content.Load<Texture2D>($"Texture/{type}"), null, new Vector2(0.5f, 0.5f)), scene)
         {
             _owner = owner;
@@ -119,6 +124,15 @@ namespace MiniGolf
                     _objectFriction = Constants.BALL_FRICTION;
                     break;
             }
+        }
+
+        protected override void LoadContent()
+        {
+            _hitSfx = Scene.Content.Load<SoundEffect>("Audio/Hit");
+            _thwackSfx = Scene.Content.Load<SoundEffect>("Audio/Thwack");
+            _collisionSfx = Scene.Content.Load<SoundEffect>($"Audio/{_ballType}");
+
+            base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
@@ -267,6 +281,8 @@ namespace MiniGolf
 
         public bool PreCollideWith(LevelObject obj)
         {
+            bool nothingHappened = true;
+
             switch (obj.Type)
             {
                 case ObjectType.WallDamaged:
@@ -274,6 +290,7 @@ namespace MiniGolf
                     if (_weight == Weight.Heavy || (_ballType == BallType.FootballBall && !_shouldSpin))
                     {
                         obj.Destroy();
+                        obj.PlaySound();
 
                         // if not football, slow down slightly
                         if (BallType != BallType.FootballBall)
@@ -281,7 +298,7 @@ namespace MiniGolf
                             SlowDown(Constants.LEVEL_DAMAGED_WALL_SLOW_DOWN);
                         }
 
-                        return false;
+                        nothingHappened = false;
                     }
                     break;
                 case ObjectType.Box:
@@ -289,21 +306,29 @@ namespace MiniGolf
                     if (_weight == Weight.Heavy)
                     {
                         obj.Destroy();
+                        obj.PlaySound();
 
                         // slow down slightly
                         SlowDown(Constants.LEVEL_BOX_SLOW_DOWN);
 
-                        return false;
+                        nothingHappened = false;
                     }
                     break;
             }
 
-            return true;
+            return nothingHappened;
         }
 
         public void CollideWith(LevelObject obj, float deltaTime)
         {
+            // check if this is inside of the object
             bool contains = obj.Flags.HasFlag(BehaviorFlags.Round) ? obj.GetHitbox().ContainsRound(GetGlobalCenter()) : obj.GetHitbox().Contains(GetGlobalCenter());
+
+            // if this object is solid, play the collision sound
+            if(obj.Flags.HasFlag(BehaviorFlags.Solid))
+            {
+                _collisionSfx.Play();
+            }
 
             // determine what to do based on its type
             switch (obj.Type)
@@ -349,7 +374,7 @@ namespace MiniGolf
                 case ObjectType.Water:
                     // kill ball if center is in the hazard
                     if (contains)
-                        Die();
+                        Die(obj);
                     break;
             }
         }
@@ -370,13 +395,21 @@ namespace MiniGolf
             _owner.Stroke++;
 
             LevelScene levelScene = (LevelScene)Scene;
-
             levelScene.OnBallHit();
 
             // if hockey puck, thwack it
             if (_ballType == BallType.HockeyPuck)
             {
+                // thwack ball
                 levelScene.ThwackBall(this);
+
+                // thwack sound
+                _thwackSfx.Play();
+            } 
+            else
+            {
+                // normal hit sound
+                _hitSfx.Play();
             }
         }
 
@@ -447,21 +480,35 @@ namespace MiniGolf
         {
             if (_state == State.Moving)
             {
+                // stop the ball
                 Stop();
+
+                hole.PlaySound();
+
+                // set to sinking state
+                _state = State.Sinking;
+
+                // forced move into hole
                 _start = LocalPosition;
                 _end = hole.LocalPosition;
-                _state = State.Sinking;
+
+                // set the movement timer
                 _maxTime = Constants.BALL_SINK_TIME;
                 _timer = _maxTime;
             }
         }
 
-        public void Die()
+        public void Die(LevelObject from)
         {
             if (_state == State.Moving)
             {
-                //Stop();
+                // play sound
+                from.PlaySound();
+
+                // set to dying
                 _state = State.Dying;
+
+                // set shrink timer
                 _maxTime = Constants.BALL_DEATH_TIME;
                 _timer = _maxTime;
             }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Path = System.IO.Path;
@@ -16,10 +19,21 @@ namespace MiniGolf
     /// </summary>
     internal class LevelScene : NavigatableScene
     {
+        private enum State
+        {
+            Play,
+            GameOver
+        }
+
         private readonly string _path;
+        private readonly string _worldName;
+        private readonly int _levelNumber;
+        private readonly bool _oneOff;
         private LevelData _data;
         private LevelInfo _info;
         private Texture2D _backgroundTexture;
+
+        private MiniGolfGame MiniGolfGame => (MiniGolfGame)Game;
 
         private readonly List<BallType> _balls = new();
         private readonly List<SpriteObject> _ballPreviews = new();
@@ -49,18 +63,52 @@ namespace MiniGolf
             get => base.CameraMoveButtonState.Combine(Input.GetMouseButtonState(Input.MouseButton.Right));
         }
 
+        private State _state;
+        private float _timer;
+
         /// <summary>
         /// Runs a level at the given path.
         /// </summary>
         /// <param name="path">The path to the level.png in the Content folder.</param>
         /// <param name="game"></param>
-        public LevelScene(string path, Game game) : base(game)
+        public LevelScene(string path, bool oneOff, Game game) : base(game)
         {
             _path = path;
-
+            _oneOff = oneOff;
             _alivePlayers = new List<Player>(Session.Players);
-
             _canvas = new CanvasObject(this);
+
+            // set defaults
+            _levelNumber = 1;
+            _worldName = string.Empty;
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                // parse world name and level number from path if possible
+                if (char.IsDigit(path[^1]))
+                {
+                    // extract the number from the end of the path
+                    // https://stackoverflow.com/questions/13169393/extract-number-at-end-of-string-in-c-sharp
+                    var result = Regex.Match(path, @"\d+$", RegexOptions.RightToLeft);
+                    _levelNumber = int.Parse(result.Value);
+                }
+                _worldName = Directory.GetParent(path).Name;
+            }
+        }
+
+        public static string GetPath(string worldName, int levelNumber)
+        {
+            return Path.GetFullPath(Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, "Scene", worldName, $"level{levelNumber}.txt"));
+        }
+
+        public static bool Exists(string worldName, int levelNumber)
+        {
+            return Exists(GetPath(worldName, levelNumber));
+        }
+
+        public static bool Exists(string path)
+        {
+            return File.Exists(path);
         }
 
         public override void Initialize()
@@ -81,7 +129,7 @@ namespace MiniGolf
             _data = new LevelData(Path.ChangeExtension(fullPath, "txt"));
             _balls.AddRange(_data.TakeBalls());
             // if no balls loaded, add one golf ball
-            if(!_balls.Any())
+            if (!_balls.Any())
             {
                 _balls.Add(BallType.GolfBall);
             }
@@ -127,6 +175,22 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
+            // move timer if waiting to move to another scene
+            if (_state != State.Play)
+            {
+                _timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (_timer <= 0.0f)
+                {
+                    switch (_state)
+                    {
+                        case State.GameOver:
+                            GameOver();
+                            return;
+                    }
+                }
+            }
+
             // if the ball is in the scene and moving, simulate physics on it
             if (_activeBall != null && _activeBall.IsMoving)
             {
@@ -134,7 +198,7 @@ namespace MiniGolf
             }
 
             // if the ball is done moving, move to the next turn
-            if(_activeBall?.CurrentState >= BallObject.State.Done)
+            if (_activeBall?.CurrentState >= BallObject.State.Done)
             {
                 NextTurn();
             }
@@ -204,7 +268,7 @@ namespace MiniGolf
 
             // stop following if we try to move
             // stop following if 
-            if(buttonState == ButtonState.Down)
+            if (buttonState == ButtonState.Down)
             {
                 SetBallFollow(false);
             }
@@ -264,17 +328,20 @@ namespace MiniGolf
         /// </summary>
         private void NextTurn()
         {
+            // ignore if no players
+            if (_alivePlayers.Count == 0) return;
+
             int move = 0;
 
-            if(_activePlayerIndex == -1) // if beginning of the game, move to first player 
+            if (_activePlayerIndex == -1) // if beginning of the game, move to first player 
             {
                 move = 1;
             }
-            else if(EndOfTurn()) // if the current player sunk their ball, remove them from play
+            else if (EndOfTurn()) // if the current player sunk their ball, remove them from play
             {
                 RemoveActivePlayerFromPlay();
             }
-            else if(ActivePlayer.Stroke >= _balls.Count) // if out of strokes, remove them from play
+            else if (ActivePlayer.Stroke >= _balls.Count) // if out of strokes, remove them from play
             {
                 RemoveActivePlayerFromPlay();
             }
@@ -284,16 +351,16 @@ namespace MiniGolf
             }
 
             // if no players left, game over
-            if(_alivePlayers.Count == 0)
+            if (_alivePlayers.Count == 0)
             {
-                GameOver();
+                TriggerGameOver();
                 return;
             }
 
             // move to next player
             int newPlayerIndex = (_activePlayerIndex + move) % _alivePlayers.Count;
 
-            if(_activePlayerIndex != newPlayerIndex)
+            if (_activePlayerIndex != newPlayerIndex)
             {
                 _activePlayerIndex = newPlayerIndex;
 
@@ -306,9 +373,42 @@ namespace MiniGolf
             SetBallFollow(true);
         }
 
+        private void TriggerGameOver()
+        {
+            _state = State.GameOver;
+            _timer = Constants.LEVEL_PAUSE_TIME;
+        }
+
         private void GameOver()
         {
-            ((MiniGolfGame)Game).LoadScene(SceneType.MainMenu);
+            if (_oneOff)
+            {
+                ReloadLevel();
+            }
+            else
+            {
+                NextLevel();
+            }
+        }
+
+        private void ReloadLevel()
+        {
+            MiniGolfGame.LoadScene(SceneType.Level, _path, _oneOff);
+        }
+
+        private void NextLevel()
+        {
+            if (!MiniGolfGame.LoadLevel(_worldName, _levelNumber + 1))
+            {
+                // if could not load the next level, go to the main menu
+                // TODO: go to game over scene
+                MainMenu();
+            }
+        }
+
+        private void MainMenu()
+        {
+            MiniGolfGame.LoadScene(SceneType.MainMenu);
         }
 
         #endregion
@@ -339,22 +439,14 @@ namespace MiniGolf
         /// <returns></returns>
         private LevelObject CreateLevelObject(ObjectTypeData typeData, ObjectData data, Texture2D texture)
         {
-            // create object
-            LevelObject levelObject = typeData.Type switch
+            // if a ball, return null, as balls can only be created with SpawnBall
+            if (typeData.Type == ObjectType.Ball)
             {
-                ObjectType.Ball => new LevelObject
-                    (
-                    typeData.Type,
-                    new Sprite(Content.Load<Texture2D>("Objects/GolfBall"), null),
-                    this
-                    ),
-                _ => new LevelObject
-                    (
-                    typeData.Type,
-                    new Sprite(texture, typeData.Rect, typeData.Pivot),
-                    this
-                    ),
-            };
+                return null;
+            }
+
+            // create object
+            LevelObject levelObject = new(typeData, texture, this);
 
             // set to proper location, size, rot
             levelObject.SetOrientation(data.Position, Vector2.One, data.Size, data.Rotation);
@@ -413,6 +505,9 @@ namespace MiniGolf
         // return true if collided with a solid object
         private bool ConductBallPhysics(BallObject ball, float deltaTime, bool triggerEvents = true)
         {
+            // if the ball is not moving, ignore it
+            if (ball.CurrentState != BallObject.State.Moving) return false;
+
             // check for future collisions
 
             // get ball data
@@ -425,7 +520,7 @@ namespace MiniGolf
             bool solidCollision = false;
 
             // check against all other collidable objects
-            for(int i = _collisionObjects.Count - 1; i >= 0; i--)
+            for (int i = _collisionObjects.Count - 1; i >= 0; i--)
             {
                 LevelObject obj = _collisionObjects[i];
 
@@ -519,7 +614,7 @@ namespace MiniGolf
             // simulate for a long time, or until a collision
             for (int i = 0; i < Constants.BALL_THWACK_ITERATIONS; i++)
             {
-                if(ConductBallPhysics(ball, gameTime, false))
+                if (ConductBallPhysics(ball, gameTime, false))
                 {
                     // ball collided
 
@@ -562,7 +657,7 @@ namespace MiniGolf
                 }
             }
 
-            if(closest != null)
+            if (closest != null)
             {
                 return new RaycastHit(ray);
             }
@@ -591,7 +686,7 @@ namespace MiniGolf
             float t0 = MathF.Max(tMin.X, tMin.Y);
             float t1 = MathF.Min(tMax.X, tMax.Y);
 
-            if(t0 > t1 || t1 < 0)
+            if (t0 > t1 || t1 < 0)
             {
                 return false;
             }

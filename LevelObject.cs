@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -16,6 +17,23 @@ namespace MiniGolf
 
         private readonly BehaviorFlags _behaviorFlags;
         public BehaviorFlags Flags => _behaviorFlags;
+
+        private readonly SoundEffect _ballInteractionSfx = null;
+
+        public LevelObject(ObjectTypeData typeData, Texture2D texture, Scene scene) : this(typeData.Type, new Sprite(texture, typeData.Rect, typeData.Pivot), scene)
+        {
+            if(typeData.SoundEffect != null)
+            {
+                // I know this is not a good practice.
+                // But I don't know how to check if an asset exists.
+                try
+                {
+                    _ballInteractionSfx = Scene.Content.Load<SoundEffect>($"Audio/{typeData.SoundEffect}");
+                }
+                catch
+                { }
+            }
+        }
 
         public LevelObject(ObjectType type, Sprite sprite, Scene scene) : base(sprite, scene)
         {
@@ -62,11 +80,12 @@ namespace MiniGolf
                 case ObjectType.Crate:
                     _behaviorFlags = BehaviorFlags.Collidable | BehaviorFlags.Solid;
                     break;
-                //case ObjectType.RotatingWall:
-                //case ObjectType.MovingWall:
-                //    _behaviorFlags = BehaviorFlags.Collidable | BehaviorFlags.Solid;
-                    //break;
             }
+        }
+
+        public void PlaySound()
+        {
+            _ballInteractionSfx?.Play();
         }
     }
 }

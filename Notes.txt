@@ -1,10 +1,17 @@
-﻿
-[4] GolfBall: https://freesound.org/people/craigsmith/sounds/675327/
-[0] TennisBall: https://freesound.org/people/rvdw2004/sounds/709678/
-[0] SoccerBall: https://freesound.org/people/Khanyisile56/sounds/707487/
-[0] BowlingBall: https://freesound.org/people/Rinaldobowles56/sounds/708103/
-https://freesound.org/people/drewsimko/sounds/682867/
-[0] PongBall: https://freesound.org/people/el_boss/sounds/628637/
-[3] Hockey: https://freesound.org/people/pthj412/sounds/224004/
+﻿Balls:
+[4] Golf/Mint: https://freesound.org/people/jcampbe8/sounds/638884/
+[0] Tennis: https://freesound.org/people/rvdw2004/sounds/709678/
+[0] Soccer/Football: https://freesound.org/people/Khanyisile56/sounds/707487/
+[0] Bowling/Pool: https://freesound.org/people/sgrowe/sounds/342535/
+[0] Pong: https://freesound.org/people/el_boss/sounds/628637/
+[4] Hockey: https://freesound.org/people/CGEffex/sounds/93100/
 
+Environment:
+[0] Hole: https://freesound.org/people/inbeeld/sounds/21878/
 [0] Collision: https://freesound.org/people/221098HariPotter/sounds/655635/
+[0] Box: https://freesound.org/people/elynch0901/sounds/464484/
+[0] Water: https://freesound.org/people/HighPixel/sounds/612133/
+
+UI:
+[4] Swoosh: https://freesound.org/people/Bpianoholic/sounds/487608/
+[0] Click: https://freesound.org/people/Kolombooo/sounds/629020/

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using static System.Formats.Asn1.AsnWriter;
@@ -15,6 +16,8 @@ namespace MiniGolf
         private RenderTarget2D _target;
         private Scene _currentScene;
         private Scene _nextScene;
+
+        private Song _song;
 
         public MiniGolfGame()
         {
@@ -47,9 +50,18 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
-            
+            _song = Content.Load<Song>("Audio/Golf");
+            MediaPlayer.Play(_song);
+            MediaPlayer.IsRepeating = true;
 
             base.LoadContent();
+        }
+
+        protected override void UnloadContent()
+        {
+            MediaPlayer.Stop();
+
+            base.UnloadContent();
         }
 
         protected override void Update(GameTime gameTime)
@@ -107,11 +119,6 @@ namespace MiniGolf
             _nextScene = scene;
         }
 
-        internal void LoadLevel(string worldName, int levelNumber)
-        {
-            LoadScene(SceneType.Level, $"{Constants.CONTENT_ROOT_DIRECTORY}/Scene/{worldName}/level{levelNumber}");
-        }
-
         internal void LoadScene(SceneType sceneType, params dynamic[] args)
         {
             switch(sceneType)
@@ -120,7 +127,7 @@ namespace MiniGolf
                     LoadScene(new MainMenuScene(this));
                     break;
                 case SceneType.Level:
-                    LoadScene(new LevelScene(args[0], this));
+                    LoadScene(new LevelScene(args[0], args[1], this));
                     break;
                 case SceneType.Editor:
                     LoadScene(new EditorScene(this));
@@ -128,6 +135,23 @@ namespace MiniGolf
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        /// <summary>
+        /// Tries to load the level with the given index. Returns false if the level does not exist.
+        /// </summary>
+        /// <param name="levelNumber"></param>
+        /// <returns></returns>
+        internal bool LoadLevel(string worldName, int levelNumber)
+        {
+            string path = LevelScene.GetPath(worldName, levelNumber);
+
+            // cannot load if dne
+            if(!LevelScene.Exists(path)) return false;
+
+            LoadScene(SceneType.Level, path, false);
+
+            return true;
         }
     }
 }
