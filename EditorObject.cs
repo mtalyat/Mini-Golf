@@ -379,7 +379,7 @@ namespace MiniGolf
                 bool moved = false;
 
                 // we can move with IK if selected
-                if (CheckKey(Keys.Q))
+                if (CheckKey(Keys.Q) || CheckKey(Keys.U))
                 {
                     actionTaken = true;
 
@@ -389,7 +389,7 @@ namespace MiniGolf
                         LocalRotation += -move;
                     }
                 }
-                if (CheckKey(Keys.E))
+                if (CheckKey(Keys.E) || CheckKey(Keys.O))
                 {
                     actionTaken = true;
 
