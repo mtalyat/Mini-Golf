@@ -47,7 +47,7 @@ namespace MiniGolf
         public static ObjectTypeData FromString(string str)
         {
             // split by separating tab
-            string[] parts = str.Split('\t');
+            string[] parts = str.Split(": ");
 
             string[] subParts = parts[1].Split('/');
 

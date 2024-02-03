@@ -28,7 +28,7 @@ namespace MiniGolf
                 if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) continue;
 
                 // no starting tab means header data
-                string[] parts = line.Split('\t');
+                string[] parts = line.Split(": ");
 
                 // parse type data
                 if (!objectTypeNames.Contains(parts[0]))

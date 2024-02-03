@@ -77,7 +77,7 @@ namespace MiniGolf
                 }
 
                 // no starting tab means header data
-                string[] parts = line.Split('\t');
+                string[] parts = line.Split(": ");
 
                 if (!Enum.TryParse(parts[0], out type))
                 {
@@ -101,7 +101,7 @@ namespace MiniGolf
             // add values
             foreach(var pair in _values)
             {
-                lines.Add($"{pair.Key}\t{pair.Value}");
+                lines.Add($"{pair.Key}: {pair.Value}");
             }
 
             // add the empty line for spacing

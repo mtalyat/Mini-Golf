@@ -1,4 +1,4 @@
-﻿Balls	GolfBall TennisBall FootballBall SoccerBall BowlingBall PongBall PoolBall HockeyPuck Mint GolfBall
+﻿Balls: GolfBall TennisBall FootballBall SoccerBall BowlingBall PongBall PoolBall HockeyPuck Mint GolfBall
 Start
 	500 500/120 120
 Hole
