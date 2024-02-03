@@ -334,7 +334,6 @@ namespace MiniGolf
                 {
                     LocalPosition = obj.LocalPosition,
                     LocalSize = obj.LocalSize,
-                    //LocalRotation = Random.Shared.Next() % 360,
                     LocalScale = obj.LocalScale,
                 });
 
