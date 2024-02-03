@@ -25,6 +25,7 @@ namespace MiniGolf
         public Sprite ForegroundSprite { get; set; } = null;
         public Color BackgroundColor { get; set; } = Color.CornflowerBlue;
 
+        protected MiniGolfGame MiniGolfGame => (MiniGolfGame)Game;
 
         public Vector2 CameraPosition
         {

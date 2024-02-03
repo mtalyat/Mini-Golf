@@ -140,9 +140,6 @@
 #begin Scene/Builtin/level1bg.png
 /copy:Scene/Builtin/level1bg.png
 
-#begin Scene/Builtin/level1fg.png
-/copy:Scene/Builtin/level1fg.png
-
 #begin Texture/Aim.png
 /importer:TextureImporter
 /processor:TextureProcessor

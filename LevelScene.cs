@@ -118,6 +118,8 @@ namespace MiniGolf
         {
             Instantiate(_canvas);
 
+            MiniGolfGame.SetLevelTitle(_worldName, _levelNumber);
+
             base.Initialize();
         }
 

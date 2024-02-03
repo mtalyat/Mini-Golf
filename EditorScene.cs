@@ -46,6 +46,8 @@ namespace MiniGolf
         {
             _canvas = Instantiate(new CanvasObject(this));
 
+            MiniGolfGame.SetLevelTitle(_worldName, _levelNumber);
+
             base.Initialize();
         }
 
@@ -56,7 +58,7 @@ namespace MiniGolf
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             // make sure the folder for mini golf exists
-            path = Path.Combine(path, Constants.APPLICATION_NAME);
+            path = Path.Combine(path, Constants.APPLICATION_NAME_SAFE);
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             // make sure the custom world folder exists
@@ -359,7 +361,7 @@ namespace MiniGolf
             ((MiniGolfGame)Game).LoadScene(SceneType.Level, Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
                 "My Games",
-                Constants.APPLICATION_NAME,
+                Constants.APPLICATION_NAME_SAFE,
                 _worldName,
                 $"level{_levelNumber}.txt"), true);
         }

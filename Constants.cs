@@ -8,7 +8,8 @@ namespace MiniGolf
 {
     internal static class Constants
     {
-        public const string APPLICATION_NAME = "Mini Golf";
+        public const string APPLICATION_NAME_SAFE = "Mini Golf";
+        public const string APPLICATION_NAME_UNSAFE = "Mini Golf?";
 
         public const string BUILTIN_WORLD_NAME = "Builtin";
 

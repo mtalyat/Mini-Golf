@@ -32,6 +32,7 @@ namespace MiniGolf
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += Window_ClientSizeChanged;
             Window.AllowAltF4 = true;
+            ResetTitle();
 
             // create target so the game can scale with the window
             _targetBatch = new SpriteBatch(GraphicsDevice);
@@ -67,12 +68,19 @@ namespace MiniGolf
 
         protected override void Update(GameTime gameTime)
         {
-            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == XnaButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            //    Exit();
-
+            // update the input system
             Input.Update(this);
 
-            if(_nextScene != null)
+            // change current scene to the next scene if needed
+            UpdateCurrentScene();
+
+            // update the scene
+            base.Update(gameTime);
+        }
+
+        private void UpdateCurrentScene()
+        {
+            if (_nextScene != null)
             {
                 // unload current scene if any
                 if (_currentScene != null)
@@ -81,8 +89,12 @@ namespace MiniGolf
                     _currentScene.Destroy();
                 }
 
+                // set the new scene to the next scene
                 _currentScene = _nextScene;
                 _nextScene = null;
+
+                // reset title, if the scene changed it
+                ResetTitle();
 
                 // load new scene if any
                 if (_currentScene != null)
@@ -90,8 +102,6 @@ namespace MiniGolf
                     Components.Add(_currentScene);
                 }
             }
-
-            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -155,6 +165,24 @@ namespace MiniGolf
         internal void LoadEditor(string worldName, int levelNumber)
         {
             LoadScene(SceneType.Editor, worldName, levelNumber);
+        }
+
+        internal void ResetTitle()
+        {
+            this.SetTitle(Constants.APPLICATION_NAME_UNSAFE);
+        }
+
+        internal void SetLevelTitle(string worldName, int levelNumber)
+        {
+            this.SetTitle($"{Constants.APPLICATION_NAME_UNSAFE}    {worldName}, level {levelNumber}");
+        }
+    }
+
+    public static class GameExtensions
+    {
+        public static void SetTitle(this Game game, string title)
+        {
+            game.Window.Title = title;
         }
     }
 }
