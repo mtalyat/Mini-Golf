@@ -98,7 +98,7 @@ namespace MiniGolf
 
         private bool UpdateOther()
         {
-            if (Selected && Input.GetKeyboardButtonState(Keys.Delete) == ButtonState.Down)
+            if (Selected && (Input.GetKeyboardButtonState(Keys.Delete) == ButtonState.Down || Input.GetMouseButtonState(Input.MouseButton.Right) == ButtonState.Down))
             {
                 Destroy();
                 return true;
