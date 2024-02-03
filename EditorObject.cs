@@ -11,7 +11,7 @@ namespace MiniGolf
 {
     internal class EditorObject : SpriteObject
     {
-        private const float SNAP_MOVE = 20.0f;
+        private const float SNAP_MOVE = 10.0f;
         private const float SNAP_SIZE = 20.0f;
         private const float SNAP_ROTATE = 22.5f;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -19,6 +20,9 @@ namespace MiniGolf
         public BehaviorFlags Flags => _behaviorFlags;
 
         private readonly SoundEffect _ballInteractionSfx = null;
+
+        private float _timer;
+        private float _maxTime;
 
         public LevelObject(ObjectTypeData typeData, Texture2D texture, Scene scene) : this(typeData.Type, new Sprite(texture, typeData.Rect, typeData.Pivot), scene)
         {
@@ -82,12 +86,66 @@ namespace MiniGolf
                 case ObjectType.Crate:
                     _behaviorFlags = BehaviorFlags.Collidable | BehaviorFlags.Solid;
                     break;
+                case ObjectType.Pad:
+                    _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Solid | BehaviorFlags.Bouncy | BehaviorFlags.Sound;
+                    break;
+                case ObjectType.Bumper:
+                    _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Solid | BehaviorFlags.Round | BehaviorFlags.Bouncy | BehaviorFlags.Sound;
+                    break;
+            }
+            
+            if(Flags.HasFlag(BehaviorFlags.Bouncy))
+            {
+                // if bouncy, create a child object so it can scale and not affect the hitbox
+
+                scene.Instantiate(new SpriteObject(sprite, LocalSize, scene)
+                {
+                    Depth = Depth + 0.0001f,
+                }, this);
             }
         }
 
-        public void PlaySound()
+        public override void Update(GameTime gameTime)
         {
-            _ballInteractionSfx?.Play();
+            if(_timer > 0.0f)
+            {
+                _timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                float percent = _timer / _maxTime;
+
+                if (Flags.HasFlag(BehaviorFlags.Bouncy))
+                {
+                    // get sprite child, scale it to make it seem like it bumped the ball
+                    Children[0].LocalScale = new Vector2(MathHelper.Lerp(1.0f, Constants.LEVEL_BOUNCE_SCALE, percent));
+                }
+
+                if (_timer <= 0.0f)
+                {
+                    if (Flags.HasFlag(BehaviorFlags.Bouncy))
+                    {
+                        // get sprite child, scale it to make it seem like it bumped the ball
+                        Children[0].LocalScale = Vector2.One;
+                    }
+                }
+            }
+
+            base.Update(gameTime);
+        }
+
+        public void StartTimer(float time)
+        {
+            _maxTime = time;
+            _timer = time;
+        }
+
+        public bool PlaySound()
+        {
+            if (_ballInteractionSfx != null)
+            {
+                _ballInteractionSfx.Play();
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -46,6 +46,18 @@ namespace MiniGolf
         /// If not a hazzard, nothing happens.
         /// </summary>
         Hazzard = 1 << 5,
+
+        /// <summary>
+        /// If bouncy, balls will bounce with 1.1 the velocity it comes into the collision with.
+        /// If not bouncy, balls will bounce as normal.
+        /// </summary>
+        Bouncy = 1 << 6,
+
+        /// <summary>
+        /// If true, this object has its own collision sound.
+        /// If false, use the default sound.
+        /// </summary>
+        Sound = 1 << 7,
     }
 
     public static class BehaviorFlagsExtensions

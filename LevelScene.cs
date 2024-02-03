@@ -596,6 +596,15 @@ namespace MiniGolf
 
                             // reflect using the normal given from the collision data
                             ball.Reflect(normal);
+
+                            if(obj.Flags.HasFlag(BehaviorFlags.Bouncy))
+                            {
+                                // bounce in the direction of the normal
+                                ball.Velocity += Constants.LEVEL_BOUNCE_POWER * normal;
+
+                                // start animation
+                                obj.StartTimer(Constants.LEVEL_BOUNCE_TIME);
+                            }
                         }
 
                         if (triggerEvents)
@@ -650,68 +659,6 @@ namespace MiniGolf
             // if nothing was hit, move back and hit as normal. That was a pathetic hit.
             ball.LocalPosition = initialPosition;
             ball.Velocity = initialVelocity;
-        }
-
-        public RaycastHit Raycast(Vector2 origin, Vector2 direction, float maxDistance = float.MaxValue) => Raycast(new Ray(origin, direction), maxDistance);
-
-        public RaycastHit Raycast(Ray ray, float maxDistance = float.MaxValue) => Raycast(ray, _collisionObjects, maxDistance);
-
-        public RaycastHit Raycast(Ray ray, List<LevelObject> levelObjects, float maxDistance = float.MaxValue)
-        {
-            LevelObject closest = null;
-            float closestDistance = maxDistance;
-
-            foreach (LevelObject levelObject in levelObjects)
-            {
-                // if the level object is not solid, ignore
-                if (!levelObject.Flags.HasFlag(BehaviorFlags.Solid))
-                {
-                    continue;
-                }
-
-                if (CheckIfRayIntersectsLevelObject(ray, levelObject, out float distance) && distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closest = levelObject;
-                }
-            }
-
-            if (closest != null)
-            {
-                return new RaycastHit(ray);
-            }
-            else
-            {
-                // TODO: get normal
-                return new RaycastHit(ray, closest, closestDistance, new Vector2());
-            }
-        }
-
-        private static bool CheckIfRayIntersectsLevelObject(Ray ray, LevelObject obj, out float distance)
-        {
-            distance = 0.0f;
-
-            Vector2 iDir = new Vector2(1.0f / ray.Direction.X, 1.0f / ray.Direction.Y);
-
-            Hitbox hitbox = obj.GetHitbox();
-            (Vector2 topLeft, Vector2 bottomRight) = hitbox.GetMinMax();
-
-            Vector2 min = (topLeft - ray.Origin) * iDir;
-            Vector2 max = (bottomRight - ray.Origin) * iDir;
-
-            Vector2 tMin = Vector2.Min(min, max);
-            Vector2 tMax = Vector2.Max(min, max);
-
-            float t0 = MathF.Max(tMin.X, tMin.Y);
-            float t1 = MathF.Min(tMax.X, tMax.Y);
-
-            if (t0 > t1 || t1 < 0)
-            {
-                return false;
-            }
-
-            distance = t0 >= 0 ? t0 : t1;
-            return true;
         }
 
         #endregion

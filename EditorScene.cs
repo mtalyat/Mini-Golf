@@ -117,17 +117,35 @@ namespace MiniGolf
             //Vector2 mousePosition = Input.MousePosition;
             Vector2 globalMousePosition = Input.GetMouseGlobalPosition(this);
 
-            if(Input.GetKeyboardButtonState(Keys.Right) == ButtonState.Down)
+            // go to next level
+            if(Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down)
             {
                 Save();
                 LoadNextLevel(1);
                 return;
             }
 
-            if(Input.GetKeyboardButtonState(Keys.Left) == ButtonState.Down)
+            // go to prev level
+            if(Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down)
             {
                 Save();
                 LoadNextLevel(-1);
+                return;
+            }
+
+            // skip 10 levels
+            if (Input.GetKeyboardButtonState(Keys.PageUp) == ButtonState.Down)
+            {
+                Save();
+                LoadNextLevel(10);
+                return;
+            }
+            
+            // go back 10 levels
+            if (Input.GetKeyboardButtonState(Keys.PageDown) == ButtonState.Down)
+            {
+                Save();
+                LoadNextLevel(-10);
                 return;
             }
 

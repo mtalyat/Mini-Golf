@@ -96,19 +96,19 @@ namespace MiniGolf
         /// </summary>
         Crate,
 
-        ///// <summary>
-        ///// A wall that can spin.
-        ///// </summary>
-        //RotatingWall,
+        /// <summary>
+        /// A bouncy pad that will bounce the ball that hits it.
+        /// </summary>
+        Pad,
 
-        ///// <summary>
-        ///// A wall that can move.
-        ///// </summary>
-        //MovingWall,
+        /// <summary>
+        /// A circular bumper that will bounce the ball that hits it.
+        /// </summary>
+        Bumper,
     }
 
     internal static class ObjectTypeExtensions
     {
-        public const int OBJECT_TYPE_COUNT = 17;
+        public const int OBJECT_TYPE_COUNT = 19;
     }
 }

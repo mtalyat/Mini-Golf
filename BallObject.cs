@@ -332,9 +332,10 @@ namespace MiniGolf
             // check if this is inside of the object
             bool contains = obj.Flags.HasFlag(BehaviorFlags.Round) ? obj.GetHitbox().ContainsRound(GetGlobalCenter()) : obj.GetHitbox().Contains(GetGlobalCenter());
 
-            // if this object is solid, play the collision sound
-            if(obj.Flags.HasFlag(BehaviorFlags.Solid))
+            // play the custom collision sound, or the default if not available
+            if(obj.Flags.HasFlag(BehaviorFlags.Solid) && (!obj.Flags.HasFlag(BehaviorFlags.Sound) || !obj.PlaySound()))
             {
+                // default sound
                 _collisionSfx.Play();
             }
 

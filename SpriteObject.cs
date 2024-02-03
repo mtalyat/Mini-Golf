@@ -45,14 +45,14 @@ namespace MiniGolf
 
         public override Vector2 GetGlobalCenter()
         {
-            return base.GetGlobalCenter() + (-GetGlobalSize() * _sprite.Pivot).Rotate(MathHelper.ToRadians(GetGlobalRotation()));
+            return base.GetGlobalCenter() + (-GetGlobalSize() * _sprite?.Pivot ?? Vector2.Zero).Rotate(MathHelper.ToRadians(GetGlobalRotation()));
         }
 
         public override Hitbox GetHitbox()
         {
             Vector2 size = GetGlobalSize();
             float rotation = GetGlobalRotation();
-            return new Hitbox(GetGlobalPosition() - (size * _sprite.Pivot).Rotate(MathHelper.ToRadians(rotation)), size, rotation);
+            return new Hitbox(GetGlobalPosition() - (size * _sprite?.Pivot ?? Vector2.Zero).Rotate(MathHelper.ToRadians(rotation)), size, rotation);
         }
 
         public override void Draw(GameTime gameTime)

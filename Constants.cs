@@ -43,6 +43,9 @@ namespace MiniGolf
         public const float LEVEL_SLOPE_FORCE = 400.0f;
         public const float LEVEL_SANDBAR_FORCE = 6.0f;
         public const float LEVEL_PAUSE_TIME = 2.0f;
+        public const float LEVEL_BOUNCE_POWER = 250.0f;
+        public const float LEVEL_BOUNCE_SCALE = 1.2f;
+        public const float LEVEL_BOUNCE_TIME = 0.2f;
 
         public const float EDITOR_EDIT_COOLDOWN_TIME_INITIAL = 0.5f;
         public const float EDITOR_EDIT_COOLDOWN_TIME_REPEAT = 0.05f;
