@@ -44,6 +44,11 @@ namespace MiniGolf
         private CooldownType _cooldownType = CooldownType.None;
         private float _cooldownTimer;
 
+        public EditorObject(ObjectTypeData typeData, Texture2D texture, Scene scene) : this(typeData.Type, new Sprite(texture, typeData.Rect, typeData.Pivot), scene)
+        {
+            Depth = typeData.Depth ?? Depth;
+        }
+
         public EditorObject(ObjectType type, Sprite sprite, Scene scene) : base(sprite, scene)
         {
             _type = type;

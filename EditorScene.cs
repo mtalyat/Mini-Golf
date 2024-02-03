@@ -394,11 +394,6 @@ namespace MiniGolf
 
         #region Objects
 
-        private Sprite GetObjectTypeSprite(ObjectTypeData data)
-        {
-            return new Sprite(_componentsTexture, data.Rect, data.Pivot);
-        }
-
         // spawns the selected type
         private EditorObject SpawnSelectedTypeObject()
         {
@@ -417,12 +412,7 @@ namespace MiniGolf
 
         private EditorObject SpawnTypeObject(ObjectTypeData typeData, ObjectData data = null)
         {
-            Sprite sprite = GetObjectTypeSprite(typeData);
-
-            // cannot spawn if null
-            if (sprite == null) return null;
-
-            EditorObject editorObject = InstantiateEditorObject(new EditorObject(typeData.Type, sprite, this));
+            EditorObject editorObject = InstantiateEditorObject(new EditorObject(typeData, _componentsTexture, this));
 
             if(data != null)
             {

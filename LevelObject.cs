@@ -33,6 +33,8 @@ namespace MiniGolf
                 catch
                 { }
             }
+
+            Depth = typeData.Depth ?? Depth;
         }
 
         public LevelObject(ObjectType type, Sprite sprite, Scene scene) : base(sprite, scene)
