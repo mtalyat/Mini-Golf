@@ -173,7 +173,7 @@ namespace MiniGolf
             _typeObjects.TryAdd(ObjectType.Ball, new List<GameObject>());
 
             // find the starting spawn location
-            Vector2 start = _typeObjects[ObjectType.Start].First().GetGlobalCenter();
+            Vector2 start = _typeObjects[ObjectType.Start].First().LocalCenter;
             // populate the respawn points
             _alivePlayerSpawns = new List<Vector3>(Enumerable.Repeat(new Vector3(start, 0.0f), _alivePlayers.Count));
 
@@ -546,7 +546,7 @@ namespace MiniGolf
                 if (obj.Flags.HasFlag(BehaviorFlags.Round))
                 {
                     // if round, just use radii
-                    collided = ballFutureCenterPosition.DistanceTo(obj.GetGlobalCenter()) <= ballRadius + obj.GetGlobalSize().X / 2.0f;
+                    collided = ballFutureCenterPosition.DistanceTo(obj.GetGlobalCenter()) <= ballRadius + obj.GetGlobalSize().X * 0.5f;
                 }
                 else
                 {

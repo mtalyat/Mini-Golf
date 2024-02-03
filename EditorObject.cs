@@ -77,6 +77,9 @@ namespace MiniGolf
 
             UpdateCooldown(gameTime);
 
+            // mouse not part of cooldowns
+            UpdatePositionMouse(snap, scale);
+
             if(_cooldownType == CooldownType.None || _cooldownType == CooldownType.Position)
                 UpdatePosition(snap, scale);
 
@@ -155,15 +158,13 @@ namespace MiniGolf
 
         private bool Ready => _cooldownTimer <= 0.0f;
 
-        private void UpdatePosition(bool snap, bool scale)
+        private void UpdatePositionMouse(bool snap, bool scale)
         {
             ButtonState mouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
 
             bool containsMouse = Input.ContainsMouse(GetHitbox());
 
             bool holdingModifierKey = Input.GetKeyboardButtonState(Keys.LeftShift) <= ButtonState.Down;
-
-            bool actionTaken = false;
 
             if (containsMouse)
             {
@@ -177,7 +178,7 @@ namespace MiniGolf
                     _editorScene.DoNotDragSelect();
                 }
 
-                if(containsMouse || Selected)
+                if (containsMouse || Selected)
                 {
                     // if not selected, unselect all others
                     if (!Selected && !holdingModifierKey)
@@ -200,22 +201,55 @@ namespace MiniGolf
             // move object to mouse if dragging
             if (_isDragging || (_editorScene.UniversalDrag && Selected))
             {
-                moved = true;
-
                 // only do color if clicking on this specific object
-                if(_isDragging)
+                if (_isDragging)
                 {
                     Color = CLICK_COLOR;
-                }                
+                }
 
                 // move to mouse + offset
                 Vector2 newPosition = Input.GetMouseGlobalPosition(Scene) + _offset;
-                if(LocalPosition !=  newPosition)
+                if (LocalPosition != newPosition)
                 {
+                    moved = true;
                     _movedWhileDragging = true;
                     LocalPosition = newPosition;
                 }
             }
+
+            // snap only if moved
+            if (moved && snap)
+            {
+                LocalPosition = LocalPosition.Snap(SNAP_MOVE);
+            }
+
+            if (mouseButtonState == ButtonState.Up && _isDragging)
+            {
+                // done dragging
+                _isDragging = false;
+
+                // if did not move, it was a click
+                if (!_movedWhileDragging)
+                {
+                    if (holdingModifierKey)
+                    {
+                        // if shift being held, add or remove from selection
+                        Selected = !Selected;
+                    }
+                    else
+                    {
+                        // only select this one
+                        _editorScene.SetAllSelected(false);
+                        Selected = true;
+                    }
+                }
+            }
+        }
+
+        private void UpdatePosition(bool snap, bool scale)
+        {
+            bool actionTaken = false;
+            bool moved = false;
 
             if (!_isDragging && Selected)
             {
@@ -268,28 +302,6 @@ namespace MiniGolf
             if (moved && snap)
             {
                 LocalPosition = LocalPosition.Snap(SNAP_MOVE);
-            }
-
-            if (mouseButtonState == ButtonState.Up && _isDragging)
-            {
-                // done dragging
-                _isDragging = false;
-
-                // if did not move, it was a click
-                if(!_movedWhileDragging)
-                {
-                    if(holdingModifierKey)
-                    {
-                        // if shift being held, add or remove from selection
-                        Selected = !Selected;
-                    }
-                    else
-                    {
-                        // only select this one
-                        _editorScene.SetAllSelected(false);
-                        Selected = true;
-                    }
-                }
             }
 
             Cooldown(actionTaken ? CooldownType.Position : CooldownType.None);

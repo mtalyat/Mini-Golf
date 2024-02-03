@@ -146,14 +146,14 @@ namespace MiniGolf
             }
 
             // change selected type
-            if (Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll > 0))
+            if (Input.GetKeyboardButtonState(Keys.R) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll > 0))
             {
                 // move to next object
                 _selectedTypeIndex = (_selectedTypeIndex - 1) % (ObjectTypeExtensions.OBJECT_TYPE_COUNT - 2) + 2;
 
                 ReloadPreview();
             }
-            else if (Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll < 0))
+            else if (Input.GetKeyboardButtonState(Keys.F) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll < 0))
             {
                 // move to previous object
                 _selectedTypeIndex = (_selectedTypeIndex - 3 + (ObjectTypeExtensions.OBJECT_TYPE_COUNT - 2)) % (ObjectTypeExtensions.OBJECT_TYPE_COUNT - 2) + 2;

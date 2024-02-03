@@ -185,7 +185,7 @@ namespace MiniGolf
 
         public virtual Vector2 GetGlobalCenter()
         {
-            return GetGlobalPosition() + GetGlobalSize() * 0.5f;
+            return GetGlobalPosition() + (GetGlobalSize() * 0.5f).Rotate(MathHelper.ToRadians(GetGlobalRotation()));
         }
 
         protected virtual Vector2 GetCenter()
