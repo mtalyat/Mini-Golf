@@ -37,7 +37,6 @@ namespace MiniGolf
         private enum CooldownType
         {
             None,
-            Position,
             Size,
             Rotation
         }
@@ -78,10 +77,7 @@ namespace MiniGolf
             UpdateCooldown(gameTime);
 
             // mouse not part of cooldowns
-            UpdatePositionMouse(snap, scale);
-
-            if(_cooldownType == CooldownType.None || _cooldownType == CooldownType.Position)
-                UpdatePosition(snap, scale);
+            UpdatePosition(snap, scale);
 
             if (_cooldownType == CooldownType.None || _cooldownType == CooldownType.Size)
                 UpdateSize(snap, scale);
@@ -158,7 +154,7 @@ namespace MiniGolf
 
         private bool Ready => _cooldownTimer <= 0.0f;
 
-        private void UpdatePositionMouse(bool snap, bool scale)
+        private void UpdatePosition(bool snap, bool scale)
         {
             ButtonState mouseButtonState = Input.GetMouseButtonState(Input.MouseButton.Left);
 
@@ -246,67 +242,6 @@ namespace MiniGolf
             }
         }
 
-        private void UpdatePosition(bool snap, bool scale)
-        {
-            bool actionTaken = false;
-            bool moved = false;
-
-            if (!_isDragging && Selected)
-            {
-                float move = (scale || snap) ? SNAP_MOVE : 1;
-
-                // if not dragging, we can move with WASD if selected
-                if (CheckKey(Keys.W))
-                {
-                    actionTaken = true;
-
-                    if(Ready)
-                    {
-                        moved = true;
-                        LocalPosition += new Vector2(0.0f, -move);
-                    }
-                }
-                if (CheckKey(Keys.S))
-                {
-                    actionTaken = true;
-
-                    if (Ready)
-                    {
-                        moved = true;
-                        LocalPosition += new Vector2(0.0f, move);
-                    }
-                }
-                if (CheckKey(Keys.A))
-                {
-                    actionTaken = true;
-
-                    if (Ready)
-                    {
-                        moved = true;
-                        LocalPosition += new Vector2(-move, 0.0f);
-                    }
-                }
-                if (CheckKey(Keys.D))
-                {
-                    actionTaken = true;
-
-                    if (Ready)
-                    {
-                        moved = true;
-                        LocalPosition += new Vector2(move, 0.0f);
-                    }
-                }
-            }
-
-            // snap only if moved
-            if (moved && snap)
-            {
-                LocalPosition = LocalPosition.Snap(SNAP_MOVE);
-            }
-
-            Cooldown(actionTaken ? CooldownType.Position : CooldownType.None);
-        }
-
         private void UpdateSize(bool snap, bool scale)
         {
             bool actionTaken = false;
@@ -317,8 +252,8 @@ namespace MiniGolf
 
                 bool moved = false;
 
-                // we can move with IK if selected
-                if (CheckKey(Keys.I))
+                // we can move with WS if selected
+                if (CheckKey(Keys.W))
                 {
                     actionTaken = true;
 
@@ -328,7 +263,7 @@ namespace MiniGolf
                         LocalSize += new Vector2(0.0f, move);
                     }
                 }
-                if (CheckKey(Keys.K))
+                if (CheckKey(Keys.S))
                 {
                     actionTaken = true;
 
@@ -338,7 +273,7 @@ namespace MiniGolf
                         LocalSize += new Vector2(0.0f, -move);
                     }
                 }
-                if (CheckKey(Keys.J))
+                if (CheckKey(Keys.A))
                 {
                     actionTaken = true;
 
@@ -348,7 +283,7 @@ namespace MiniGolf
                         LocalSize += new Vector2(-move, 0.0f);
                     }
                 }
-                if (CheckKey(Keys.L))
+                if (CheckKey(Keys.D))
                 {
                     actionTaken = true;
 
@@ -379,7 +314,7 @@ namespace MiniGolf
                 bool moved = false;
 
                 // we can move with IK if selected
-                if (CheckKey(Keys.Q) || CheckKey(Keys.U))
+                if (CheckKey(Keys.Q))
                 {
                     actionTaken = true;
 
@@ -389,7 +324,7 @@ namespace MiniGolf
                         LocalRotation += -move;
                     }
                 }
-                if (CheckKey(Keys.E) || CheckKey(Keys.O))
+                if (CheckKey(Keys.E))
                 {
                     actionTaken = true;
 
@@ -399,7 +334,8 @@ namespace MiniGolf
                         LocalRotation += move;
                     }
                 }
-                if(Input.GetKeyboardButtonState(Keys.R) == ButtonState.Down)
+
+                if(Input.GetKeyboardButtonState(Keys.Back) == ButtonState.Down)
                 {
                     actionTaken = true;
 
