@@ -291,14 +291,15 @@ namespace MiniGolf
         {
             bool nothingHappened = true;
 
+            bool smash = false;
+
             switch (obj.Type)
             {
                 case ObjectType.WallDamaged:
                     // break if heavy or if a football that is not spinning
                     if (_weight == Weight.Heavy || (_ballType == BallType.FootballBall && !_shouldSpin))
                     {
-                        obj.Destroy();
-                        obj.PlaySound();
+                        smash = true;
 
                         // if not football, slow down slightly
                         if (BallType != BallType.FootballBall)
@@ -313,8 +314,7 @@ namespace MiniGolf
                     // kill box if heavy
                     if (_weight == Weight.Heavy)
                     {
-                        obj.Destroy();
-                        obj.PlaySound();
+                        smash = true;
 
                         // slow down slightly
                         SlowDown(Constants.LEVEL_BOX_SLOW_DOWN);
@@ -322,6 +322,24 @@ namespace MiniGolf
                         nothingHappened = false;
                     }
                     break;
+            }
+
+            if(smash)
+            {
+                // play the sound of the obj being smashed
+                obj.PlaySound();
+
+                // spawn timed object where obj is
+                Scene.Instantiate(new TimedObject(Constants.LEVEL_SMASHED_TIME, null, new Sprite(Scene.Content.Load<Texture2D>("Texture/Smashed"), null, obj.Sprite.Pivot), Scene)
+                {
+                    LocalPosition = obj.LocalPosition,
+                    LocalSize = obj.LocalSize,
+                    //LocalRotation = Random.Shared.Next() % 360,
+                    LocalScale = obj.LocalScale,
+                });
+
+                // destroy obj
+                obj.Destroy();
             }
 
             return nothingHappened;

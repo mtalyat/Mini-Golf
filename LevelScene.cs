@@ -32,8 +32,6 @@ namespace MiniGolf
         private LevelData _data;
         private LevelInfo _info;
 
-        private MiniGolfGame MiniGolfGame => (MiniGolfGame)Game;
-
         private readonly List<BallType> _balls = new();
         private readonly List<SpriteObject> _ballPreviews = new();
 
