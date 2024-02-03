@@ -75,9 +75,9 @@ namespace MiniGolf
             return new Vector2[4]
             {
                 Position,
-                Position + new Vector2(Size.X, 0.0f).Rotate(MathHelper.ToRadians(-Rotation)),
-                Position + new Vector2(0.0f, Size.Y).Rotate(MathHelper.ToRadians(-Rotation)),
-                Position + new Vector2(Size.X, Size.Y).Rotate(MathHelper.ToRadians(-Rotation))
+                Position + new Vector2(Size.X, 0.0f).Rotate(MathHelper.ToRadians(Rotation)),
+                Position + new Vector2(0.0f, Size.Y).Rotate(MathHelper.ToRadians(Rotation)),
+                Position + new Vector2(Size.X, Size.Y).Rotate(MathHelper.ToRadians(Rotation))
             };
         }
 

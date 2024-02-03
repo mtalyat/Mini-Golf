@@ -1,10 +1,11 @@
 ﻿Balls:
-[4] Golf/Mint: https://freesound.org/people/jcampbe8/sounds/638884/
+[4] Golf: https://freesound.org/people/jcampbe8/sounds/638884/
 [0] Tennis: https://freesound.org/people/rvdw2004/sounds/709678/
 [0] Soccer/Football: https://freesound.org/people/Khanyisile56/sounds/707487/
 [0] Bowling/Pool: https://freesound.org/people/sgrowe/sounds/342535/
 [0] Pong: https://freesound.org/people/el_boss/sounds/628637/
 [4] Hockey: https://freesound.org/people/CGEffex/sounds/93100/
+[3] Mint: https://freesound.org/people/lsprice/sounds/89806/
 
 Environment:
 [0] Hole: https://freesound.org/people/inbeeld/sounds/21878/

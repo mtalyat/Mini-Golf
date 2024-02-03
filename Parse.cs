@@ -25,6 +25,14 @@ namespace MiniGolf
             return new Vector3(ParseFloat(split[0]), ParseFloat(split[1]), ParseFloat(split[2]));
         }
 
+        public static Color ParseColor(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return new Color();
+
+            string[] split = str.Split(' ');
+            return new Color(ParseInt(split[0]), ParseInt(split[1]), ParseInt(split[2]), split.Length < 4 ? 255 : ParseInt(split[3]));
+        }
+
         public static Rectangle ParseRectangle(string str)
         {
             if (string.IsNullOrEmpty(str)) return Rectangle.Empty;

@@ -43,6 +43,9 @@ namespace MiniGolf
         public const float LEVEL_SANDBAR_FORCE = 6.0f;
         public const float LEVEL_PAUSE_TIME = 2.0f;
 
+        public const float EDITOR_EDIT_COOLDOWN_TIME_INITIAL = 0.5f;
+        public const float EDITOR_EDIT_COOLDOWN_TIME_REPEAT = 0.05f;
+
         public const float PREVIEW_ANIMATION_SPEED = 50.0f;
     }
 }

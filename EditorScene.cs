@@ -13,7 +13,8 @@ namespace MiniGolf
 {
     internal class EditorScene : NavigatableScene
     {
-        private const string CUSTOM_NAME = "Custom";
+        private readonly string _worldName;
+        private readonly int _levelNumber;
 
         private Texture2D _componentsTexture;
         private LevelInfo _levelInfo;
@@ -21,7 +22,7 @@ namespace MiniGolf
         private bool _shouldDragSelect = false;
         private bool _universalDrag = false;
         public bool UniversalDrag => _universalDrag;
-        private int _selectedTypeIndex = 0;
+        private int _selectedTypeIndex = (int)ObjectType.Hole;
         private ObjectType SelectedType => (ObjectType)_selectedTypeIndex;
 
         private SpriteObject _preview;
@@ -35,9 +36,10 @@ namespace MiniGolf
 
         private readonly Dictionary<ObjectType, List<EditorObject>> _editorObjects = new();
 
-        public EditorScene(Game game) : base(game)
+        public EditorScene(string worldName, int levelNumber, Game game) : base(game)
         {
-
+            _worldName = worldName;
+            _levelNumber = levelNumber;
         }
 
         public override void Initialize()
@@ -58,13 +60,10 @@ namespace MiniGolf
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             // make sure the custom world folder exists
-            path = Path.Combine(path, CUSTOM_NAME);
+            path = Path.Combine(path, _worldName);
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
-            string levelPath = Path.Combine(path, "level1");
-
-            // TODO: load texture
-            //string texturePath = Path.ChangeExtension(levelPath, "png");
+            string levelPath = Path.Combine(path, $"level{_levelNumber}");
             string scenePath = Path.ChangeExtension(levelPath, "txt");
 
             // create scene file if necessary
@@ -79,6 +78,20 @@ namespace MiniGolf
             _componentsTexture = ExternalContent.LoadTexture2D(Path.Combine(path, "components.png"));
             _levelInfo = new LevelInfo(Path.Combine(path, "info.txt"));
             _levelData = new LevelData(scenePath);
+
+            // load the level pngs
+            Texture2D backgroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension($"{Path.ChangeExtension(levelPath, null)}bg", "png"));
+            if (backgroundTexture != null)
+            {
+                BackgroundSprite = new Sprite(backgroundTexture);
+                LocalSize = BackgroundSprite.Size;
+            }
+            Texture2D foregroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension($"{Path.ChangeExtension(levelPath, null)}fg", "png"));
+            if (foregroundTexture != null)
+            {
+                ForegroundSprite = new Sprite(foregroundTexture);
+            }
+            BackgroundColor = _levelData.TakeColor(new Color(37, 121, 9));
 
             ReloadPreview();
 
@@ -99,8 +112,22 @@ namespace MiniGolf
             ButtonState leftControlButtonState = Input.GetKeyboardButtonState(Keys.LeftControl);
             ButtonState leftShiftButtonState = Input.GetKeyboardButtonState(Keys.LeftShift);
             int scroll = Input.GetMouseDeltaScrollY();
-            Vector2 mousePosition = Input.MousePosition;
+            //Vector2 mousePosition = Input.MousePosition;
             Vector2 globalMousePosition = Input.GetMouseGlobalPosition(this);
+
+            if(Input.GetKeyboardButtonState(Keys.Right) == ButtonState.Down)
+            {
+                Save();
+                LoadNextLevel(1);
+                return;
+            }
+
+            if(Input.GetKeyboardButtonState(Keys.Left) == ButtonState.Down)
+            {
+                Save();
+                LoadNextLevel(-1);
+                return;
+            }
 
             // exit
             if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
@@ -120,21 +147,20 @@ namespace MiniGolf
             if (Input.GetKeyboardButtonState(Keys.Up) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll > 0))
             {
                 // move to next object
-                _selectedTypeIndex = (_selectedTypeIndex + 1) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
+                _selectedTypeIndex = (_selectedTypeIndex - 1) % (ObjectTypeExtensions.OBJECT_TYPE_COUNT - 2) + 2;
 
                 ReloadPreview();
             }
             else if (Input.GetKeyboardButtonState(Keys.Down) == ButtonState.Down || (leftControlButtonState <= ButtonState.Down && scroll < 0))
             {
                 // move to previous object
-                _selectedTypeIndex = (_selectedTypeIndex - 1 + ObjectTypeExtensions.OBJECT_TYPE_COUNT) % ObjectTypeExtensions.OBJECT_TYPE_COUNT;
+                _selectedTypeIndex = (_selectedTypeIndex - 3 + (ObjectTypeExtensions.OBJECT_TYPE_COUNT - 2)) % (ObjectTypeExtensions.OBJECT_TYPE_COUNT - 2) + 2;
 
                 ReloadPreview();
             }
 
             // place new items
-            if(Input.GetMouseButtonState(Input.MouseButton.Right) == ButtonState.Down ||
-                Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
+            if(Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
             {
                 if(leftControlButtonState <= ButtonState.Down)
                 {
@@ -210,26 +236,26 @@ namespace MiniGolf
                         {
                             Vector2[] corners = editorObject.GetHitbox().GetCorners();
 
-                            bool selected = false;
+                            bool selected = true;
 
                             foreach (Vector2 corner in corners)
                             {
                                 if (
-                                    corner.X >= selectionHitbox.Position.X &&
-                                    corner.X <= selectionHitbox.Position.X + selectionHitbox.Size.X &&
-                                    corner.Y >= selectionHitbox.Position.Y &&
-                                    corner.Y <= selectionHitbox.Position.Y + selectionHitbox.Size.Y)
+                                    corner.X < selectionHitbox.Position.X ||
+                                    corner.X > selectionHitbox.Position.X + selectionHitbox.Size.X ||
+                                    corner.Y < selectionHitbox.Position.Y ||
+                                    corner.Y > selectionHitbox.Position.Y + selectionHitbox.Size.Y)
                                 {
                                     // any corner is inside of this selection box
-                                    selected = true;
-                                    selectedObjects.Add(editorObject);
+                                    selected = false;
+                                    unselectedObjects.Add(editorObject);
                                     break;
                                 }
                             }
 
-                            if (!selected)
+                            if (selected)
                             {
-                                unselectedObjects.Add(editorObject);
+                                selectedObjects.Add(editorObject);
                             }
                         }
                     }
@@ -283,6 +309,7 @@ namespace MiniGolf
         {
             // compile values
             _levelData.AddValue("Balls", _balls);
+            _levelData.AddValue("Color", $"{BackgroundColor.R} {BackgroundColor.G} {BackgroundColor.B} {BackgroundColor.A}");
 
             // compile level data
             _levelData.ObjectDatas.Clear();
@@ -333,8 +360,8 @@ namespace MiniGolf
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
                 "My Games",
                 Constants.APPLICATION_NAME,
-                CUSTOM_NAME,
-                "level1"), true);
+                _worldName,
+                $"level{_levelNumber}.txt"), true);
         }
 
         private void Exit()
@@ -352,6 +379,13 @@ namespace MiniGolf
         {
             Save();
             Test();
+        }
+
+        private void LoadNextLevel(int direction)
+        {
+            MiniGolfGame game = (MiniGolfGame)Game;
+
+            game.LoadEditor(_worldName, _levelNumber + direction);
         }
 
         #endregion

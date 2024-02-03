@@ -168,6 +168,16 @@ namespace MiniGolf
             return result.ToArray();
         }
 
+        public Color TakeColor(Color defaultColor = new Color())
+        {
+            if(_values.ContainsKey("Color"))
+            {
+                return Parse.ParseColor(TakeValue("Color"));
+            }
+
+            return defaultColor;
+        }
+
         public void Clear()
         {
             _values.Clear();

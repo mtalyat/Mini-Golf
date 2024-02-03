@@ -22,7 +22,9 @@ namespace MiniGolf
         public SpriteBatch SpriteBatch => _spriteBatch;
 
         public Sprite BackgroundSprite { get; set; } = null;
+        public Sprite ForegroundSprite { get; set; } = null;
         public Color BackgroundColor { get; set; } = Color.CornflowerBlue;
+
 
         public Vector2 CameraPosition
         {
@@ -78,22 +80,40 @@ namespace MiniGolf
 
             // draw background first
             GraphicsDevice.Clear(BackgroundColor);
-            if (BackgroundSprite != null)
+            if(BackgroundSprite != null || ForegroundSprite != null)
             {
                 Vector2 position = GetGlobalPosition();
                 Vector2 size = GetGlobalSize();
                 float rotation = GetGlobalRotation();
 
-                SpriteBatch.Draw(
-                    BackgroundSprite.Texture,
-                    new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
-                    BackgroundSprite.Slice,
-                    Color.White,
-                    MathHelper.ToRadians(rotation),
-                    BackgroundSprite.Size * BackgroundSprite.Pivot,
-                    SpriteEffects.None,
-                    0.0f);
+                if (BackgroundSprite != null)
+                {
+                    SpriteBatch.Draw(
+                        BackgroundSprite.Texture,
+                        new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
+                        BackgroundSprite.Slice,
+                        Color.White,
+                        MathHelper.ToRadians(rotation),
+                        BackgroundSprite.Size * BackgroundSprite.Pivot,
+                        SpriteEffects.None,
+                        0.0f);
+                }
+
+                if (ForegroundSprite != null)
+                {
+                    SpriteBatch.Draw(
+                        ForegroundSprite.Texture,
+                        new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
+                        ForegroundSprite.Slice,
+                        Color.White,
+                        MathHelper.ToRadians(rotation),
+                        ForegroundSprite.Size * ForegroundSprite.Pivot,
+                        SpriteEffects.None,
+                        0.75f);
+                }
             }
+
+            
 
             // draw other things in the scene
             base.Draw(gameTime);

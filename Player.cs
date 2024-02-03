@@ -20,5 +20,10 @@ namespace MiniGolf
             Name = name;
             Color = color;
         }
+
+        public void Reset()
+        {
+            Stroke = 0;
+        }
     }
 }

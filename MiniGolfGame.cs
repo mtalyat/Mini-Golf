@@ -51,8 +51,9 @@ namespace MiniGolf
         protected override void LoadContent()
         {
             _song = Content.Load<Song>("Audio/Golf");
-            MediaPlayer.Play(_song);
-            MediaPlayer.IsRepeating = true;
+            // TODO: sound settings
+            //MediaPlayer.Play(_song);
+            //MediaPlayer.IsRepeating = true;
 
             base.LoadContent();
         }
@@ -127,7 +128,7 @@ namespace MiniGolf
                     LoadScene(new LevelScene(args[0], args[1], this));
                     break;
                 case SceneType.Editor:
-                    LoadScene(new EditorScene(this));
+                    LoadScene(new EditorScene(args[0], args[1], this));
                     break;
                 default:
                     throw new NotImplementedException();
@@ -149,6 +150,11 @@ namespace MiniGolf
             LoadScene(SceneType.Level, path, false);
 
             return true;
+        }
+
+        internal void LoadEditor(string worldName, int levelNumber)
+        {
+            LoadScene(SceneType.Editor, worldName, levelNumber);
         }
     }
 }

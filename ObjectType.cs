@@ -109,6 +109,6 @@ namespace MiniGolf
 
     internal static class ObjectTypeExtensions
     {
-        public const int OBJECT_TYPE_COUNT = 16;
+        public const int OBJECT_TYPE_COUNT = 17;
     }
 }

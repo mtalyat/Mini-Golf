@@ -72,7 +72,7 @@ namespace MiniGolf
         /// <param name="game"></param>
         public LevelScene(string path, bool testing, Game game) : base(game)
         {
-            _path = path;
+            _path = Path.ChangeExtension(path, null);
             _testing = testing;
             _alivePlayers = new List<Player>(Session.Players);
             _canvas = new CanvasObject(this);
@@ -80,18 +80,22 @@ namespace MiniGolf
             // set defaults
             _levelNumber = 1;
             _worldName = string.Empty;
+            foreach(Player player in _alivePlayers)
+            {
+                player.Reset();
+            }
 
-            if (!string.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(_path))
             {
                 // parse world name and level number from path if possible
-                if (char.IsDigit(path[^1]))
+                if (char.IsDigit(_path[^1]))
                 {
                     // extract the number from the end of the path
                     // https://stackoverflow.com/questions/13169393/extract-number-at-end-of-string-in-c-sharp
-                    var result = Regex.Match(path, @"\d+$", RegexOptions.RightToLeft);
+                    var result = Regex.Match(_path, @"\d+$", RegexOptions.RightToLeft);
                     _levelNumber = int.Parse(result.Value);
                 }
-                _worldName = Directory.GetParent(path).Name;
+                _worldName = Directory.GetParent(_path).Name;
             }
         }
 
@@ -134,12 +138,18 @@ namespace MiniGolf
             }
 
             // load the level png
-            Texture2D backgroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension(fullPath, "png"));
+            Texture2D backgroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension($"{Path.ChangeExtension(fullPath, null)}bg", "png"));
             if(backgroundTexture != null)
             {
                 BackgroundSprite = new Sprite(backgroundTexture);
                 LocalSize = BackgroundSprite.Size;
             }
+            Texture2D foregroundTexture = ExternalContent.LoadTexture2D(Path.ChangeExtension($"{Path.ChangeExtension(fullPath, null)}fg", "png"));
+            if (foregroundTexture != null)
+            {
+                ForegroundSprite = new Sprite(foregroundTexture);
+            }
+            BackgroundColor = _data.TakeColor();
 
             // load the level components png
             Texture2D levelComponentsTexture = ExternalContent.LoadTexture2D(Path.Combine(folderPath, "components.png"));
@@ -409,7 +419,7 @@ namespace MiniGolf
         {
             if(_testing)
             {
-                MiniGolfGame.LoadScene(SceneType.Editor);
+                MiniGolfGame.LoadEditor(_worldName, _levelNumber);
             }
             else
             {

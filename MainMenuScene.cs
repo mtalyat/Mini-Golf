@@ -55,7 +55,7 @@ namespace MiniGolf
 
         private void LoadEditor()
         {
-            ((MiniGolfGame)Game).LoadScene(SceneType.Editor);
+            ((MiniGolfGame)Game).LoadScene(SceneType.Editor, "Custom", 1);
         }
     }
 }
