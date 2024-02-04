@@ -430,7 +430,7 @@ namespace MiniGolf
 
         #endregion
 
-        #region Creating Objects
+        #region Objects
 
         private LevelObject InstantiateLevelObject(LevelObject levelObject, Vector2? position = null, float? rotation = null)
         {
@@ -479,6 +479,16 @@ namespace MiniGolf
             rotation ??= spawn.Z;
 
             return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position, rotation);
+        }
+
+        public GameObject[] GetGameObjects(ObjectType type)
+        {
+            if(_typeObjects.TryGetValue(type, out List<GameObject> value))
+            {
+                return value.ToArray();
+            }
+
+            return Array.Empty<GameObject>();
         }
 
         #endregion
@@ -553,6 +563,8 @@ namespace MiniGolf
 
                     collided = collisionData.RelativeBallPosition.DistanceTo(collisionData.ClampedBallPosition) <= ballRadius;
                 }
+
+                ball.TestObject(obj, collided);
 
                 // if within the radius of the ball, collison is going to occur
                 if (collided)

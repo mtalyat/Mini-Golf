@@ -105,10 +105,25 @@ namespace MiniGolf
         /// A circular bumper that will bounce the ball that hits it.
         /// </summary>
         Bumper,
+
+        /// <summary>
+        /// Teleports the ball from one portal of this type, to another.
+        /// </summary>
+        Portal1,
+
+        /// <summary>
+        /// Teleports the ball from one portal of this type, to another.
+        /// </summary>
+        Portal2,
+
+        /// <summary>
+        /// Teleports the ball from one portal of this type, to another.
+        /// </summary>
+        Portal3,
     }
 
     internal static class ObjectTypeExtensions
     {
-        public const int OBJECT_TYPE_COUNT = 19;
+        public const int OBJECT_TYPE_COUNT = 22;
     }
 }

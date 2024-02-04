@@ -58,6 +58,12 @@ namespace MiniGolf
         /// If false, use the default sound.
         /// </summary>
         Sound = 1 << 7,
+
+        /// <summary>
+        /// If true, this object will perpetually spin.
+        /// If false, the object will not.
+        /// </summary>
+        Spin = 1 << 8,
     }
 
     public static class BehaviorFlagsExtensions

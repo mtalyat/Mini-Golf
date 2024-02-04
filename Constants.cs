@@ -37,6 +37,9 @@ namespace MiniGolf
         public const int BALL_THWACK_ITERATIONS = 1000;
         public const float BALL_THWACK_TIME = 0.2f;
         public const float BALL_MAX_POWER = RESOLUTION_WIDTH;
+        // the velocity magnitude where the time will be 1 second to go in/1 second to go out of the portal
+        public const float BALL_TELEPORT_VELOCITY_SCALE = 200.0f;
+        public const float BALL_TELEPORT_SPIN_AMOUNT = MathF.PI * 2.0f;
 
         public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.25f;
         public const float LEVEL_BOX_SLOW_DOWN = 0.33f;
@@ -47,6 +50,7 @@ namespace MiniGolf
         public const float LEVEL_BOUNCE_POWER = 250.0f;
         public const float LEVEL_BOUNCE_SCALE = 1.2f;
         public const float LEVEL_BOUNCE_TIME = 0.2f;
+        public const float LEVEL_SPIN_SPEED = 90.0f;
 
         public const float EDITOR_EDIT_COOLDOWN_TIME_INITIAL = 0.5f;
         public const float EDITOR_EDIT_COOLDOWN_TIME_REPEAT = 0.025f;

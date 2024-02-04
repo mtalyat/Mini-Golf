@@ -92,6 +92,11 @@ namespace MiniGolf
                 case ObjectType.Bumper:
                     _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Solid | BehaviorFlags.Round | BehaviorFlags.Bouncy | BehaviorFlags.Sound;
                     break;
+                case ObjectType.Portal1:
+                case ObjectType.Portal2:
+                case ObjectType.Portal3:
+                    _behaviorFlags = BehaviorFlags.Static | BehaviorFlags.Collidable | BehaviorFlags.Round | BehaviorFlags.Spin;
+                    break;
             }
             
             if(Flags.HasFlag(BehaviorFlags.Bouncy))
@@ -127,6 +132,11 @@ namespace MiniGolf
                         Children[0].LocalScale = Vector2.One;
                     }
                 }
+            }
+
+            if(Flags.HasFlag(BehaviorFlags.Spin))
+            {
+                LocalRotation += Constants.LEVEL_SPIN_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             base.Update(gameTime);

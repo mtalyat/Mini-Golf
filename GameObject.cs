@@ -190,7 +190,7 @@ namespace MiniGolf
 
         protected virtual Vector2 GetCenter()
         {
-            return _localPosition + (_localSize * _localScale * 0.5f).Rotate(MathHelper.ToRadians(LocalRotation));
+            return _localPosition + (_localSize * _localScale * 0.5f).Rotate(MathHelper.ToRadians(_localRotation));
         }
 
         public virtual Hitbox GetHitbox()

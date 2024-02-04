@@ -97,6 +97,24 @@
 /processorParam:Quality=Best
 /build:Audio/PoolBall.wav
 
+#begin Audio/Portal1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Portal1.wav
+
+#begin Audio/Portal2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Portal2.wav
+
+#begin Audio/Portal3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Portal3.wav
+
 #begin Audio/SoccerBall.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

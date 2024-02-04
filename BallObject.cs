@@ -24,6 +24,16 @@ namespace MiniGolf
             Moving,
 
             /// <summary>
+            /// The ball is moving into a portal.
+            /// </summary>
+            TeleportingIn,
+
+            /// <summary>
+            /// The ball is moving out of a portal.
+            /// </summary>
+            TeleportingOut,
+
+            /// <summary>
             /// The ball is dying.
             /// </summary>
             Dying,
@@ -71,6 +81,7 @@ namespace MiniGolf
         public BallType BallType => _ballType;
 
         public Vector2 Velocity { get; set; } = Vector2.Zero;
+        public float Speed => Velocity.Magnitude();
         public bool IsMoving => Velocity.X != 0.0f && Velocity.Y != 0.0f;
 
         private float _angularVelocity = 0.0f;
@@ -79,8 +90,7 @@ namespace MiniGolf
         private TrailObject _trail = null;
         private AimingObject _aiming = null;
 
-        public bool Dead => _state == State.Dead;
-        public bool Sunk => _state == State.Sunk;
+        private LevelObject _portal = null;
         private float _timer;
         private float _maxTime;
         private Vector2 _start;
@@ -89,6 +99,8 @@ namespace MiniGolf
         private SoundEffect _hitSfx;
         private SoundEffect _thwackSfx;
         private SoundEffect _collisionSfx;
+
+        private LevelScene LevelScene => (LevelScene)Scene;
 
         public BallObject(BallType type, Player owner, Scene scene) : base(ObjectType.Ball, new Sprite(scene.Content.Load<Texture2D>($"Texture/{type}"), null, new Vector2(0.5f, 0.5f)), scene)
         {
@@ -220,13 +232,14 @@ namespace MiniGolf
                 }
             }
 
-            if (_state == State.Sinking || _state == State.Dying)
+            if (_state >= State.TeleportingIn && _state <= State.Sinking)
             {
                 // shrinking
                 _timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 // update scale
                 float percent = MathF.Max(_timer, 0.0f) / _maxTime;
+                float invertedPercent = 1.0f - percent;
                 float scale = percent;
                 LocalScale = new Vector2(scale, scale);
 
@@ -237,22 +250,68 @@ namespace MiniGolf
                         LocalPosition = Vector2.Lerp(_end, _start, percent);
                         Color = new Color(percent, percent, percent, 1.0f);
                         break;
+                    case State.TeleportingIn:
+                        {
+                            // spin in to center of target (_end)
+                            float angle = _end.AngleTo(_start) + Constants.BALL_TELEPORT_SPIN_AMOUNT * invertedPercent;
+                            float distance = _end.DistanceTo(_start) * percent;
+
+                            LocalPosition = _end + Vector2Helper.FromAngle(angle) * distance;
+                            LocalScale = new Vector2(percent);
+                        }
+                        break;
+                    case State.TeleportingOut:
+                        {
+                            // spin out to target position (_end)
+                            float angle = _start.AngleTo(_end) - Constants.BALL_TELEPORT_SPIN_AMOUNT * percent;
+                            float distance = _start.DistanceTo(_end) * invertedPercent;
+
+                            LocalPosition = _start + Vector2Helper.FromAngle(angle) * distance;
+                            LocalScale = new Vector2(invertedPercent);
+                        }
+                        break;
                 }
 
                 // if timer is done, finish
                 if (_timer <= 0.0f)
                 {
-                    if (_state == State.Sinking)
+                    switch(_state)
                     {
-                        _state = State.Sunk;
-                    }
-                    else if (_state == State.Dying)
-                    {
-                        _state = State.Dead;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
+                        case State.TeleportingIn:
+                            // move to teleport out state
+                            _state = State.TeleportingOut;
+                            _timer = _maxTime;
+
+                            // find the next portal
+                            List<LevelObject> portals = LevelScene.GetGameObjects(_portal.Type).Cast<LevelObject>().ToList();
+
+                            // remove current target so we do not teleport to that one
+                            portals.Remove(_portal);
+
+                            // randomly select one of the rest
+                            // if none left, use target I guess...
+                            if(portals.Any())
+                            {
+                                _portal = portals[Random.Shared.Next(portals.Count)];
+                            }
+
+                            // set new start and stop
+                            Vector2 offset = _start - _end;
+                            _start = _portal.LocalPosition;
+                            _end = _start + offset;
+                            break;
+                        case State.TeleportingOut:
+                            // all done, keep moving
+                            _state = State.Moving;
+                            break;
+                        case State.Dying:
+                            _state = State.Dead;
+                            break;
+                        case State.Sinking:
+                            _state = State.Sunk;
+                            break;
+                        default:
+                            throw new NotImplementedException();
                     }
                 }
             }
@@ -286,6 +345,20 @@ namespace MiniGolf
         #endregion
 
         #region Collisions
+
+        /// <summary>
+        /// Tests the given object, and performs some action based on different criteria.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="collision"></param>
+        public void TestObject(LevelObject obj, bool collision)
+        {
+            if(!collision && obj == _portal)
+            {
+                // no longer inside of the portal
+                _portal = null;
+            }
+        }
 
         public bool PreCollideWith(LevelObject obj)
         {
@@ -401,6 +474,12 @@ namespace MiniGolf
                     // kill ball if center is in the hazard
                     if (contains)
                         Die(obj);
+                    break;
+                case ObjectType.Portal1:
+                case ObjectType.Portal2:
+                case ObjectType.Portal3:
+                    if (contains)
+                        Teleport(obj);
                     break;
             }
         }
@@ -537,6 +616,27 @@ namespace MiniGolf
                 // set shrink timer
                 _maxTime = Constants.BALL_DEATH_TIME;
                 _timer = _maxTime;
+            }
+        }
+
+        private void Teleport(LevelObject from)
+        {
+            if (_state == State.Moving && from != _portal)
+            {
+                // play sound
+                from.PlaySound();
+
+                // set to teleporting
+                _state = State.TeleportingIn;
+
+                // set shrink timer
+                _maxTime = Constants.BALL_TELEPORT_VELOCITY_SCALE / Speed;
+                _timer = _maxTime;
+
+                // set target
+                _portal = from;
+                _start = LocalPosition;
+                _end = from.LocalPosition;
             }
         }
 
