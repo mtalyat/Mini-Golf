@@ -103,9 +103,13 @@ namespace MiniGolf
             {
                 // if bouncy, create a child object so it can scale and not affect the hitbox
 
+                // make self invisible
+                Visible = false;
+
+                // visuals relayed through the child
                 scene.Instantiate(new SpriteObject(sprite, LocalSize, scene)
                 {
-                    Depth = Depth + 0.0001f,
+                    Depth = Depth,
                 }, this);
             }
         }

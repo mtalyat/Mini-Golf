@@ -171,7 +171,12 @@ namespace MiniGolf
             _typeObjects.TryAdd(ObjectType.Ball, new List<GameObject>());
 
             // find the starting spawn location
-            Vector2 start = _typeObjects[ObjectType.Start].First().LocalCenter;
+            Vector2 start = Vector2.Zero;
+            if(_typeObjects.TryGetValue(ObjectType.Start, out List<GameObject> value))
+            {
+                start = value[0].LocalCenter;
+            }
+
             // populate the respawn points
             _alivePlayerSpawns = new List<Vector3>(Enumerable.Repeat(new Vector3(start, 0.0f), _alivePlayers.Count));
 
