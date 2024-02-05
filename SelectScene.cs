@@ -25,8 +25,7 @@ namespace MiniGolf
         private string _world;
 
         public SelectScene(Game game) : base(game)
-        {
-        }
+        { }
 
         protected override void LoadContent()
         {
@@ -41,17 +40,31 @@ namespace MiniGolf
 
             _gridBackButton = Instantiate(new ButtonObject("Back", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160)), this, (GameObject _) =>
             {
-                _depth--;
-                Refresh();
+                if(_depth == 0)
+                {
+                    // go back to main menu
+                    Exit();
+                }
+                else
+                {
+                    // go back to prev step
+                    _depth--;
+                    Refresh();
+                }
             })
             {
                 Margin = 0.0625f,
-                LocalSize = new Vector2(100.0f, 50.0f)
-            }, new Vector2(0, Constants.RESOLUTION_HEIGHT - 50.0f));
+                LocalSize = new Vector2(120.0f, 80.0f)
+            }, new Vector2(10.0f, Constants.RESOLUTION_HEIGHT - 90.0f));
 
             Refresh();
 
             base.LoadContent();
+        }
+
+        private void Exit()
+        {
+            MiniGolfGame.LoadScene(SceneType.MainMenu);
         }
 
         private void Refresh()
@@ -69,9 +82,6 @@ namespace MiniGolf
                     LoadWorld();
                     break;
             }
-
-            // hide back button if cannot go back
-            _gridBackButton.Visible = _depth > 0;
         }
 
         private void UnloadGrid()

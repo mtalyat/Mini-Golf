@@ -56,6 +56,8 @@ namespace MiniGolf
             set => SetMargin(value);
         }
 
+        private bool _clicking = false;
+
         public Action<GameObject> OnClick { get; set; } = null;
 
         public ButtonObject(string text, Sprite sprite, Scene scene, Action<GameObject> onClick = null) : this(text, sprite, 0.0f, scene, onClick) { }
@@ -80,19 +82,6 @@ namespace MiniGolf
         {
             if (_textObject != null)
             {
-                //// get size w/o the margin
-                //Vector2 adjustedSize = LocalSize - new Vector2(_margin, _margin) * 2.0f;
-
-                //// get the size of the text itself
-                //Vector2 textSize = _textObject.ScaledTextSize;
-
-                //// calculate the offset so that the text is centered in the button
-                //Vector2 offset = (LocalSize - textSize) * 0.5f;
-
-                //// adjust text size to match
-                //_textObject.LocalPosition = offset;
-                //_textObject.LocalSize = adjustedSize;
-
                 _textObject.Pivot = new Vector2(0.5f);
                 _textObject.LocalPosition = LocalSize * 0.5f;
                 _textObject.LocalSize = LocalSize - _margin * 2.0f * LocalSize;
@@ -132,26 +121,32 @@ namespace MiniGolf
                     // mouse inside button
 
                     ButtonState buttonState = Input.GetMouseButtonState(0);
-                    if (buttonState <= ButtonState.Down)
+                    if (buttonState)
                     {
                         // mouse being held down
                         _renderColorIndex = COLOR_CLICK;
 
-                        if (buttonState == ButtonState.Down)
+                        if(buttonState == ButtonState.Down)
                         {
-                            // click detected
-                            OnClick?.Invoke(this);
+                            _clicking = true;
                         }
+                    }
+                    else if (buttonState == ButtonState.Up && _clicking)
+                    {
+                        // click detected
+                        OnClick?.Invoke(this);
                     }
                     else
                     {
                         // mouse hovering
+                        _clicking = false;
                         _renderColorIndex = COLOR_HOVER;
                     }
                 }
                 else
                 {
                     // mouse not over button
+                    _clicking = false;
                     _renderColorIndex = COLOR_NORMAL;
                 }
             }
