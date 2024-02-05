@@ -94,19 +94,19 @@ namespace MiniGolf
 
         public override void Draw(GameTime gameTime)
         {
-            if(Visible && !string.IsNullOrWhiteSpace(_text.Content))
+            if (Visible && !string.IsNullOrWhiteSpace(_text.Content))
             {
                 Scene.SpriteBatch.DrawString(
-                _text.Font,
-                _text.Content,
-                GetGlobalPosition(),
-                Color,
-                GetGlobalRotation(),
-                -GetGlobalSize() * _text.Pivot,
-                _scale,
-                SpriteEffects.None,
-                _depth);
-            }            
+                    _text.Font,
+                    _text.Content,
+                    GetGlobalPosition(),
+                    Color,
+                    MathHelper.ToRadians(GetGlobalRotation()),
+                    _text.Size * _text.Pivot,
+                    _scale,
+                    SpriteEffects.None,
+                    _depth);
+            }
 
             base.Draw(gameTime);
         }

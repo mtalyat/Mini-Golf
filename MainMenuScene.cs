@@ -28,24 +28,24 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
-            Instantiate(new TextObject("Main menu", new Vector2(Constants.RESOLUTION_WIDTH, 100), new Vector2(0.5f, 0.0f), this), new Vector2(10, 10), 0.0f);
+            Instantiate(new TextObject(Constants.APPLICATION_NAME_UNSAFE, new Vector2(Constants.RESOLUTION_WIDTH, 100), new Vector2(0.5f, 0.0f), this), new Vector2(Constants.RESOLUTION_WIDTH * 0.5f, 0.0f));
 
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
             Instantiate(new ButtonObject("Start", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
             {
                 LoadFirstLevel();
-            }), new Vector2(400, 400), 0.0f);
+            }), new Vector2(400, 400));
 
             Instantiate(new ButtonObject("Levels", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
             {
                 LoadLevelSelect();
-            }), new Vector2(400, 600), 0.0f);
+            }), new Vector2(400, 600));
 
             Instantiate(new ButtonObject("Editor", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
             {
                 LoadEditor();
-            }), new Vector2(400, 800), 0.0f);
+            }), new Vector2(400, 800));
 
             base.LoadContent();
         }

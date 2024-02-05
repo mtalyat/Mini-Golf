@@ -43,7 +43,10 @@ namespace MiniGolf
             {
                 _depth--;
                 Refresh();
-            }), new Vector2(0, 500));
+            })
+            {
+                Margin = 20
+            }, new Vector2(0, 500));
 
             Refresh();
 
@@ -86,14 +89,20 @@ namespace MiniGolf
                 _depth++;
                 _location = Location.Builtin;
                 Refresh();
-            }), _grid);
+            })
+            {
+                Margin = 20
+            }, _grid);
 
             Instantiate(new ButtonObject("Custom", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0, 0)), 20.0f, this, (GameObject _) =>
             {
                 _depth++;
                 _location = Location.Custom;
                 Refresh();
-            }), _grid);
+            })
+            {
+                Margin = 20
+            }, _grid);
 
             _grid.Refresh();
         }
@@ -122,7 +131,10 @@ namespace MiniGolf
                     _depth++;
                     _world = button.Text;
                     Refresh();
-                }), _grid);
+                })
+                {
+                    Margin = 20
+                }, _grid);
             }
 
             _grid.Refresh();
@@ -156,7 +168,10 @@ namespace MiniGolf
                     ButtonObject button = (ButtonObject)sender;
 
                     LoadLevel(int.Parse(button.Text));
-                }), _grid);
+                })
+                {
+                    Margin = 20
+                }, _grid);
 
                 levelNumber++;
             }

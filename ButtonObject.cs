@@ -80,26 +80,22 @@ namespace MiniGolf
         {
             if (_textObject != null)
             {
-                // get size w/o the margin
-                Vector2 adjustedSize = LocalSize - new Vector2(_margin, _margin) * 2.0f;
+                //// get size w/o the margin
+                //Vector2 adjustedSize = LocalSize - new Vector2(_margin, _margin) * 2.0f;
 
-                // get the size of the text itself
-                Vector2 textSize = _textObject.ScaledTextSize;
+                //// get the size of the text itself
+                //Vector2 textSize = _textObject.ScaledTextSize;
 
-                // calculate the offset so that the text is centered in the button
-                Vector2 offset = Vector2.Zero;
-                if(textSize.X > textSize.Y)
-                {
-                    offset.Y = (adjustedSize.Y - textSize.Y) / 2.0f;
-                }
-                else
-                {
-                    offset.X = (adjustedSize.X - textSize.X) / 2.0f;
-                }
+                //// calculate the offset so that the text is centered in the button
+                //Vector2 offset = (LocalSize - textSize) * 0.5f;
 
-                // adjust text size to match
-                _textObject.LocalPosition = new Vector2(_margin, _margin) + offset;
-                _textObject.LocalSize = adjustedSize;
+                //// adjust text size to match
+                //_textObject.LocalPosition = offset;
+                //_textObject.LocalSize = adjustedSize;
+
+                _textObject.Pivot = new Vector2(0.5f);
+                _textObject.LocalPosition = LocalSize * 0.5f;
+                _textObject.LocalSize = LocalSize - new Vector2(_margin * 2.0f);
             }
         }
 
