@@ -1,5 +1,5 @@
 ﻿Balls:
-[4] Golf: https://freesound.org/people/jcampbe8/sounds/638884/
+[0] Golf: https://freesound.org/people/jcampbe8/sounds/638884/
 [0] Tennis: https://freesound.org/people/rvdw2004/sounds/709678/
 [0] Soccer/Football: https://freesound.org/people/Khanyisile56/sounds/707487/
 [0] Bowling/Pool: https://freesound.org/people/sgrowe/sounds/342535/

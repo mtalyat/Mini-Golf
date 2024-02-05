@@ -28,6 +28,8 @@ namespace MiniGolf
                 Margin = 0.0625f,
                 LocalSize = new Vector2(120.0f, 80.0f)
             }, new Vector2(10.0f, Constants.RESOLUTION_HEIGHT - 90.0f));
+            
+            //Instantiate(new TextObject())
 
             base.LoadContent();
         }

@@ -18,6 +18,7 @@ namespace MiniGolf
         }
 
         private LayoutObject _grid;
+        private TextObject _text;
 
         private int _depth = 0;
         private Location _location;
@@ -28,6 +29,8 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
+            _text = Instantiate(new TextObject("", new Vector2(Constants.RESOLUTION_WIDTH - 200.0f, 100.0f), 0.9f, this), new Vector2(100.0f, 0.0f));
+
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
             _grid = Instantiate(new LayoutObject(new Vector2(Constants.RESOLUTION_WIDTH - 200, Constants.RESOLUTION_HEIGHT - 200), this)
@@ -95,6 +98,8 @@ namespace MiniGolf
         {
             UnloadGrid();
 
+            _text.Content = "Select location:";
+
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
             Instantiate(new ButtonObject("Built In", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0, 0)), 20.0f, this, (GameObject _) =>
@@ -117,12 +122,15 @@ namespace MiniGolf
                 Margin = 0.0625f,
             }, _grid);
 
+            _grid.CellSize = new Vector2(320.0f, 160.0f);
             _grid.Refresh();
         }
 
         private void LoadLocation()
         {
             UnloadGrid();
+
+            _text.Content = "Select world:";
 
             string directoryPath = _location switch
             {
@@ -157,6 +165,8 @@ namespace MiniGolf
         private void LoadWorld()
         {
             UnloadGrid();
+
+            _text.Content = "Select level:";
 
             string directoryPath = _location switch
             {
