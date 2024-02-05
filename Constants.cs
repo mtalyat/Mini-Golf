@@ -43,6 +43,7 @@ namespace MiniGolf
         public const float BALL_MAX_POWER = RESOLUTION_WIDTH;
         // the velocity magnitude where the time will be 1 second to go in/1 second to go out of the portal
         public const float BALL_TELEPORT_VELOCITY_SCALE = 200.0f;
+        public const float BALL_TELEPORT_MAX_TIME = 2.0f;
         public const float BALL_TELEPORT_SPIN_AMOUNT = MathF.PI * 2.0f;
 
         public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.25f;

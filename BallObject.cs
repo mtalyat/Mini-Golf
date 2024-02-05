@@ -630,7 +630,7 @@ namespace MiniGolf
                 _state = State.TeleportingIn;
 
                 // set shrink timer
-                _maxTime = Constants.BALL_TELEPORT_VELOCITY_SCALE / Speed;
+                _maxTime = Math.Min(Constants.BALL_TELEPORT_MAX_TIME, Constants.BALL_TELEPORT_VELOCITY_SCALE / Speed);
                 _timer = _maxTime;
 
                 // set target
