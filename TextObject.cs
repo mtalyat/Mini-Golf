@@ -43,10 +43,21 @@ namespace MiniGolf
 
         public TextObject(string text, Vector2 size, Scene scene) : this(text, size, Vector2.Zero, scene) { }
 
+        public TextObject(string text, float depth, Scene scene) : this(text, Vector2.Zero, Vector2.Zero, depth, scene) { }
+
+        public TextObject(string text, Vector2 size, float depth, Scene scene) : this(text, size, Vector2.Zero, depth, scene) { }
+
         public TextObject(string text, Vector2 size, Vector2 pivot, Scene scene) : base(scene)
         {
             _text = new Text(text, scene.Content.Load<SpriteFont>("Font/rocks-serif"), pivot);
             LocalSize = size;
+        }
+
+        public TextObject(string text, Vector2 size, Vector2 pivot, float depth, Scene scene) : base(scene)
+        {
+            _text = new Text(text, scene.Content.Load<SpriteFont>("Font/rocks-serif"), pivot);
+            LocalSize = size;
+            _depth = depth;
         }
 
         private void UpdateTextScale()

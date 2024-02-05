@@ -68,5 +68,9 @@ namespace MiniGolf
 
         public static string PATH_LEVEL_EXTENSION = ".level";
         public static string PATH_INFO_EXTENSION = ".txt";
+
+        public static readonly Rectangle UI_BUTTON = new(0, 0, 320, 160);
+        public static readonly Rectangle UI_PANEL = new(0, 160, 320, 320);
+        public static readonly Rectangle UI_BACKGROUND = new(320, 0, 160, 160);
     }
 }

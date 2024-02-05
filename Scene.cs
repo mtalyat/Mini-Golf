@@ -42,6 +42,8 @@ namespace MiniGolf
             set => SetCameraPosition(value + CameraSize * 0.5f);
         }
 
+        public bool Paused { get; set; }
+
         public Scene(Game game) : base(game)
         {
             // initialize this class
@@ -50,6 +52,14 @@ namespace MiniGolf
             _spriteBatch = new SpriteBatch(game.GraphicsDevice);
 
             SetCameraPosition(Vector2.Zero);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if(!Paused)
+            {
+                base.Update(gameTime);
+            }
         }
 
         protected override void UnloadContent()
@@ -134,7 +144,12 @@ namespace MiniGolf
             return gameObject;
         }
 
-        public T Instantiate<T>(T gameObject, Vector2 position, float rotation = 0.0f, GameObject parent = null) where T : GameObject
+        public T Instantiate<T>(T gameObject, Vector2 position, GameObject parent = null) where T : GameObject
+        {
+            return Instantiate(gameObject, position, 0.0f, parent);
+        }
+
+        public T Instantiate<T>(T gameObject, Vector2 position, float rotation, GameObject parent = null) where T : GameObject
         {
             gameObject.SetParent(parent ?? this);
             gameObject.SetOrientation(position, Vector2.One, gameObject.LocalSize, rotation);

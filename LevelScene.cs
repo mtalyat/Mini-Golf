@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,7 @@ namespace MiniGolf
         private BallObject _activeBall = null;
 
         private readonly CanvasObject _canvas;
+        private SpriteObject _pauseMenu;
 
         private bool _isFollowingBall = false;
 
@@ -123,6 +125,9 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
+            // create the pause menu
+            LoadPauseMenu();
+
             string fullPath = _path;
             string folderPath = Path.GetDirectoryName(_path);
             string fullFolderPath = Path.GetDirectoryName(fullPath);
@@ -195,9 +200,16 @@ namespace MiniGolf
         public override void Update(GameTime gameTime)
         {
             // if press escape, exit
-            if(Input.GetKeyboardAny(Keys.Escape))
+            if(Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
             {
-                Exit();
+                SetPause(!Paused);
+            }
+
+            if (Paused)
+            {
+                // update the pause menu only
+                _pauseMenu.Update(gameTime);
+
                 return;
             }
 
@@ -252,6 +264,64 @@ namespace MiniGolf
             SetBallFollow(true);
             TrimPreviews();
         }
+
+        #region Pausing
+
+        private void SetPause(bool pause)
+        {
+            Paused = pause;
+            _pauseMenu.Visible = pause;
+        }
+
+        #endregion
+
+        #region Load
+
+        private void LoadPauseMenu()
+        {
+            Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
+
+            const float pauseMenuSpacing = 20.0f;
+            const float pauseMenuSpacing2 = pauseMenuSpacing * 2.0f;
+            const float pauseMenuDepth = 0.95f;
+            const float pauseMenuItemDepth = pauseMenuDepth + 0.001f;
+
+            _pauseMenu = Instantiate(new SpriteObject(new Sprite(uiTexture, Constants.UI_BACKGROUND), new Vector2(320.0f, Constants.RESOLUTION_HEIGHT), pauseMenuDepth, this), _canvas);
+            float pauseMenuWidth = _pauseMenu.LocalSize.X - pauseMenuSpacing2;
+            Instantiate(new TextObject("Pause", new Vector2(pauseMenuWidth, 100.0f), pauseMenuItemDepth, this), new Vector2(pauseMenuSpacing, pauseMenuSpacing), _pauseMenu);
+            Instantiate(new ButtonObject("Resume", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                SetPause(false);
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 2.0f + 100.0f), _pauseMenu);
+            Instantiate(new ButtonObject("Restart", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                ReloadLevel();
+                SetPause(false);
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 3.0f + 200.0f), _pauseMenu);
+            Instantiate(new ButtonObject("Main Menu", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                Exit();
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 4.0f + 300.0f), _pauseMenu);
+
+            _pauseMenu.Visible = false;
+        }
+
+        #endregion
 
         #region Camera
 
@@ -711,7 +781,7 @@ namespace MiniGolf
             {
                 SpriteObject preview = new(new Sprite(Content.Load<Texture2D>($"Texture/{_balls[i + offset]}"), null, new Vector2(0.5f, 0.5f)), this)
                 {
-                    Depth = 1.0f, // render on top
+                    Depth = 0.9f, // render on top
                     LocalPosition = new Vector2(PREVIEW_OFFSET + i * 40.0f, PREVIEW_OFFSET),
                     LocalSize = new Vector2(50.0f),
                 };

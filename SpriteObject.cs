@@ -43,6 +43,19 @@ namespace MiniGolf
             LocalSize = size;
         }
 
+        public SpriteObject(Sprite sprite, float depth, Scene scene) : base(scene)
+        {
+            _sprite = sprite;
+            _depth = depth;
+        }
+
+        public SpriteObject(Sprite sprite, Vector2 size, float depth, Scene scene) : base(scene)
+        {
+            _sprite = sprite;
+            _depth = depth;
+            LocalSize = size;
+        }
+
         public override Vector2 GetGlobalCenter()
         {
             return base.GetGlobalCenter() + (-GetGlobalSize() * _sprite?.Pivot ?? Vector2.Zero).Rotate(MathHelper.ToRadians(GetGlobalRotation()));
