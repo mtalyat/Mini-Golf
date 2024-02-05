@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reflection;
+using Microsoft.Xna.Framework.Audio;
 
 namespace MiniGolf
 {
@@ -34,6 +35,7 @@ namespace MiniGolf
 
         private CanvasObject _canvas;
         private SpriteObject _pauseMenu;
+        private SoundEffect _pauseSfx;
 
         private readonly Dictionary<ObjectType, List<EditorObject>> _editorObjects = new();
 
@@ -414,12 +416,18 @@ namespace MiniGolf
 
         private void SetPause(bool pause)
         {
-            Paused = pause;
-            _pauseMenu.Visible = pause;
+            if (pause != Paused)
+            {
+                _pauseSfx.Play();
+                Paused = pause;
+                _pauseMenu.Visible = pause;
+            }
         }
 
         private void LoadPauseMenu()
         {
+            _pauseSfx = Content.Load<SoundEffect>("Audio/Woosh");
+
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
             const float pauseMenuSpacing = 20.0f;

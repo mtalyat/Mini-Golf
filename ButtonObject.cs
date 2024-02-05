@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -57,8 +58,9 @@ namespace MiniGolf
         }
 
         private bool _clicking = false;
-
         public Action<GameObject> OnClick { get; set; } = null;
+        private SoundEffect _downSfx;
+        private SoundEffect _upSfx;
 
         public ButtonObject(string text, Sprite sprite, Scene scene, Action<GameObject> onClick = null) : this(text, sprite, 0.0f, scene, onClick) { }
 
@@ -76,6 +78,14 @@ namespace MiniGolf
             Scene.Instantiate(_textObject, this);
 
             base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _downSfx = Scene.Content.Load<SoundEffect>("Audio/ClickDown");
+            _upSfx = Scene.Content.Load<SoundEffect>("Audio/ClickUp");
+
+            base.LoadContent();
         }
 
         private void UpdateTextObject()
@@ -128,12 +138,14 @@ namespace MiniGolf
 
                         if(buttonState == ButtonState.Down)
                         {
+                            _downSfx.Play();
                             _clicking = true;
                         }
                     }
                     else if (buttonState == ButtonState.Up && _clicking)
                     {
                         // click detected
+                        _upSfx.Play();
                         OnClick?.Invoke(this);
                     }
                     else

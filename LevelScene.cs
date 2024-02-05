@@ -54,6 +54,7 @@ namespace MiniGolf
 
         private readonly CanvasObject _canvas;
         private SpriteObject _pauseMenu;
+        private SoundEffect _pauseSfx;
 
         private bool _isFollowingBall = false;
 
@@ -269,12 +270,18 @@ namespace MiniGolf
 
         private void SetPause(bool pause)
         {
-            Paused = pause;
-            _pauseMenu.Visible = pause;
+            if(pause != Paused)
+            {
+                _pauseSfx.Play();
+                Paused = pause;
+                _pauseMenu.Visible = pause;
+            }
         }
 
         private void LoadPauseMenu()
         {
+            _pauseSfx = Content.Load<SoundEffect>("Audio/Woosh");
+
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
             const float pauseMenuSpacing = 20.0f;
