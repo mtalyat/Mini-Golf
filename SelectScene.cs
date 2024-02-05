@@ -29,6 +29,8 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
+            BackgroundSprite = new Sprite(Content.Load<Texture2D>("Texture/MenuBackground"));
+
             _text = Instantiate(new TextObject("", new Vector2(Constants.RESOLUTION_WIDTH - 200.0f, 100.0f), 0.9f, this), new Vector2(100.0f, 0.0f));
 
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");

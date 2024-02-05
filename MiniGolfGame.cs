@@ -54,8 +54,8 @@ namespace MiniGolf
         {
             _song = Content.Load<Song>("Audio/Golf");
             // TODO: sound settings
-            //MediaPlayer.Play(_song);
-            //MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(_song);
+            MediaPlayer.IsRepeating = true;
 
             base.LoadContent();
         }
