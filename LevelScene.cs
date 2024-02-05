@@ -99,7 +99,7 @@ namespace MiniGolf
 
         public static string GetPath(string worldName, int levelNumber)
         {
-            return Path.GetFullPath(Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, "Scene", worldName, $"level{levelNumber}.level"));
+            return Path.GetFullPath(Path.Combine(Constants.PATH_BUILTIN, worldName, $"level{levelNumber}{Constants.PATH_LEVEL_EXTENSION}"));
         }
 
         public static bool Exists(string worldName, int levelNumber)
