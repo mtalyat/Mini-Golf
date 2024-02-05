@@ -18,7 +18,6 @@ namespace MiniGolf
         }
 
         private LayoutObject _grid;
-        private ButtonObject _gridBackButton;
 
         private int _depth = 0;
         private Location _location;
@@ -38,7 +37,7 @@ namespace MiniGolf
                 CellSize = new Vector2(0.0f, 0.0f)
             }, new Vector2(100.0f));
 
-            _gridBackButton = Instantiate(new ButtonObject("Back", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160)), this, (GameObject _) =>
+            Instantiate(new ButtonObject("Back", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
             {
                 if(_depth == 0)
                 {

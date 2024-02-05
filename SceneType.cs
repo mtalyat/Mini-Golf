@@ -11,7 +11,7 @@ namespace MiniGolf
         MainMenu,
         Level,
         Select,
-        Recap,
         Editor,
+        Credit,
     }
 }

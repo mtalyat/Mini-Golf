@@ -141,11 +141,11 @@ namespace MiniGolf
                 case SceneType.Select:
                     LoadScene(new SelectScene(this));
                     break;
-                case SceneType.Recap:
-                    throw new NotImplementedException();
-                    break;
                 case SceneType.Editor:
                     LoadScene(new EditorScene(args[0], args[1], this));
+                    break;
+                case SceneType.Credit:
+                    LoadScene(new CreditScene(this));
                     break;
                 default:
                     throw new NotImplementedException();

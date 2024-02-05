@@ -28,24 +28,64 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
-            Instantiate(new TextObject(Constants.APPLICATION_NAME_UNSAFE, new Vector2(Constants.RESOLUTION_WIDTH, 100), new Vector2(0.5f, 0.0f), this), new Vector2(Constants.RESOLUTION_WIDTH * 0.5f, 0.0f));
+            Instantiate(new TextObject(Constants.APPLICATION_NAME_UNSAFE, new Vector2(Constants.RESOLUTION_WIDTH, 150), new Vector2(0.5f, 0.0f), this), new Vector2(Constants.RESOLUTION_WIDTH * 0.5f, 50.0f));
 
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
-            Instantiate(new ButtonObject("Start", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 0.0625f, this, (GameObject _) =>
+            const float panelDepth = 0.9f;
+            const float panelItemDepth = panelDepth + 0.001f;
+            const float panelSpacing = 20.0f;
+            const float panelWidth = 440.0f;
+            const float panelItemWidth = panelWidth - panelSpacing * 2.0f;
+            Vector2 panelItemSize = new(panelItemWidth, 180.0f);
+
+            Instantiate(new SpriteObject(new Sprite(uiTexture, Constants.UI_BACKGROUND), new Vector2(panelWidth, Constants.RESOLUTION_HEIGHT), panelDepth, this));
+
+            Instantiate(new ButtonObject("Start", new Sprite(uiTexture, Constants.UI_BUTTON), 0.0625f, this, (GameObject _) =>
             {
                 LoadFirstLevel();
-            }), new Vector2(400, 400));
+            })
+            {
+                Depth = panelItemDepth,
+                LocalSize = panelItemSize,
+            }, new Vector2(panelSpacing, panelSpacing));
 
-            Instantiate(new ButtonObject("Levels", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 0.0625f, this, (GameObject _) =>
+            Instantiate(new ButtonObject("Levels", new Sprite(uiTexture, Constants.UI_BUTTON), 0.0625f, this, (GameObject _) =>
             {
                 LoadLevelSelect();
-            }), new Vector2(400, 600));
+            })
+            {
+                Depth = panelItemDepth,
+                LocalSize = panelItemSize,
+            }, new Vector2(panelSpacing, panelSpacing * 2.0f + panelItemSize.Y * 1.0f));
 
-            Instantiate(new ButtonObject("Editor", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 0.0625f, this, (GameObject _) =>
+            Instantiate(new ButtonObject("Editor", new Sprite(uiTexture, Constants.UI_BUTTON), 0.0625f, this, (GameObject _) =>
             {
                 LoadEditor();
-            }), new Vector2(400, 800));
+            })
+            {
+                Depth = panelItemDepth,
+                LocalSize = panelItemSize,
+            }, new Vector2(panelSpacing, panelSpacing * 3.0f + panelItemSize.Y * 2.0f));
+
+            Instantiate(new ButtonObject("Credits", new Sprite(uiTexture, Constants.UI_BUTTON), 0.0625f, this, (GameObject _) =>
+            {
+                LoadCredits();
+            })
+            {
+                Depth = panelItemDepth,
+                LocalSize = panelItemSize,
+            }, new Vector2(panelSpacing, panelSpacing * 4.0f + panelItemSize.Y * 3.0f));
+
+            Instantiate(new ButtonObject("Exit", new Sprite(uiTexture, Constants.UI_BUTTON), 0.0625f, this, (GameObject _) =>
+            {
+                // close game
+                Game.Exit();
+            })
+            {
+                Depth = panelItemDepth,
+                LocalSize = panelItemSize,
+            }, new Vector2(panelSpacing, panelSpacing * 5.0f + panelItemSize.Y * 4.0f));
 
             base.LoadContent();
         }
@@ -68,6 +108,11 @@ namespace MiniGolf
         private void LoadEditor()
         {
             MiniGolfGame.LoadScene(SceneType.Editor, "Custom", 1);
+        }
+
+        private void LoadCredits()
+        {
+            MiniGolfGame.LoadScene(SceneType.Credit);
         }
     }
 }
