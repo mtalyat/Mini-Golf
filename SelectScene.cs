@@ -87,6 +87,9 @@ namespace MiniGolf
         private void UnloadGrid()
         {
             _grid.DestroyChildren();
+            _grid.CellCount = Point.Zero;
+            _grid.CellSize = Vector2.Zero;
+            _grid.CellOrientation = LayoutObject.Orientation.Grid;
         }
 
         private void LoadHeaders()
@@ -148,6 +151,7 @@ namespace MiniGolf
                 }, _grid);
             }
 
+            _grid.CellSize = new Vector2(320.0f, 160.0f);
             _grid.Refresh();
         }
 
