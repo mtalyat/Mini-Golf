@@ -110,8 +110,20 @@ namespace MiniGolf
                 scene.Instantiate(new SpriteObject(sprite, LocalSize, scene)
                 {
                     Depth = Depth,
+                    LocalScale = LocalScale,
                 }, this);
             }
+        }
+
+        protected override void SetSize(Vector2 size)
+        {
+            // set child size as well, if bouncy
+            if (Flags.HasFlag(BehaviorFlags.Bouncy))
+            {
+                Children[0].LocalSize = size;
+            }
+
+            base.SetSize(size);
         }
 
         public override void Update(GameTime gameTime)
