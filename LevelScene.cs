@@ -265,17 +265,13 @@ namespace MiniGolf
             TrimPreviews();
         }
 
-        #region Pausing
+        #region Pause
 
         private void SetPause(bool pause)
         {
             Paused = pause;
             _pauseMenu.Visible = pause;
         }
-
-        #endregion
-
-        #region Load
 
         private void LoadPauseMenu()
         {
@@ -308,7 +304,7 @@ namespace MiniGolf
                 LocalSize = new Vector2(pauseMenuWidth, 80.0f),
                 Margin = 0.0625f,
             }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 3.0f + 200.0f), _pauseMenu);
-            Instantiate(new ButtonObject("Main Menu", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            Instantiate(new ButtonObject("Exit", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
             {
                 Exit();
             })

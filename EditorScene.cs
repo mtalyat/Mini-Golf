@@ -33,6 +33,7 @@ namespace MiniGolf
         private SpriteObject _plus;
 
         private CanvasObject _canvas;
+        private SpriteObject _pauseMenu;
 
         private readonly Dictionary<ObjectType, List<EditorObject>> _editorObjects = new();
 
@@ -105,12 +106,25 @@ namespace MiniGolf
             ReloadBallPreviews();
 
             Load();
+            LoadPauseMenu();            
 
             base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
+            if(Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
+            {
+                SetPause(!Paused);
+            }
+
+            if(Paused)
+            {
+                // only update pause menu
+                _pauseMenu.Update(gameTime);
+                return;
+            }
+
             ButtonState leftControlButtonState = Input.GetKeyboardButtonState(Keys.LeftControl);
             ButtonState leftShiftButtonState = Input.GetKeyboardButtonState(Keys.LeftShift);
             int scroll = Input.GetMouseDeltaScrollY();
@@ -146,20 +160,6 @@ namespace MiniGolf
             {
                 Save();
                 LoadNextLevel(-10);
-                return;
-            }
-
-            // exit
-            if (Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
-            {
-                SaveAndExit();
-                return;
-            }
-            
-            // test
-            if(Input.GetKeyboardButtonState(Keys.Enter) == ButtonState.Down)
-            {
-                SaveAndTest();
                 return;
             }
 
@@ -406,6 +406,68 @@ namespace MiniGolf
             MiniGolfGame game = (MiniGolfGame)Game;
 
             game.LoadEditor(_worldName, _levelNumber + direction);
+        }
+
+        #endregion
+
+        #region Pause
+
+        private void SetPause(bool pause)
+        {
+            Paused = pause;
+            _pauseMenu.Visible = pause;
+        }
+
+        private void LoadPauseMenu()
+        {
+            Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
+
+            const float pauseMenuSpacing = 20.0f;
+            const float pauseMenuSpacing2 = pauseMenuSpacing * 2.0f;
+            const float pauseMenuDepth = 0.95f;
+            const float pauseMenuItemDepth = pauseMenuDepth + 0.001f;
+
+            _pauseMenu = Instantiate(new SpriteObject(new Sprite(uiTexture, Constants.UI_BACKGROUND), new Vector2(320.0f, Constants.RESOLUTION_HEIGHT), pauseMenuDepth, this), _canvas);
+            float pauseMenuWidth = _pauseMenu.LocalSize.X - pauseMenuSpacing2;
+            Instantiate(new TextObject("Pause", new Vector2(pauseMenuWidth, 100.0f), pauseMenuItemDepth, this), new Vector2(pauseMenuSpacing, pauseMenuSpacing), _pauseMenu);
+            Instantiate(new ButtonObject("Resume", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                SetPause(false);
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 2.0f + 100.0f), _pauseMenu);
+            Instantiate(new ButtonObject("Save", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                Save();
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 3.0f + 200.0f), _pauseMenu);
+            Instantiate(new ButtonObject("Save and Test", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                SaveAndTest();
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 4.0f + 300.0f), _pauseMenu);
+            Instantiate(new ButtonObject("Save and Exit", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
+            {
+                SaveAndExit();
+            })
+            {
+                Depth = pauseMenuItemDepth,
+                LocalSize = new Vector2(pauseMenuWidth, 80.0f),
+                Margin = 0.0625f,
+            }, new Vector2(pauseMenuSpacing, pauseMenuSpacing * 5.0f + 400.0f), _pauseMenu);
+
+            _pauseMenu.Visible = false;
         }
 
         #endregion
