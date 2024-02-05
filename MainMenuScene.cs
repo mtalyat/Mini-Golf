@@ -12,7 +12,7 @@ namespace MiniGolf
     {
         public MainMenuScene(Game game) : base(game)
         {
-
+            
         }
 
         public override void Initialize()
@@ -28,6 +28,8 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
+            BackgroundSprite = new Sprite(Content.Load<Texture2D>("Texture/MenuBackground"));
+
             Instantiate(new TextObject(Constants.APPLICATION_NAME_UNSAFE, new Vector2(Constants.RESOLUTION_WIDTH, 150), new Vector2(0.5f, 0.0f), this), new Vector2(Constants.RESOLUTION_WIDTH * 0.5f, 50.0f));
 
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");

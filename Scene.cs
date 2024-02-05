@@ -21,8 +21,18 @@ namespace MiniGolf
         private readonly SpriteBatch _spriteBatch;
         public SpriteBatch SpriteBatch => _spriteBatch;
 
-        public Sprite BackgroundSprite { get; set; } = null;
-        public Sprite ForegroundSprite { get; set; } = null;
+        private Sprite _backgroundSprite = null;
+        public Sprite BackgroundSprite
+        {
+            get => _backgroundSprite;
+            set => SetBackgroundSprite(value);
+        }
+        private Sprite _foregroundSprite = null;
+        public Sprite ForegroundSprite
+        {
+            get => _foregroundSprite;
+            set => SetForegroundSprite(value);
+        }
         public Color BackgroundColor { get; set; } = Color.CornflowerBlue;
 
         protected MiniGolfGame MiniGolfGame => (MiniGolfGame)Game;
@@ -94,14 +104,13 @@ namespace MiniGolf
             if(BackgroundSprite != null || ForegroundSprite != null)
             {
                 Vector2 position = GetGlobalPosition();
-                Vector2 size = GetGlobalSize();
                 float rotation = GetGlobalRotation();
 
                 if (BackgroundSprite != null)
                 {
                     SpriteBatch.Draw(
                         BackgroundSprite.Texture,
-                        new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
+                        new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(BackgroundSprite.Size.X), (int)MathF.Floor(BackgroundSprite.Size.Y)),
                         BackgroundSprite.Slice,
                         Color.White,
                         MathHelper.ToRadians(rotation),
@@ -114,7 +123,7 @@ namespace MiniGolf
                 {
                     SpriteBatch.Draw(
                         ForegroundSprite.Texture,
-                        new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(size.X), (int)MathF.Floor(size.Y)),
+                        new Rectangle((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y), (int)MathF.Floor(ForegroundSprite.Size.X), (int)MathF.Floor(ForegroundSprite.Size.Y)),
                         ForegroundSprite.Slice,
                         Color.White,
                         MathHelper.ToRadians(rotation),
@@ -174,6 +183,16 @@ namespace MiniGolf
         private Vector2 GetCameraPosition()
         {
             return LocalPosition + CameraOffset;
+        }
+
+        private void SetBackgroundSprite(Sprite sprite)
+        {
+            _backgroundSprite = sprite;
+        }
+
+        private void SetForegroundSprite(Sprite sprite)
+        {
+            _foregroundSprite = sprite;
         }
     }
 }

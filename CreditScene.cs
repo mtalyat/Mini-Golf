@@ -16,6 +16,8 @@ namespace MiniGolf
 
         protected override void LoadContent()
         {
+            BackgroundSprite = new Sprite(Content.Load<Texture2D>("Texture/MenuBackground"));
+
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
             Instantiate(new ButtonObject("Back", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
