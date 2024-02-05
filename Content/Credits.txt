@@ -1,19 +1,32 @@
 ﻿Programming: Mitchell Talyat
+Made using Monogame.
+
 Art: Mitchell Talyat
-Music: Mitchell Talyat
-Sound Effects: Various Authors from freesound.org
+Made using GIMP.
+
+Music:
+- "Golf Happy Happy Happy" by Mitchell Talyat
+Made using LMMS.
+
+Sound Effects:
 - "Golf Swing" by jcampbe8 (https://freesound.org/people/jcampbe8/sounds/638884/)
 - "SFXTennis-EXT_Hitting a tennis ball-Mia_OwSfx" by rvdw2004 (https://freesound.org/people/rvdw2004/sounds/709678/)
 - "Kicking soccer ball against wall in bedroom. Recorded with a Zoom H6 and stereo microphone (rode NTG2). OWI..wav" by Khanyisile56 (https://freesound.org/people/Khanyisile56/sounds/707487/)
 - "Medium Thud 1" by sgrowe (https://freesound.org/people/sgrowe/sounds/342535/)
 - "Ping Pong - Ball on Table" by el_boss (https://freesound.org/people/el_boss/sounds/628637/)
 - "Whip Crack 01.wav" by CGEffex (https://freesound.org/people/CGEffex/sounds/93100/)
+  - CC by 4.0 (https://creativecommons.org/licenses/by/4.0/)
 - "md03.aif" by lsprice (https://freesound.org/people/lsprice/sounds/89806/)
+  - CC by 3.0 (https://creativecommons.org/licenses/by/3.0/)
 - "golf_putting.wav" by inbeeld (https://freesound.org/people/inbeeld/sounds/21878/)
 - "Golf ball - single bounce - 221098_AshtiHari_SD100_T" by 221098HariPotter (https://freesound.org/people/221098HariPotter/sounds/655635/)
 - "Brittle Wooden Box Landing On Floor 2" by elynch0901 (https://freesound.org/people/elynch0901/sounds/464484/)
 - "WaterDropletEchoed.wav" by HighPixel (https://freesound.org/people/HighPixel/sounds/612133/)
 - "Boing 1" by magnuswaker (https://freesound.org/people/magnuswaker/sounds/540788/)
 - "port.wav" by Sergenious (https://freesound.org/people/Sergenious/sounds/55843/)
--
+  - CC by 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- "Fade away effect (for windows, menus, pop ups)" by Bpianoholic (https://freesound.org/people/Bpianoholic/sounds/487608/)
+  - CC by 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- "Button click" by Kolombooo (https://freesound.org/people/Kolombooo/sounds/629020/)
+
 Font: Rocks Serif by Gomarice Font (https://www.fontspace.com/rocks-serif-font-f107520)
