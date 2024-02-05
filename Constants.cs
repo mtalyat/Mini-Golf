@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace MiniGolf
 
         public const int RESOLUTION_WIDTH = 1920;
         public const int RESOLUTION_HEIGHT = 1080;
+        public static Vector2 RESOLUTION => new(RESOLUTION_WIDTH, RESOLUTION_HEIGHT);
+        public static Vector2 RESOLUTION_HALF => new(RESOLUTION_WIDTH >> 1, RESOLUTION_HEIGHT >> 1);
 
         public const float CAMERA_ZOOM_FACTOR = 2.0f;
         public const float CAMERA_ZOOM_SPEED = 10.0f;

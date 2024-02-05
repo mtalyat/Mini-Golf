@@ -32,17 +32,17 @@ namespace MiniGolf
 
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
-            Instantiate(new ButtonObject("Start", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
+            Instantiate(new ButtonObject("Start", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 0.0625f, this, (GameObject _) =>
             {
                 LoadFirstLevel();
             }), new Vector2(400, 400));
 
-            Instantiate(new ButtonObject("Levels", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
+            Instantiate(new ButtonObject("Levels", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 0.0625f, this, (GameObject _) =>
             {
                 LoadLevelSelect();
             }), new Vector2(400, 600));
 
-            Instantiate(new ButtonObject("Editor", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
+            Instantiate(new ButtonObject("Editor", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 0.0625f, this, (GameObject _) =>
             {
                 LoadEditor();
             }), new Vector2(400, 800));

@@ -32,12 +32,12 @@ namespace MiniGolf
         {
             Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
 
-            _grid = Instantiate(new LayoutObject(new Vector2(500, 500), this)
+            _grid = Instantiate(new LayoutObject(new Vector2(Constants.RESOLUTION_WIDTH - 200, Constants.RESOLUTION_HEIGHT - 200), this)
             {
                 CellCount = new Point(0, 0),
                 CellOrientation = LayoutObject.Orientation.Grid,
                 CellSize = new Vector2(0.0f, 0.0f)
-            });
+            }, new Vector2(100.0f));
 
             _gridBackButton = Instantiate(new ButtonObject("Back", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160)), this, (GameObject _) =>
             {
@@ -45,8 +45,9 @@ namespace MiniGolf
                 Refresh();
             })
             {
-                Margin = 20
-            }, new Vector2(0, 500));
+                Margin = 0.0625f,
+                LocalSize = new Vector2(100.0f, 50.0f)
+            }, new Vector2(0, Constants.RESOLUTION_HEIGHT - 50.0f));
 
             Refresh();
 
@@ -91,7 +92,7 @@ namespace MiniGolf
                 Refresh();
             })
             {
-                Margin = 20
+                Margin = 0.0625f,
             }, _grid);
 
             Instantiate(new ButtonObject("Custom", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0, 0)), 20.0f, this, (GameObject _) =>
@@ -101,7 +102,7 @@ namespace MiniGolf
                 Refresh();
             })
             {
-                Margin = 20
+                Margin = 0.0625f,
             }, _grid);
 
             _grid.Refresh();
@@ -133,7 +134,7 @@ namespace MiniGolf
                     Refresh();
                 })
                 {
-                    Margin = 20
+                    Margin = 0.0625f,
                 }, _grid);
             }
 
@@ -170,7 +171,7 @@ namespace MiniGolf
                     LoadLevel(int.Parse(button.Text));
                 })
                 {
-                    Margin = 20
+                    Margin = 0.0625f,
                 }, _grid);
 
                 levelNumber++;

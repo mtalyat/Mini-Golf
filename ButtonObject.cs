@@ -95,7 +95,7 @@ namespace MiniGolf
 
                 _textObject.Pivot = new Vector2(0.5f);
                 _textObject.LocalPosition = LocalSize * 0.5f;
-                _textObject.LocalSize = LocalSize - new Vector2(_margin * 2.0f);
+                _textObject.LocalSize = LocalSize - _margin * 2.0f * LocalSize;
             }
         }
 
@@ -110,7 +110,7 @@ namespace MiniGolf
 
         private void SetMargin(float margin)
         {
-            _margin = Math.Max(margin, 0.0f);
+            _margin = Math.Clamp(margin, 0.0f, 1.0f);
 
             UpdateTextObject();
         }
