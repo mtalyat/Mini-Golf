@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,5 +57,13 @@ namespace MiniGolf
         public const float EDITOR_EDIT_COOLDOWN_TIME_REPEAT = 0.025f;
 
         public const float PREVIEW_ANIMATION_SPEED = 50.0f;
+
+        // local path to built in worlds
+        public static string PATH_BUILTIN => Path.Combine("Content", "Level");
+        // global path to custom levels (in "Documents/My Games" folder on Windows)
+        public static string PATH_CUSTOM => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", APPLICATION_NAME_SAFE);
+
+        public static string PATH_LEVEL_EXTENSION = ".level";
+        public static string PATH_INFO_EXTENSION = ".txt";
     }
 }

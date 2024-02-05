@@ -94,7 +94,9 @@ namespace MiniGolf
 
         public override void Draw(GameTime gameTime)
         {
-            Scene.SpriteBatch.DrawString(
+            if(Visible && !string.IsNullOrWhiteSpace(_text.Content))
+            {
+                Scene.SpriteBatch.DrawString(
                 _text.Font,
                 _text.Content,
                 GetGlobalPosition(),
@@ -104,6 +106,7 @@ namespace MiniGolf
                 _scale,
                 SpriteEffects.None,
                 _depth);
+            }            
 
             base.Draw(gameTime);
         }

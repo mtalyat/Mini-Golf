@@ -152,6 +152,87 @@
 /processorParam:TextureFormat=Compressed
 /build:Font/rocks-serif.spritefont
 
+#begin Level/Builtin/components.png
+/copy:Level/Builtin/components.png
+
+#begin Level/Builtin/info.txt
+/copy:Level/Builtin/info.txt
+
+#begin Level/Builtin/level1.level
+/copy:Level/Builtin/level1.level
+
+#begin Level/Builtin/level10.level
+/copy:Level/Builtin/level10.level
+
+#begin Level/Builtin/level11.level
+/copy:Level/Builtin/level11.level
+
+#begin Level/Builtin/level12.level
+/copy:Level/Builtin/level12.level
+
+#begin Level/Builtin/level13.level
+/copy:Level/Builtin/level13.level
+
+#begin Level/Builtin/level14.level
+/copy:Level/Builtin/level14.level
+
+#begin Level/Builtin/level15.level
+/copy:Level/Builtin/level15.level
+
+#begin Level/Builtin/level16.level
+/copy:Level/Builtin/level16.level
+
+#begin Level/Builtin/level17.level
+/copy:Level/Builtin/level17.level
+
+#begin Level/Builtin/level18.level
+/copy:Level/Builtin/level18.level
+
+#begin Level/Builtin/level19.level
+/copy:Level/Builtin/level19.level
+
+#begin Level/Builtin/level2.level
+/copy:Level/Builtin/level2.level
+
+#begin Level/Builtin/level20.level
+/copy:Level/Builtin/level20.level
+
+#begin Level/Builtin/level21.level
+/copy:Level/Builtin/level21.level
+
+#begin Level/Builtin/level22.level
+/copy:Level/Builtin/level22.level
+
+#begin Level/Builtin/level23.level
+/copy:Level/Builtin/level23.level
+
+#begin Level/Builtin/level24.level
+/copy:Level/Builtin/level24.level
+
+#begin Level/Builtin/level25.level
+/copy:Level/Builtin/level25.level
+
+#begin Level/Builtin/level3.level
+/copy:Level/Builtin/level3.level
+
+#begin Level/Builtin/level4.level
+/copy:Level/Builtin/level4.level
+
+#begin Level/Builtin/level5.level
+/copy:Level/Builtin/level5.level
+
+#begin Level/Builtin/level6.level
+/copy:Level/Builtin/level6.level
+
+#begin Level/Builtin/level7.level
+/copy:Level/Builtin/level7.level
+
+#begin Level/Builtin/level8.level
+/copy:Level/Builtin/level8.level
+
+#begin Level/Builtin/level9.level
+/copy:Level/Builtin/level9.level
+
 #begin Texture/Aim.png
 /importer:TextureImporter
 /processor:TextureProcessor

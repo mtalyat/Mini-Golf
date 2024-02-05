@@ -30,15 +30,22 @@ namespace MiniGolf
         {
             Instantiate(new TextObject("Main menu", new Vector2(Constants.RESOLUTION_WIDTH, 100), new Vector2(0.5f, 0.0f), this), new Vector2(10, 10), 0.0f);
 
-            Instantiate(new ButtonObject("Start", new Sprite(Content.Load<Texture2D>("Texture/UI"), new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
+            Texture2D uiTexture = Content.Load<Texture2D>("Texture/UI");
+
+            Instantiate(new ButtonObject("Start", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
             {
                 LoadFirstLevel();
             }), new Vector2(400, 400), 0.0f);
 
-            Instantiate(new ButtonObject("Editor", new Sprite(Content.Load<Texture2D>("Texture/UI"), new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
+            Instantiate(new ButtonObject("Levels", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
+            {
+                LoadLevelSelect();
+            }), new Vector2(400, 600), 0.0f);
+
+            Instantiate(new ButtonObject("Editor", new Sprite(uiTexture, new Rectangle(0, 0, 320, 160), new Vector2(0,0)), 20.0f, this, (GameObject _) =>
             {
                 LoadEditor();
-            }), new Vector2(400, 600), 0.0f);
+            }), new Vector2(400, 800), 0.0f);
 
             base.LoadContent();
         }
@@ -50,12 +57,17 @@ namespace MiniGolf
 
         private void LoadFirstLevel()
         {
-            ((MiniGolfGame)Game).LoadLevel(Constants.BUILTIN_WORLD_NAME, 1);
+            MiniGolfGame.LoadLevel(Constants.BUILTIN_WORLD_NAME, 1);
+        }
+
+        private void LoadLevelSelect()
+        {
+            MiniGolfGame.LoadScene(SceneType.Select);
         }
 
         private void LoadEditor()
         {
-            ((MiniGolfGame)Game).LoadScene(SceneType.Editor, "Custom", 1);
+            MiniGolfGame.LoadScene(SceneType.Editor, "Custom", 1);
         }
     }
 }

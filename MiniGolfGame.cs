@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using static System.Formats.Asn1.AsnWriter;
 using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
@@ -137,6 +138,12 @@ namespace MiniGolf
                 case SceneType.Level:
                     LoadScene(new LevelScene(args[0], args[1], this));
                     break;
+                case SceneType.Select:
+                    LoadScene(new SelectScene(this));
+                    break;
+                case SceneType.Recap:
+                    throw new NotImplementedException();
+                    break;
                 case SceneType.Editor:
                     LoadScene(new EditorScene(args[0], args[1], this));
                     break;
@@ -156,6 +163,15 @@ namespace MiniGolf
 
             // cannot load if dne
             if(!LevelScene.Exists(path)) return false;
+
+            LoadScene(SceneType.Level, path, false);
+
+            return true;
+        }
+
+        internal bool LoadLevel(string path)
+        {
+            if (!File.Exists(path)) return false;
 
             LoadScene(SceneType.Level, path, false);
 

@@ -129,32 +129,35 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
-            if (Input.ContainsMouse(GetHitbox()))
+            if(Visible)
             {
-                // mouse inside button
-
-                ButtonState buttonState = Input.GetMouseButtonState(0);
-                if (buttonState <= ButtonState.Down)
+                if (Input.ContainsMouse(GetHitbox()))
                 {
-                    // mouse being held down
-                    _renderColorIndex = COLOR_CLICK;
+                    // mouse inside button
 
-                    if (buttonState == ButtonState.Down)
+                    ButtonState buttonState = Input.GetMouseButtonState(0);
+                    if (buttonState <= ButtonState.Down)
                     {
-                        // click detected
-                        OnClick?.Invoke(this);
+                        // mouse being held down
+                        _renderColorIndex = COLOR_CLICK;
+
+                        if (buttonState == ButtonState.Down)
+                        {
+                            // click detected
+                            OnClick?.Invoke(this);
+                        }
+                    }
+                    else
+                    {
+                        // mouse hovering
+                        _renderColorIndex = COLOR_HOVER;
                     }
                 }
                 else
                 {
-                    // mouse hovering
-                    _renderColorIndex = COLOR_HOVER;
+                    // mouse not over button
+                    _renderColorIndex = COLOR_NORMAL;
                 }
-            }
-            else
-            {
-                // mouse not over button
-                _renderColorIndex = COLOR_NORMAL;
             }
 
             base.Update(gameTime);

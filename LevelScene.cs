@@ -99,7 +99,7 @@ namespace MiniGolf
 
         public static string GetPath(string worldName, int levelNumber)
         {
-            return Path.GetFullPath(Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, "Scene", worldName, $"level{levelNumber}.txt"));
+            return Path.GetFullPath(Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, "Scene", worldName, $"level{levelNumber}.level"));
         }
 
         public static bool Exists(string worldName, int levelNumber)
@@ -128,8 +128,8 @@ namespace MiniGolf
             string fullFolderPath = Path.GetDirectoryName(fullPath);
 
             // load level data from the file
-            _info = new LevelInfo(Path.Combine(fullFolderPath, "info.txt"));
-            _data = new LevelData(Path.ChangeExtension(fullPath, "txt"));
+            _info = new LevelInfo(Path.Combine(fullFolderPath, $"info{Constants.PATH_INFO_EXTENSION}"));
+            _data = new LevelData(Path.ChangeExtension(fullPath, Constants.PATH_LEVEL_EXTENSION));
             _balls.AddRange(_data.TakeBalls());
             // if no balls loaded, add one golf ball
             if (!_balls.Any())

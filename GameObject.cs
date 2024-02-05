@@ -72,14 +72,30 @@ namespace MiniGolf
             SetParent(null);
 
             // destroy all children first
+            DestroyChildren();
+
+            // remove self from game
+            UnloadContent();
+        }
+
+        protected override void OnVisibleChanged(object sender, EventArgs args)
+        {
+            // set all children to the same visibility
+            foreach(GameObject child in Children)
+            {
+                child.Visible = Visible;
+            }
+
+            base.OnVisibleChanged(sender, args);
+        }
+
+        public void DestroyChildren()
+        {
             for (int i = _children.Count - 1; i >= 0; i--)
             {
                 _children[i].Destroy();
             }
             _children.Clear();
-
-            // remove self from game
-            UnloadContent();
         }
 
         public override void Update(GameTime gameTime)

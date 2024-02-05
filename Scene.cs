@@ -134,14 +134,9 @@ namespace MiniGolf
             return gameObject;
         }
 
-        public T Instantiate<T>(T gameObject, Vector2 position, float rotation) where T : GameObject
+        public T Instantiate<T>(T gameObject, Vector2 position, float rotation = 0.0f, GameObject parent = null) where T : GameObject
         {
-            return Instantiate(gameObject, position, rotation, this);
-        }
-
-        public T Instantiate<T>(T gameObject, Vector2 position, float rotation, GameObject parent) where T : GameObject
-        {
-            gameObject.SetParent(parent);
+            gameObject.SetParent(parent ?? this);
             gameObject.SetOrientation(position, Vector2.One, gameObject.LocalSize, rotation);
             gameObject.Initialize();
             return gameObject;
