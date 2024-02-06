@@ -42,20 +42,7 @@ namespace MiniGolf
                 CellSize = new Vector2(0.0f, 0.0f)
             }, new Vector2(100.0f));
 
-            Instantiate(new ButtonObject("Back", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) =>
-            {
-                if(_depth == 0)
-                {
-                    // go back to main menu
-                    Exit();
-                }
-                else
-                {
-                    // go back to prev step
-                    _depth--;
-                    Refresh();
-                }
-            })
+            Instantiate(new ButtonObject("Back", new Sprite(uiTexture, Constants.UI_BUTTON), this, (GameObject _) => Back())
             {
                 Margin = 0.0625f,
                 LocalSize = new Vector2(120.0f, 80.0f)
@@ -64,6 +51,31 @@ namespace MiniGolf
             Refresh();
 
             base.LoadContent();
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if (Input.GetKeyboardButtonState(Microsoft.Xna.Framework.Input.Keys.Escape) == ButtonState.Down)
+            {
+                Back();
+            }
+
+            base.Update(gameTime);
+        }
+
+        private void Back()
+        {
+            if (_depth == 0)
+            {
+                // go back to main menu
+                Exit();
+            }
+            else
+            {
+                // go back to prev step
+                _depth--;
+                Refresh();
+            }
         }
 
         private void Exit()
@@ -214,7 +226,7 @@ namespace MiniGolf
                 _ => throw new NotImplementedException(),
             };
 
-            MiniGolfGame.LoadLevel(Path.Combine(directoryPath, _world, $"level{levelNumber}{Constants.PATH_LEVEL_EXTENSION}"));
+            MiniGolfGame.LoadLevel(Path.Combine(directoryPath, _world, $"level{levelNumber}{Constants.PATH_LEVEL_EXTENSION}"), SceneType.Select);
         }
     }
 }

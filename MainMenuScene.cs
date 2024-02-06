@@ -169,7 +169,7 @@ namespace MiniGolf
 
         private void LoadFirstLevel()
         {
-            MiniGolfGame.LoadLevel(Constants.BUILTIN_WORLD_NAME, 1);
+            MiniGolfGame.LoadLevel(Constants.BUILTIN_WORLD_NAME, 1, SceneType.MainMenu);
         }
 
         private void LoadLevelSelect()

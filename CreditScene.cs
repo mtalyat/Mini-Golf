@@ -35,6 +35,16 @@ namespace MiniGolf
             base.LoadContent();
         }
 
+        public override void Update(GameTime gameTime)
+        {
+            if(Input.GetKeyboardButtonState(Microsoft.Xna.Framework.Input.Keys.Escape) == ButtonState.Down)
+            {
+                Exit();
+            }
+
+            base.Update(gameTime);
+        }
+
         private void LoadCredits()
         {
             const float layoutWidth = Constants.RESOLUTION_WIDTH;

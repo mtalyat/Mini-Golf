@@ -157,23 +157,23 @@ namespace MiniGolf
         /// </summary>
         /// <param name="levelNumber"></param>
         /// <returns></returns>
-        internal bool LoadLevel(string worldName, int levelNumber)
+        internal bool LoadLevel(string worldName, int levelNumber, SceneType exitScene)
         {
             string path = LevelScene.GetPath(worldName, levelNumber);
 
             // cannot load if dne
             if(!LevelScene.Exists(path)) return false;
 
-            LoadScene(SceneType.Level, path, false);
+            LoadScene(SceneType.Level, path, exitScene);
 
             return true;
         }
 
-        internal bool LoadLevel(string path)
+        internal bool LoadLevel(string path, SceneType exitScene)
         {
             if (!File.Exists(path)) return false;
 
-            LoadScene(SceneType.Level, path, false);
+            LoadScene(SceneType.Level, path, exitScene);
 
             return true;
         }
