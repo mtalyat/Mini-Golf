@@ -95,7 +95,7 @@ namespace MiniGolf
         private TrailObject _trail = null;
         private AimingObject _aiming = null;
 
-        private LevelObject _portal = null;
+        private LevelObject _target = null;
         private float _timer;
         private float _maxTime;
         private Vector2 _start;
@@ -223,7 +223,7 @@ namespace MiniGolf
                         Vector2 direction = Vector2Helper.FromAngle(GetTrailAngle());
                         // only hit if strong enough
                         float power = _trail.LocalSize.Y;
-                        if(power > LocalSize.X * 0.5f)
+                        if (power > LocalSize.X * 0.5f)
                         {
                             Hit(direction * power);
                         }
@@ -248,7 +248,7 @@ namespace MiniGolf
                 float scale = percent;
 
                 // update color and position and more
-                switch(_state)
+                switch (_state)
                 {
                     case State.TeleportingIn:
                         {
@@ -285,7 +285,7 @@ namespace MiniGolf
                 // if timer is done, finish
                 if (_timer <= 0.0f)
                 {
-                    switch(_state)
+                    switch (_state)
                     {
                         case State.TeleportingIn:
                             // move to teleport out state
@@ -293,21 +293,21 @@ namespace MiniGolf
                             _timer = _maxTime;
 
                             // find the next portal
-                            List<LevelObject> portals = LevelScene.GetGameObjects(_portal.Type).Cast<LevelObject>().ToList();
+                            List<LevelObject> portals = LevelScene.GetGameObjects(_target.Type).Cast<LevelObject>().ToList();
 
                             // remove current target so we do not teleport to that one
-                            portals.Remove(_portal);
+                            portals.Remove(_target);
 
                             // randomly select one of the rest
                             // if none left, use target I guess...
-                            if(portals.Any())
+                            if (portals.Any())
                             {
-                                _portal = portals[Random.Shared.Next(portals.Count)];
+                                _target = portals[Random.Shared.Next(portals.Count)];
                             }
 
                             // set new start and stop
                             Vector2 offset = _start - _end;
-                            _start = _portal.LocalPosition;
+                            _start = _target.LocalPosition;
                             _end = _start + offset;
                             break;
                         case State.TeleportingOut:
@@ -349,6 +349,18 @@ namespace MiniGolf
             return LocalPosition + (LocalSize * LocalScale * 0.5f);
         }
 
+        public BallData GetData()
+        {
+            return new BallData(LocalPosition, LocalRotation, _target);
+        }
+        
+        public void SetData(in BallData data)
+        {
+            LocalPosition = data.Position;
+            LocalRotation = data.Rotation;
+            _target = data.Target as LevelObject;
+        }
+
         #region Trail
 
         private float GetTrailAngle()
@@ -367,10 +379,10 @@ namespace MiniGolf
         /// <param name="collision"></param>
         public void TestObject(LevelObject obj, bool collision)
         {
-            if(!collision && obj == _portal)
+            if(!collision && obj == _target)
             {
                 // no longer inside of the portal
-                _portal = null;
+                _target = null;
             }
         }
 
@@ -677,7 +689,7 @@ namespace MiniGolf
 
         private void Teleport(LevelObject from)
         {
-            if (_state == State.Moving && from != _portal)
+            if (_state == State.Moving && from != _target)
             {
                 // play sound
                 from.PlaySound();
@@ -690,7 +702,7 @@ namespace MiniGolf
                 _timer = _maxTime;
 
                 // set target
-                _portal = from;
+                _target = from;
                 _start = LocalPosition;
                 _end = from.LocalPosition;
             }

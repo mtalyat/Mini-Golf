@@ -215,8 +215,41 @@
 #begin Level/Builtin/level25.level
 /copy:Level/Builtin/level25.level
 
+#begin Level/Builtin/level26.level
+/copy:Level/Builtin/level26.level
+
+#begin Level/Builtin/level27.level
+/copy:Level/Builtin/level27.level
+
+#begin Level/Builtin/level28.level
+/copy:Level/Builtin/level28.level
+
+#begin Level/Builtin/level29.level
+/copy:Level/Builtin/level29.level
+
 #begin Level/Builtin/level3.level
 /copy:Level/Builtin/level3.level
+
+#begin Level/Builtin/level30.level
+/copy:Level/Builtin/level30.level
+
+#begin Level/Builtin/level31.level
+/copy:Level/Builtin/level31.level
+
+#begin Level/Builtin/level32.level
+/copy:Level/Builtin/level32.level
+
+#begin Level/Builtin/level33.level
+/copy:Level/Builtin/level33.level
+
+#begin Level/Builtin/level34.level
+/copy:Level/Builtin/level34.level
+
+#begin Level/Builtin/level35.level
+/copy:Level/Builtin/level35.level
+
+#begin Level/Builtin/level36.level
+/copy:Level/Builtin/level36.level
 
 #begin Level/Builtin/level4.level
 /copy:Level/Builtin/level4.level

@@ -44,7 +44,7 @@ namespace MiniGolf
         // holds references to player objects
         private List<Player> _alivePlayers;
         // holds position and rotation
-        private List<Vector3> _alivePlayerSpawns;
+        private List<BallData> _alivePlayerSpawns;
         // current player index in _alivePlayers
         private int _activePlayerIndex = -1;
         // active player with the active ball
@@ -184,7 +184,7 @@ namespace MiniGolf
             }
 
             // populate the respawn points
-            _alivePlayerSpawns = new List<Vector3>(Enumerable.Repeat(new Vector3(start, 0.0f), _alivePlayers.Count));
+            _alivePlayerSpawns = new List<BallData>(Enumerable.Repeat(new BallData(start), _alivePlayers.Count));
 
             // start the game
             NextTurn();
@@ -387,7 +387,7 @@ namespace MiniGolf
                     case BallObject.State.Done:
                         // ball finished turn as normal, nothing crazy happened
                         // update respawn point
-                        _alivePlayerSpawns[_activePlayerIndex] = new Vector3(_activeBall.LocalPosition, _activeBall.LocalRotation);
+                        _alivePlayerSpawns[_activePlayerIndex] = _activeBall.GetData();
                         break;
                     case BallObject.State.Dead:
                         // oops, the ball hit a hazzard
@@ -555,12 +555,22 @@ namespace MiniGolf
 
         private BallObject SpawnBall(Player player, Vector2? position = null, float? rotation = null)
         {
-            Vector3 spawn = _alivePlayerSpawns[_activePlayerIndex];
+            BallObject ball = (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this));
 
-            position ??= new Vector2(spawn.X, spawn.Y);
-            rotation ??= spawn.Z;
+            BallData data = _alivePlayerSpawns[_activePlayerIndex];
 
-            return (BallObject)InstantiateLevelObject(new BallObject(_balls[player.Stroke], player, this), position, rotation);
+            if(position != null)
+            {
+                data.Position = position.Value;
+            }
+            if(rotation != null)
+            {
+                data.Rotation = rotation.Value;
+            }
+
+            ball.SetData(data);
+
+            return ball;
         }
 
         public GameObject[] GetGameObjects(ObjectType type)

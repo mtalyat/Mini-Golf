@@ -104,6 +104,8 @@ namespace MiniGolf
             for(int i = _children.Count - 1; i >= 0; i--)
             {
                 _children[i].Update(gameTime);
+
+                i = Math.Min(i, _children.Count);
             }
 
             base.Update(gameTime);
