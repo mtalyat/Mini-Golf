@@ -50,6 +50,10 @@ namespace MiniGolf
         // active player with the active ball
         private Player ActivePlayer => _alivePlayers[_activePlayerIndex];
 
+        private readonly int _playerCount = 0;
+        private int _winCount = 0;
+        private int _loseCount = 0;
+
         private BallObject _activeBall = null;
         private TextObject _strokeText = null;
 
@@ -77,6 +81,7 @@ namespace MiniGolf
             _path = Path.ChangeExtension(path, null);
             _testing = testing;
             _alivePlayers = new List<Player>(Session.Players);
+            _playerCount = _alivePlayers.Count;
             _canvas = new CanvasObject(this);
 
             // set defaults
@@ -479,10 +484,12 @@ namespace MiniGolf
             }
             else if (EndOfTurn()) // if the current player sunk their ball, remove them from play
             {
+                _winCount++;
                 RemoveActivePlayerFromPlay();
             }
             else if (ActivePlayer.Stroke >= _balls.Count) // if out of strokes, remove them from play
             {
+                _loseCount++;
                 RemoveActivePlayerFromPlay();
             }
             else // no one was removed, so move to the next player
@@ -523,7 +530,7 @@ namespace MiniGolf
 
         private void GameOver()
         {
-            if (_testing)
+            if (_testing || _winCount == 0)
             {
                 ReloadLevel();
             }
