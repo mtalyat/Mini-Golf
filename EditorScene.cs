@@ -430,7 +430,7 @@ namespace MiniGolf
                 "My Games",
                 Constants.APPLICATION_NAME_SAFE,
                 _worldName,
-                $"level{_levelNumber}.txt"), true);
+                $"level{_levelNumber}.txt"), SceneType.Editor);
         }
 
         private void Exit()
