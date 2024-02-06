@@ -448,12 +448,8 @@ namespace MiniGolf
                 obj.PlaySound();
 
                 // spawn timed object where obj is
-                Scene.Instantiate(new TimedObject(Constants.LEVEL_SMASHED_TIME, null, new Sprite(Scene.Content.Load<Texture2D>("Texture/Smashed"), null, obj.Sprite.Pivot), Scene)
-                {
-                    LocalPosition = obj.LocalPosition,
-                    LocalSize = obj.LocalSize,
-                    LocalScale = obj.LocalScale,
-                });
+                TimedObject smashEffect = Scene.Instantiate(new TimedObject(Constants.LEVEL_SMASHED_TIME, null, new Sprite(Scene.Content.Load<Texture2D>("Texture/Smashed"), null, obj.Sprite.Pivot), Scene));
+                smashEffect.SetOrientation(obj);
 
                 // destroy obj
                 obj.Destroy();
