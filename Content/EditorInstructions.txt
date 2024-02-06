@@ -1,0 +1,24 @@
+﻿Select -> Left Click
+Move Camera -> Middle Click
+Zoom In/Out -> Scroll
+Delete Object -> Right Click
+Add to Selection -> Left Click + Left Shift
+
+Change Selected Object Type -> Ctrl + Scroll
+Spawn Object -> Space
+
+Move Selected -> Left Click Drag
+Rotate Selected -> E/Q
+Scale Selected Y -> W/S
+Scale Selected X -> D/A
+Delete Selected -> Delete
+Duplicate Selected -> Ctrl + Space
+
+Disable Snapping -> Hold Ctrl
+
+Next Level -> Up
+Previous Level -> Down
++10 Level -> Page Up
+-10 Level -> Page Down
+
+Toggle Pause -> Escape

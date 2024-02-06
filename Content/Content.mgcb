@@ -148,6 +148,9 @@
 #begin Credits.txt
 /copy:Credits.txt
 
+#begin EditorInstructions.txt
+/copy:EditorInstructions.txt
+
 #begin Font/rocks-serif.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -268,6 +271,9 @@
 
 #begin Level/Builtin/level9.level
 /copy:Level/Builtin/level9.level
+
+#begin LevelInstructions.txt
+/copy:LevelInstructions.txt
 
 #begin Texture/Aim.png
 /importer:TextureImporter

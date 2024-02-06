@@ -189,6 +189,7 @@ namespace MiniGolf
             // start the game
             NextTurn();
             SnapCameraToBall();
+            LoadInstructions();
 
             base.LoadContent();
         }
@@ -200,7 +201,7 @@ namespace MiniGolf
 
         public override void Update(GameTime gameTime)
         {
-            // if press escape, exit
+            // if press escape, pause
             if(Input.GetKeyboardButtonState(Keys.Escape) == ButtonState.Down)
             {
                 SetPause(!Paused);
@@ -212,6 +213,12 @@ namespace MiniGolf
                 _pauseMenu.Update(gameTime);
 
                 return;
+            }
+
+            // if press space, follow ball
+            if(Input.GetKeyboardButtonState(Keys.Space) == ButtonState.Down)
+            {
+                SetBallFollow(true);
             }
 
             // move timer if waiting to move to another scene
@@ -270,15 +277,52 @@ namespace MiniGolf
             TrimPreviews();
         }
 
+        #region Initializing
+
+        private void LoadInstructions()
+        {
+            const float margin = 30.0f;
+
+            float layoutWidth = Constants.RESOLUTION_WIDTH - _pauseMenu.LocalSize.X - margin * 2.0f;
+
+            float itemWidth = layoutWidth;
+            const float itemHeight = 30.0f;
+
+            // create a layout
+            LayoutObject layout = Instantiate(new LayoutObject(new Vector2(layoutWidth, Constants.RESOLUTION_HEIGHT), this)
+            {
+                CellSize = new Vector2(layoutWidth, itemHeight),
+                CellOrientation = LayoutObject.Orientation.Vertical,
+            }, new Vector2(_pauseMenu.LocalSize.X + margin, margin), _pauseMenu);
+
+            // load all lines into the layout in text objects
+            string path = Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, "LevelInstructions.txt");
+
+            string[] lines = ExternalContent.ReadText(path);
+
+            foreach (string line in lines)
+            {
+                Instantiate(new TextObject(line, new Vector2(itemWidth, itemHeight), 0.9f, this), layout);
+            }
+
+            layout.Refresh();
+        }
+
+        #endregion
+
         #region Pause
 
         private void SetPause(bool pause)
         {
             if(pause != Paused)
             {
+                // pause
                 _pauseSfx.Play();
                 Paused = pause;
                 _pauseMenu.Visible = pause;
+
+                // cancel stroke if taking one
+                _activeBall?.CancelStroke();
             }
         }
 

@@ -349,6 +349,23 @@ namespace MiniGolf
             return LocalPosition + (LocalSize * LocalScale * 0.5f);
         }
 
+        public void CancelStroke()
+        {
+            if(_trail != null)
+            {
+                _trail.Destroy();
+                _trail = null;
+            }
+
+            if(_aiming != null)
+            {
+                _aiming.Destroy();
+                _aiming = null;
+            }
+        }
+
+        #region Data
+
         public BallData GetData()
         {
             return new BallData(LocalPosition, LocalRotation, _target);
@@ -360,6 +377,8 @@ namespace MiniGolf
             LocalRotation = data.Rotation;
             _target = data.Target as LevelObject;
         }
+
+        #endregion
 
         #region Trail
 

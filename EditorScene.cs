@@ -108,7 +108,8 @@ namespace MiniGolf
             ReloadBallPreviews();
 
             Load();
-            LoadPauseMenu();            
+            LoadPauseMenu();
+            LoadInstructions();
 
             base.LoadContent();
         }
@@ -325,6 +326,39 @@ namespace MiniGolf
             base.Clean(gameObject);
         }
 
+        #region Initializing
+
+        private void LoadInstructions()
+        {
+            const float margin = 30.0f;
+
+            float layoutWidth = Constants.RESOLUTION_WIDTH - _pauseMenu.LocalSize.X - margin * 2.0f;
+
+            float itemWidth = layoutWidth;
+            const float itemHeight = 30.0f;
+
+            // create a layout
+            LayoutObject layout = Instantiate(new LayoutObject(new Vector2(layoutWidth, Constants.RESOLUTION_HEIGHT), this)
+            {
+                CellSize = new Vector2(layoutWidth, itemHeight),
+                CellOrientation = LayoutObject.Orientation.Vertical,
+            }, new Vector2(_pauseMenu.LocalSize.X + margin, margin), _pauseMenu);
+
+            // load all lines into the layout in text objects
+            string path = Path.Combine(Constants.CONTENT_ROOT_DIRECTORY, "EditorInstructions.txt");
+
+            string[] lines = ExternalContent.ReadText(path);
+
+            foreach (string line in lines)
+            {
+                Instantiate(new TextObject(line, new Vector2(itemWidth, itemHeight), 0.9f, this), layout);
+            }
+
+            layout.Refresh();
+        }
+
+        #endregion
+
         #region Saving and Loading
 
         private void Save()
@@ -407,7 +441,10 @@ namespace MiniGolf
         {
             MiniGolfGame game = (MiniGolfGame)Game;
 
-            game.LoadEditor(_worldName, _levelNumber + direction);
+            // cap at 1, cannot go below that
+            int nextNumber = Math.Max(1, _levelNumber + direction);
+
+            game.LoadEditor(_worldName, nextNumber);
         }
 
         #endregion

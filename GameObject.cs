@@ -178,6 +178,9 @@ namespace MiniGolf
             if(_parent != null)
             {
                 _parent.Children.Add(this);
+
+                // copy any properties that normal propagate themselves to children when set
+                Visible = _parent.Visible;
             }
         }
 
