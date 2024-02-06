@@ -263,6 +263,10 @@ namespace MiniGolf
         public void OnBallHit()
         {
             SetBallFollow(true);
+        }
+
+        public void OnBallStroke()
+        {
             TrimPreviews();
         }
 

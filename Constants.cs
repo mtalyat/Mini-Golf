@@ -45,6 +45,7 @@ namespace MiniGolf
         public const float BALL_TELEPORT_VELOCITY_SCALE = 200.0f;
         public const float BALL_TELEPORT_MAX_TIME = 2.0f;
         public const float BALL_TELEPORT_SPIN_AMOUNT = MathF.PI * 2.0f;
+        public const float BALL_BROKEN_DELAY = 1.0f;
 
         public const float LEVEL_DAMAGED_WALL_SLOW_DOWN = 0.25f;
         public const float LEVEL_BOX_SLOW_DOWN = 0.33f;

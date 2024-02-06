@@ -34,6 +34,11 @@ namespace MiniGolf
             TeleportingOut,
 
             /// <summary>
+            /// The ball is broken.
+            /// </summary>
+            Broken,
+
+            /// <summary>
             /// The ball is dying.
             /// </summary>
             Dying,
@@ -241,15 +246,10 @@ namespace MiniGolf
                 float percent = MathF.Max(_timer, 0.0f) / _maxTime;
                 float invertedPercent = 1.0f - percent;
                 float scale = percent;
-                LocalScale = new Vector2(scale, scale);
 
-                // update color and position
+                // update color and position and more
                 switch(_state)
                 {
-                    case State.Sinking:
-                        LocalPosition = Vector2.Lerp(_end, _start, percent);
-                        Color = new Color(percent, percent, percent, 1.0f);
-                        break;
                     case State.TeleportingIn:
                         {
                             // spin in to center of target (_end)
@@ -269,6 +269,16 @@ namespace MiniGolf
                             LocalPosition = _start + Vector2Helper.FromAngle(angle) * distance;
                             LocalScale = new Vector2(invertedPercent);
                         }
+                        break;
+                    case State.Broken:
+                        break;
+                    case State.Dying:
+                        LocalScale = new Vector2(scale);
+                        break;
+                    case State.Sinking:
+                        LocalScale = new Vector2(scale);
+                        LocalPosition = Vector2.Lerp(_end, _start, percent);
+                        Color = new Color(percent, percent, percent, 1.0f);
                         break;
                 }
 
@@ -309,6 +319,10 @@ namespace MiniGolf
                             break;
                         case State.Sinking:
                             _state = State.Sunk;
+                            break;
+                        case State.Broken:
+                            // go back to normal
+                            _state = State.Done;
                             break;
                         default:
                             throw new NotImplementedException();
@@ -440,9 +454,18 @@ namespace MiniGolf
                 case ObjectType.Wall4:
                 case ObjectType.Box:
                 case ObjectType.Crate:
-                    // spin if hit a wall
-                    _shouldSpin = true;
-                    return;
+                    // if a mint, break (hard object collision)
+                    // if not a mint, spin if not already
+                    if(_ballType== BallType.Mint)
+                    {
+                        Break();
+                    }
+                    else
+                    {
+                        // spin if hit a wall
+                        _shouldSpin = true;
+                    }
+                    break;
                 case ObjectType.Hole:
                     // if the ball is over the hole, sink into it
                     if (contains && Velocity.Magnitude() <= Constants.BALL_SINK_THRESHOLD)
@@ -490,16 +513,21 @@ namespace MiniGolf
 
         public void Hit(Vector2 directionAndPower)
         {
+            LevelScene levelScene = (LevelScene)Scene;
+
             // move the ball
             Velocity = Constants.BALL_HIT_POWER * (2.0f - (float)_weight / 2.0f) * directionAndPower;
             // mark as moving
             _state = State.Moving;
             // mark as spinning if not a football
             _shouldSpin = _ballType != BallType.FootballBall;
-            // add a stroke
-            _owner.Stroke++;
+            // add a stroke if not a mint (mint adds when it breaks)
+            if(_ballType != BallType.Mint)
+            {
+                _owner.Stroke++;
+                levelScene.OnBallStroke();
+            }
 
-            LevelScene levelScene = (LevelScene)Scene;
             levelScene.OnBallHit();
 
             // if hockey puck, thwack it
@@ -580,6 +608,34 @@ namespace MiniGolf
         #endregion
 
         #region Events
+
+        private void Break()
+        {
+            if(_state == State.Moving)
+            {
+                LevelScene levelScene = (LevelScene)Scene;
+
+                // stop the ball
+                Stop();
+
+                // set to broken state
+                _state = State.Broken;
+
+                // add a stroke
+                Owner.Stroke++;
+                levelScene.OnBallStroke();
+
+                // set broken delay timer
+                _maxTime = Constants.BALL_BROKEN_DELAY;
+                _timer = _maxTime;
+
+                // set the visual
+                Sprite = new Sprite(Scene.Content.Load<Texture2D>("Texture/MintBroken"), null, new Vector2(0.5f));
+
+                // scale 2x since the texture is twice as big
+                LocalScale *= 2.0f;
+            }
+        }
 
         public void Sink(LevelObject hole)
         {
