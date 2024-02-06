@@ -1,6 +1,6 @@
 ﻿Power Up & Aim Ball -> Left Click + Drag
 Cancel Power Up -> Release Left Click Inside Ball
-Move Camera -> Middle Click/Left Click
+Move Camera -> Middle Click + Drag or Left Click + Drag
 Zoom In/Out -> Scroll
 Follow Ball -> Space
 

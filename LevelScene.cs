@@ -51,6 +51,7 @@ namespace MiniGolf
         private Player ActivePlayer => _alivePlayers[_activePlayerIndex];
 
         private BallObject _activeBall = null;
+        private TextObject _strokeText = null;
 
         private readonly CanvasObject _canvas;
         private SpriteObject _pauseMenu;
@@ -186,6 +187,9 @@ namespace MiniGolf
             // populate the respawn points
             _alivePlayerSpawns = new List<BallData>(Enumerable.Repeat(new BallData(start), _alivePlayers.Count));
 
+            const float strokeTextWidth = 200.0f;
+            _strokeText = Instantiate(new TextObject("Stokes: 0", new Vector2(strokeTextWidth, 80.0f), 0.93f, this), new Vector2(Constants.RESOLUTION_WIDTH - strokeTextWidth, 0.0f), _canvas);
+
             // start the game
             NextTurn();
             SnapCameraToBall();
@@ -275,6 +279,7 @@ namespace MiniGolf
         public void OnBallStroke()
         {
             TrimPreviews();
+            _strokeText.Content = $"Strokes: {ActivePlayer.Stroke}";
         }
 
         #region Initializing
@@ -502,6 +507,8 @@ namespace MiniGolf
                 // only need to refresh if new, otherwise TrimPreviews takes care of removing balls
                 RefreshPreviews();
             }
+
+            _strokeText.Content = $"Strokes: {ActivePlayer.Stroke}";
 
             // spawn their ball
             _activeBall = SpawnBall(ActivePlayer);

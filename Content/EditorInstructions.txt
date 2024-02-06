@@ -4,7 +4,7 @@ Zoom In/Out -> Scroll
 Delete Object -> Right Click
 Add to Selection -> Left Click + Left Shift
 
-Change Selected Object Type -> Ctrl + Scroll
+Change Selected Object Type -> Ctrl + Scroll or R/F
 Spawn Object -> Space
 
 Move Selected -> Left Click Drag
@@ -15,6 +15,10 @@ Delete Selected -> Delete
 Duplicate Selected -> Ctrl + Space
 
 Disable Snapping -> Hold Ctrl
+
+Add New Ball -> Left Click The Plus Circle
+Cycle Ball Type -> Left/Right Click Ball
+Remove Ball -> Middle Click Ball
 
 Next Level -> Up
 Previous Level -> Down

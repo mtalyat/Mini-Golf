@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,9 @@ namespace MiniGolf
 
         public LevelInfo(string path)
         {
-            string[] lines = System.IO.File.ReadAllLines(path);
+            if (!File.Exists(path)) return;
+
+            string[] lines = File.ReadAllLines(path);
 
             // get ObjectType names
             HashSet<string> objectTypeNames = new(Enum.GetNames<ObjectType>());
